@@ -1,6 +1,6 @@
 # Socratic Agents
 
-Production-grade multi-agent orchestration system with 18 specialized agents for AI workflows. Extracted from the Socrates AI platform and optimized for standalone use.
+Production-grade multi-agent orchestration system with 19 specialized agents for AI workflows. Extracted from the Socrates AI platform and optimized for standalone use. Includes adaptive skill generation for intelligent agent optimization.
 
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -8,9 +8,9 @@ Production-grade multi-agent orchestration system with 18 specialized agents for
 
 ## Overview
 
-Socratic Agents provides a comprehensive agent orchestration framework with 18 pre-built agents designed to handle complex AI workflows. Each agent specializes in a specific capability (code generation, analysis, learning, coordination, etc.) and can work independently or be orchestrated together.
+Socratic Agents provides a comprehensive agent orchestration framework with 19 pre-built agents designed to handle complex AI workflows. Each agent specializes in a specific capability (code generation, analysis, learning, coordination, skill generation, etc.) and can work independently or be orchestrated together.
 
-### The 18 Agents
+### The 19 Agents
 
 **Core Agents**:
 1. **Socratic Counselor** - Guided learning and interactive problem-solving
@@ -18,29 +18,30 @@ Socratic Agents provides a comprehensive agent orchestration framework with 18 p
 3. **Code Validator** - Validation and testing of generated code
 4. **Knowledge Manager** - Knowledge base management and RAG integration
 5. **Learning Agent** - Continuous improvement and pattern learning
+6. **Skill Generator** - Adaptive skill generation for agent optimization
 
 **Coordination Agents**:
-6. **Multi-LLM Coordinator** - Provider switching and model orchestration
-7. **Project Manager** - Project scope and timeline management
-8. **Quality Controller** - Quality assurance and testing orchestration
-9. **Context Analyzer** - Context understanding and management
+7. **Multi-LLM Coordinator** - Provider switching and model orchestration
+8. **Project Manager** - Project scope and timeline management
+9. **Quality Controller** - Quality assurance and testing orchestration
+10. **Context Analyzer** - Context understanding and management
 
 **Data Agents**:
-10. **Document Processor** - Document parsing and processing
-11. **GitHub Sync Handler** - GitHub integration and synchronization
-12. **System Monitor** - System health and performance monitoring
-13. **User Manager** - User context and preferences management
+11. **Document Processor** - Document parsing and processing
+12. **GitHub Sync Handler** - GitHub integration and synchronization
+13. **System Monitor** - System health and performance monitoring
+14. **User Manager** - User context and preferences management
 
 **Analysis Agents**:
-14. **Conflict Detector** - Conflict detection and resolution
-15. **Knowledge Analyzer** - Knowledge analysis and insights
-16. **Document Context Analyzer** - Document semantic analysis
-17. **Note Manager** - Notes and memory management
-18. **Question Queue Agent** - Question queuing and prioritization
+15. **Conflict Detector** - Conflict detection and resolution
+16. **Knowledge Analyzer** - Knowledge analysis and insights
+17. **Document Context Analyzer** - Document semantic analysis
+18. **Note Manager** - Notes and memory management
+19. **Question Queue Agent** - Question queuing and prioritization
 
 ## Key Features
 
-- **18 Pre-built Agents** - Specialized agents for different tasks
+- **19 Pre-built Agents** - Specialized agents for different tasks including adaptive skill generation
 - **Agent Orchestration** - Coordinate multiple agents for complex workflows
 - **Async Support** - Full async/await support for non-blocking operations
 - **Extensible Design** - Create custom agents by extending BaseAgent
@@ -129,6 +130,42 @@ result = orchestrator.execute_workflow(
 print(result)
 ```
 
+### Adaptive Skill Generation
+
+Generate and apply adaptive skills to optimize agent behavior based on maturity and learning patterns:
+
+```python
+from socratic_agents import SkillGeneratorAgent
+
+# Create skill generator
+skill_gen = SkillGeneratorAgent()
+
+# Generate skills based on maturity and learning data
+result = skill_gen.process({
+    "action": "generate",
+    "maturity_data": {
+        "current_phase": "discovery",
+        "completion_percent": 35,
+        "weak_categories": ["problem_definition"],
+        "category_scores": {
+            "problem_definition": 0.3,
+            "scope": 0.8
+        }
+    },
+    "learning_data": {
+        "learning_velocity": "medium",
+        "engagement_score": 0.75
+    }
+})
+
+# Get recommended skills
+for rec in result["recommendations"]:
+    skill = rec["skill"]
+    print(f"Skill: {skill['id']}")
+    print(f"Priority: {rec['priority']}")
+    print(f"Expected Impact: {rec['expected_impact']:.0%}")
+```
+
 ### Openclaw Integration
 
 ```python
@@ -174,6 +211,7 @@ agent = initialize_agent(
 - **Coordination Agents** - Orchestrate other agents (MultiLLMCoordinator, ProjectManager)
 - **Analysis Agents** - Analyze information (ConflictDetector, KnowledgeAnalyzer)
 - **Management Agents** - Manage resources (UserManager, SystemMonitor)
+- **Optimization Agents** - Optimize agent behavior (SkillGenerator)
 
 **AgentOrchestrator** - Coordinates multiple agents:
 - Dependency resolution
