@@ -1,11 +1,11 @@
 """Unit tests for Socratic Agents."""
 
 import pytest
+
 from socratic_agents import (
-    BaseAgent,
-    SocraticCounselor,
     CodeGenerator,
     CodeValidator,
+    SocraticCounselor,
 )
 
 

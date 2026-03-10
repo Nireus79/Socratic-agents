@@ -1,6 +1,7 @@
 """Quality Controller Agent - Quality assurance and testing."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
+
 from .base import BaseAgent
 
 

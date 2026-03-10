@@ -1,7 +1,8 @@
 """LangChain tool for Socratic Agents orchestration."""
 
-from typing import Dict, Any, Optional, List, Union
-from socratic_agents import BaseAgent, SocraticCounselor, CodeGenerator, CodeValidator
+from typing import Any, Dict, List, Optional
+
+from socratic_agents import CodeGenerator, CodeValidator, SocraticCounselor
 
 
 class SocraticAgentsTool:

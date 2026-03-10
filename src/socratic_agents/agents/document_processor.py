@@ -1,6 +1,7 @@
 """Document Processor Agent - Document parsing and processing."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
+
 from .base import BaseAgent
 
 
@@ -45,7 +46,7 @@ class DocumentProcessor(BaseAgent):
         if not content:
             return {"status": "error", "message": "Content required"}
         lines = content.split("\n")
-        paragraphs = [l for l in lines if l.strip()]
+        paragraphs = [line for line in lines if line.strip()]
         return {
             "status": "success",
             "agent": self.name,

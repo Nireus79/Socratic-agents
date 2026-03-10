@@ -1,6 +1,7 @@
 """Project Manager Agent - Project planning and management."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
+
 from .base import BaseAgent
 
 

@@ -1,6 +1,7 @@
 """Socratic Counselor Agent - Guided learning through questioning."""
 
 from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

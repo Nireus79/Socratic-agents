@@ -1,8 +1,9 @@
 """Integration tests for Socratic Agents integrations."""
 
 import pytest
-from socratic_agents.integrations.openclaw import SocraticAgentsSkill
+
 from socratic_agents.integrations.langchain import SocraticAgentsTool, create_socratic_tools
+from socratic_agents.integrations.openclaw import SocraticAgentsSkill
 
 
 class TestOpenclawIntegration:

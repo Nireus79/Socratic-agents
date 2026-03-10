@@ -1,6 +1,7 @@
 """System Monitor Agent - System health and performance monitoring."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

@@ -1,6 +1,7 @@
 """Knowledge Manager Agent - Manages knowledge base and document organization."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

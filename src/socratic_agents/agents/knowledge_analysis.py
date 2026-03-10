@@ -1,6 +1,7 @@
 """Knowledge Analysis Agent - Knowledge analysis and insights."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
+
 from .base import BaseAgent
 
 

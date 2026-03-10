@@ -1,6 +1,7 @@
 """Code Generator Agent - Intelligent code generation."""
 
 from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

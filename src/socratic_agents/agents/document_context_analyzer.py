@@ -1,6 +1,7 @@
 """Document Context Analyzer Agent - Document semantic analysis."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
+
 from .base import BaseAgent
 
 
@@ -46,7 +47,7 @@ class DocumentContextAnalyzer(BaseAgent):
         if not document:
             return {"status": "error", "message": "Document required"}
         lines = document.split("\n")
-        context_lines = [l for l in lines if len(l.strip()) > 5]
+        context_lines = [line for line in lines if len(line.strip()) > 5]
         return {
             "status": "success",
             "agent": self.name,

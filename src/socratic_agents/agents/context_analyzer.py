@@ -1,6 +1,7 @@
 """Context Analyzer Agent - Context understanding and analysis."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

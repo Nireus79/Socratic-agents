@@ -1,6 +1,7 @@
 """Multi-LLM Agent - Coordinates multiple LLM providers."""
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
+
 from .base import BaseAgent
 
 

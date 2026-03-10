@@ -1,26 +1,27 @@
 """Openclaw skill for Socratic Agents orchestration."""
 
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
+
 from socratic_agents import (
     BaseAgent,
-    SocraticCounselor,
     CodeGenerator,
     CodeValidator,
+    ConflictDetector,
+    ContextAnalyzer,
+    DocumentContextAnalyzer,
+    DocumentProcessor,
+    GithubSyncHandler,
+    KnowledgeAnalysis,
     KnowledgeManager,
     LearningAgent,
     MultiLlmAgent,
+    NoteManager,
     ProjectManager,
     QualityController,
-    ContextAnalyzer,
-    DocumentProcessor,
-    GithubSyncHandler,
+    QuestionQueueAgent,
+    SocraticCounselor,
     SystemMonitor,
     UserManager,
-    ConflictDetector,
-    KnowledgeAnalysis,
-    DocumentContextAnalyzer,
-    NoteManager,
-    QuestionQueueAgent,
 )
 
 
