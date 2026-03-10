@@ -1,6 +1,6 @@
 """Openclaw skill for Socratic Agents orchestration."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 
 from socratic_agents import (
     BaseAgent,
@@ -32,7 +32,7 @@ class SocraticAgentsSkill:
     Provides access to all 18 agents through a unified Openclaw skill interface.
     """
 
-    AGENTS = {
+    AGENTS: Dict[str, Type[BaseAgent]] = {
         "counselor": SocraticCounselor,
         "code_generator": CodeGenerator,
         "code_validator": CodeValidator,
@@ -67,7 +67,7 @@ class SocraticAgentsSkill:
 
         # Initialize agents with LLM client
         for agent_name, agent_class in self.AGENTS.items():
-            self.agents[agent_name] = agent_class(llm_client=llm_client)
+            self.agents[agent_name] = agent_class(llm_client=llm_client)  # type: ignore
 
     def get_agent(self, agent_name: str) -> Optional[BaseAgent]:
         """Get an agent by name."""

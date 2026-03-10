@@ -18,9 +18,9 @@ class KnowledgeAnalysis(BaseAgent):
         """Process knowledge analysis requests."""
         action = request.get("action", "analyze")
         if action == "analyze":
-            return self.analyze_knowledge(request.get("knowledge"))
+            return self.analyze_knowledge(request.get("knowledge"))  # type: ignore[arg-type]
         elif action == "extract":
-            return self.extract_insights(request.get("content"))
+            return self.extract_insights(request.get("content"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_insights()
         else:

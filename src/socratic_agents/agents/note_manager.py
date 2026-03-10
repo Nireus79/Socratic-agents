@@ -18,11 +18,11 @@ class NoteManager(BaseAgent):
         """Process note management requests."""
         action = request.get("action", "list")
         if action == "create":
-            return self.create_note(request.get("title"), request.get("content"))
+            return self.create_note(request.get("title"), request.get("content"))  # type: ignore[arg-type]
         elif action == "get":
-            return self.get_note(request.get("note_id"))
+            return self.get_note(request.get("note_id"))  # type: ignore[arg-type]
         elif action == "update":
-            return self.update_note(request.get("note_id"), request.get("content"))
+            return self.update_note(request.get("note_id"), request.get("content"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_notes()
         else:

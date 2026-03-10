@@ -45,7 +45,8 @@ class CodeGenerator(BaseAgent):
             Generated code
         """
         result = self.process({"prompt": prompt, "language": language})
-        return result.get("code", "")
+        code = result.get("code", "")
+        return str(code) if code else ""
 
     def _generate_code(self, prompt: str, language: str) -> str:
         """Generate code using LLM if available, otherwise return stub."""
@@ -54,7 +55,7 @@ class CodeGenerator(BaseAgent):
             llm_prompt = f"Generate {language} code for: {prompt}"
             try:
                 response = self.llm_client.chat(llm_prompt)
-                return response.content
+                return str(response.content) if response.content else ""
             except Exception as e:
                 self.logger.error(f"Code generation error: {e}")
                 return f"# Error generating code: {e}"

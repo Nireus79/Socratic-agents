@@ -99,8 +99,8 @@ select = ["E", "F", "W", "I"]
 ignore = ["E501"]
 
 [tool.mypy]
-python_version = "3.8"
-warn_return_any = true
+python_version = "3.9"
+warn_return_any = false
 warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false

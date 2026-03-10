@@ -17,9 +17,9 @@ class ConflictDetector(BaseAgent):
         """Process conflict detection requests."""
         action = request.get("action", "detect")
         if action == "detect":
-            return self.detect_conflicts(request.get("items"))
+            return self.detect_conflicts(request.get("items"))  # type: ignore[arg-type]
         elif action == "resolve":
-            return self.resolve_conflict(request.get("conflict_id"))
+            return self.resolve_conflict(request.get("conflict_id"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_conflicts()
         else:

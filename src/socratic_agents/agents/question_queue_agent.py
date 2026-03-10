@@ -18,11 +18,11 @@ class QuestionQueueAgent(BaseAgent):
         """Process question queue requests."""
         action = request.get("action", "add")
         if action == "add":
-            return self.add_question(request.get("question"), request.get("priority", "normal"))
+            return self.add_question(request.get("question"), request.get("priority", "normal"))  # type: ignore[arg-type]
         elif action == "next":
             return self.get_next_question()
         elif action == "process":
-            return self.process_question(request.get("question_id"))
+            return self.process_question(request.get("question_id"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_queue()
         else:

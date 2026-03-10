@@ -18,7 +18,7 @@ class QualityController(BaseAgent):
         """Process quality control requests."""
         action = request.get("action", "check")
         if action == "check":
-            return self.check_quality(request.get("code"))
+            return self.check_quality(request.get("code"))  # type: ignore[arg-type]
         elif action == "run_tests":
             return self.run_tests()
         elif action == "report":

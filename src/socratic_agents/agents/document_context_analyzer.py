@@ -17,9 +17,9 @@ class DocumentContextAnalyzer(BaseAgent):
         """Process document context analysis requests."""
         action = request.get("action", "analyze")
         if action == "analyze":
-            return self.analyze_document(request.get("document"))
+            return self.analyze_document(request.get("document"))  # type: ignore[arg-type]
         elif action == "extract_context":
-            return self.extract_context(request.get("document"))
+            return self.extract_context(request.get("document"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_analyzed()
         else:

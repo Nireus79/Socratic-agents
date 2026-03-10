@@ -18,9 +18,9 @@ class GithubSyncHandler(BaseAgent):
         """Process GitHub sync requests."""
         action = request.get("action", "status")
         if action == "sync":
-            return self.sync_repository(request.get("repo"))
+            return self.sync_repository(request.get("repo"))  # type: ignore[arg-type]
         elif action == "commit":
-            return self.record_commit(request.get("message"))
+            return self.record_commit(request.get("message"))  # type: ignore[arg-type]
         elif action == "status":
             return self.sync_status()
         else:

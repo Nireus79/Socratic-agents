@@ -44,20 +44,21 @@ class SocraticAgentsTool:
             if agent_type == "counselor":
                 topic = kwargs.get("topic", task)
                 level = kwargs.get("level", "beginner")
-                result = self.counselor.guide(topic, level)
+                result = self.counselor.guide(str(topic), str(level))
                 questions = result.get("questions", [])
-                return "\n".join(questions)
+                return "\n".join(str(q) for q in questions if q)
 
             elif agent_type == "code_generator":
                 prompt = kwargs.get("prompt", task)
                 language = kwargs.get("language", "python")
                 result = self.code_generator.process({"prompt": prompt, "language": language})
-                return result.get("code", "")
+                code = result.get("code", "")
+                return str(code) if code else ""
 
             elif agent_type == "code_validator":
                 code = kwargs.get("code", task)
                 language = kwargs.get("language", "python")
-                result = self.code_validator.validate(code, language)
+                result = self.code_validator.validate(str(code), str(language))
                 if result["valid"]:
                     return "Code is valid ✓"
                 else:

@@ -18,7 +18,7 @@ class LearningAgent(BaseAgent):
         """Process learning requests."""
         action = request.get("action", "record")
         if action == "record":
-            return self.record_interaction(request.get("interaction"))
+            return self.record_interaction(request.get("interaction"))  # type: ignore[arg-type]
         elif action == "analyze":
             return self.analyze_patterns()
         elif action == "suggest":

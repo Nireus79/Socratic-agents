@@ -17,17 +17,28 @@ class UserManager(BaseAgent):
         """Process user management requests."""
         action = request.get("action", "list")
         if action == "create":
-            return self.create_user(request.get("user_id"), request.get("preferences"))
+            user_id = request.get("user_id") or ""
+            preferences = request.get("preferences") or {}
+            return self.create_user(
+                str(user_id), preferences if isinstance(preferences, dict) else {}
+            )
         elif action == "update":
-            return self.update_preferences(request.get("user_id"), request.get("preferences"))
+            user_id = request.get("user_id") or ""
+            preferences = request.get("preferences") or {}
+            return self.update_preferences(
+                str(user_id), preferences if isinstance(preferences, dict) else {}
+            )
         elif action == "get":
-            return self.get_user(request.get("user_id"))
+            user_id = request.get("user_id") or ""
+            return self.get_user(str(user_id))
         elif action == "list":
             return self.list_users()
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
-    def create_user(self, user_id: str, preferences: Dict[str, Any] = None) -> Dict[str, Any]:
+    def create_user(
+        self, user_id: str, preferences: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Create a new user."""
         if not user_id:
             return {"status": "error", "message": "User ID required"}

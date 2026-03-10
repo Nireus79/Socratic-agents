@@ -17,11 +17,11 @@ class ContextAnalyzer(BaseAgent):
         """Process context analysis requests."""
         action = request.get("action", "analyze")
         if action == "analyze":
-            return self.analyze_context(request.get("content"))
+            return self.analyze_context(request.get("content"))  # type: ignore[arg-type]
         elif action == "store":
-            return self.store_context(request.get("name"), request.get("content"))
+            return self.store_context(request.get("name"), request.get("content"))  # type: ignore[arg-type]
         elif action == "retrieve":
-            return self.retrieve_context(request.get("name"))
+            return self.retrieve_context(request.get("name"))  # type: ignore[arg-type]
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 

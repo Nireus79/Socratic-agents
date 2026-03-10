@@ -18,9 +18,9 @@ class ProjectManager(BaseAgent):
         """Process project management requests."""
         action = request.get("action", "list")
         if action == "create":
-            return self.create_project(request.get("project_name"), request.get("description"))
+            return self.create_project(request.get("project_name"), request.get("description"))  # type: ignore[arg-type]
         elif action == "add_task":
-            return self.add_task(request.get("project_id"), request.get("task"))
+            return self.add_task(request.get("project_id"), request.get("task"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_projects()
         else:

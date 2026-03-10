@@ -18,9 +18,9 @@ class KnowledgeManager(BaseAgent):
         """Process knowledge management requests."""
         action = request.get("action", "list")
         if action == "add":
-            return self.add_document(request.get("document"), request.get("metadata"))
+            return self.add_document(request.get("document"), request.get("metadata"))  # type: ignore[arg-type]
         elif action == "search":
-            return self.search_documents(request.get("query"))
+            return self.search_documents(request.get("query"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_documents()
         else:

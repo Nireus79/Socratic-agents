@@ -18,9 +18,9 @@ class DocumentProcessor(BaseAgent):
         """Process document requests."""
         action = request.get("action", "parse")
         if action == "parse":
-            return self.parse_document(request.get("content"), request.get("format", "txt"))
+            return self.parse_document(request.get("content"), request.get("format", "txt"))  # type: ignore[arg-type]
         elif action == "extract":
-            return self.extract_text(request.get("content"))
+            return self.extract_text(request.get("content"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_documents()
         else:

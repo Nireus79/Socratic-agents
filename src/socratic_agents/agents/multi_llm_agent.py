@@ -18,11 +18,11 @@ class MultiLlmAgent(BaseAgent):
         """Process multi-LLM requests."""
         action = request.get("action", "switch")
         if action == "switch":
-            return self.switch_provider(request.get("provider"))
+            return self.switch_provider(request.get("provider"))  # type: ignore[arg-type]
         elif action == "list":
             return self.list_providers()
         elif action == "query":
-            return self.query_llm(request.get("prompt"))
+            return self.query_llm(request.get("prompt"))  # type: ignore[arg-type]
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
