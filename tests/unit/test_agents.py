@@ -120,9 +120,9 @@ class TestCodeValidator:
         """Test validation of empty code."""
         validator = CodeValidator()
         result = validator.validate("", language="python")
-        
-        assert result["status"] == "success"
-        assert len(result["issues"]) > 0
+
+        # Empty code is an error (code is required)
+        assert result["status"] == "error"
 
     @pytest.mark.unit
     def test_validate_without_code(self):
