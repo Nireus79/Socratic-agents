@@ -20,14 +20,20 @@ from .agents.note_manager import NoteManager
 from .agents.project_manager import ProjectManager
 from .agents.quality_controller import QualityController
 from .agents.question_queue_agent import QuestionQueueAgent
+from .agents.skill_generator_agent import SkillGeneratorAgent
 
 # Concrete agent implementations
 from .agents.socratic_counselor import SocraticCounselor
 from .agents.system_monitor import SystemMonitor
 from .agents.user_manager import UserManager
 
+# Data models
+from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
+
 __all__ = [
+    # Base class
     "BaseAgent",
+    # Agent implementations
     "SocraticCounselor",
     "CodeGenerator",
     "CodeValidator",
@@ -36,6 +42,7 @@ __all__ = [
     "MultiLlmAgent",
     "ProjectManager",
     "QualityController",
+    "SkillGeneratorAgent",
     "ContextAnalyzer",
     "DocumentProcessor",
     "GithubSyncHandler",
@@ -46,4 +53,8 @@ __all__ = [
     "DocumentContextAnalyzer",
     "NoteManager",
     "QuestionQueueAgent",
+    # Data models
+    "AgentSkill",
+    "SkillApplicationResult",
+    "SkillRecommendation",
 ]

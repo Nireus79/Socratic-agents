@@ -16,6 +16,7 @@ from .note_manager import NoteManager
 from .project_manager import ProjectManager
 from .quality_controller import QualityController
 from .question_queue_agent import QuestionQueueAgent
+from .skill_generator_agent import SkillGeneratorAgent
 from .socratic_counselor import SocraticCounselor
 from .system_monitor import SystemMonitor
 from .user_manager import UserManager
@@ -33,6 +34,7 @@ __all__ = [
     "ContextAnalyzer",
     "DocumentProcessor",
     "GithubSyncHandler",
+    "SkillGeneratorAgent",
     "SystemMonitor",
     "UserManager",
     "ConflictDetector",
