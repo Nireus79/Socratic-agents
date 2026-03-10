@@ -55,31 +55,26 @@ class SkillGeneratorAgent:
             return self.generate_skills(
                 maturity_data=request.get("maturity_data"),
                 learning_data=request.get("learning_data"),
-                context=request.get("context", {})
+                context=request.get("context", {}),
             )
         elif action == "evaluate":
             return self.evaluate_skill_effectiveness(
                 skill_id=request.get("skill_id"),
                 feedback=request.get("feedback"),
-                effectiveness_score=request.get("effectiveness_score")
+                effectiveness_score=request.get("effectiveness_score"),
             )
         elif action == "list":
             return self.list_active_skills(
-                agent_name=request.get("agent_name"),
-                phase=request.get("phase")
+                agent_name=request.get("agent_name"), phase=request.get("phase")
             )
         else:
-            return {
-                "status": "error",
-                "agent": self.name,
-                "message": f"Unknown action: {action}"
-            }
+            return {"status": "error", "agent": self.name, "message": f"Unknown action: {action}"}
 
     def generate_skills(
         self,
         maturity_data: Optional[Dict[str, Any]],
         learning_data: Optional[Dict[str, Any]],
-        context: Dict[str, Any]
+        context: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
         Generate skills based on maturity and learning data.
@@ -96,11 +91,7 @@ class SkillGeneratorAgent:
             Dictionary with status, generated skills, and recommendations
         """
         if not maturity_data:
-            return {
-                "status": "error",
-                "agent": self.name,
-                "message": "maturity_data required"
-            }
+            return {"status": "error", "agent": self.name, "message": "maturity_data required"}
 
         phase = maturity_data.get("current_phase", "unknown")
         completion = maturity_data.get("completion_percent", 0)
@@ -122,16 +113,14 @@ class SkillGeneratorAgent:
                     template=skill_template,
                     phase=phase,
                     learning_data=learning_data or {},
-                    context=context
+                    context=context,
                 )
                 skills.append(skill)
                 self.generated_skills[skill.id] = skill
 
         # Prioritize skills based on category weakness score and learning velocity
         recommendations = self._prioritize_skills(
-            skills=skills,
-            category_scores=category_scores,
-            learning_data=learning_data or {}
+            skills=skills, category_scores=category_scores, learning_data=learning_data or {}
         )
 
         return {
@@ -141,7 +130,7 @@ class SkillGeneratorAgent:
             "completion_percent": completion,
             "skills_generated": len(skills),
             "skills": [self._skill_to_dict(s) for s in skills],
-            "recommendations": [rec.to_dict() for rec in recommendations]
+            "recommendations": [rec.to_dict() for rec in recommendations],
         }
 
     def _create_skill_from_template(
@@ -149,7 +138,7 @@ class SkillGeneratorAgent:
         template: Dict[str, Any],
         phase: str,
         learning_data: Dict[str, Any],
-        context: Dict[str, Any]
+        context: Dict[str, Any],
     ) -> AgentSkill:
         """
         Create an AgentSkill from a template.
@@ -187,7 +176,7 @@ class SkillGeneratorAgent:
             config=config,
             confidence=min(adjusted_confidence, 1.0),  # Cap at 1.0
             maturity_phase=phase,
-            category_focus=template.get("trigger_category")
+            category_focus=template.get("trigger_category"),
         )
 
         return skill
@@ -211,9 +200,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "problem_definition",
                         "intensity": "high",
-                        "question_style": "deep_exploration"
+                        "question_style": "deep_exploration",
                     },
-                    "confidence": 0.90
+                    "confidence": 0.90,
                 },
                 {
                     "id": "scope_refinement",
@@ -223,9 +212,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "scope",
                         "intensity": "medium",
-                        "question_style": "boundary_clarification"
+                        "question_style": "boundary_clarification",
                     },
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 },
                 {
                     "id": "target_audience_analysis",
@@ -235,10 +224,10 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "target_audience",
                         "intensity": "medium",
-                        "question_style": "stakeholder_discovery"
+                        "question_style": "stakeholder_discovery",
                     },
-                    "confidence": 0.80
-                }
+                    "confidence": 0.80,
+                },
             ],
             "analysis": [
                 {
@@ -249,9 +238,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "functional_requirements",
                         "detail_level": "high",
-                        "include_edge_cases": True
+                        "include_edge_cases": True,
                     },
-                    "confidence": 0.88
+                    "confidence": 0.88,
                 },
                 {
                     "id": "nonfunctional_requirements_focus",
@@ -261,9 +250,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "non_functional_requirements",
                         "detail_level": "high",
-                        "categories": ["performance", "scalability", "security"]
+                        "categories": ["performance", "scalability", "security"],
                     },
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 },
                 {
                     "id": "data_requirements_analysis",
@@ -273,10 +262,10 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "data_requirements",
                         "detail_level": "high",
-                        "include_relationships": True
+                        "include_relationships": True,
                     },
-                    "confidence": 0.82
-                }
+                    "confidence": 0.82,
+                },
             ],
             "design": [
                 {
@@ -287,9 +276,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "technology_stack",
                         "optimization": "performance",
-                        "consider_maintainability": True
+                        "consider_maintainability": True,
                     },
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 },
                 {
                     "id": "architecture_design_review",
@@ -299,9 +288,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_area": "architecture",
                         "review_depth": "comprehensive",
-                        "check_coupling": True
+                        "check_coupling": True,
                     },
-                    "confidence": 0.88
+                    "confidence": 0.88,
                 },
                 {
                     "id": "integration_strategy_focus",
@@ -311,10 +300,10 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_category": "integrations",
                         "detail_level": "high",
-                        "include_error_handling": True
+                        "include_error_handling": True,
                     },
-                    "confidence": 0.80
-                }
+                    "confidence": 0.80,
+                },
             ],
             "implementation": [
                 {
@@ -325,9 +314,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_area": "code_quality",
                         "standards": "strict",
-                        "enforce_patterns": True
+                        "enforce_patterns": True,
                     },
-                    "confidence": 0.87
+                    "confidence": 0.87,
                 },
                 {
                     "id": "testing_strategy",
@@ -337,9 +326,9 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_area": "testing",
                         "coverage_target": 85,
-                        "include_integration_tests": True
+                        "include_integration_tests": True,
                     },
-                    "confidence": 0.85
+                    "confidence": 0.85,
                 },
                 {
                     "id": "documentation_focus",
@@ -349,18 +338,18 @@ class SkillGeneratorAgent:
                     "config": {
                         "focus_area": "documentation",
                         "completeness": "comprehensive",
-                        "include_examples": True
+                        "include_examples": True,
                     },
-                    "confidence": 0.80
-                }
-            ]
+                    "confidence": 0.80,
+                },
+            ],
         }
 
     def _prioritize_skills(
         self,
         skills: List[AgentSkill],
         category_scores: Dict[str, float],
-        learning_data: Dict[str, Any]
+        learning_data: Dict[str, Any],
     ) -> List[SkillRecommendation]:
         """
         Prioritize skills based on weakness severity and engagement.
@@ -402,10 +391,7 @@ class SkillGeneratorAgent:
             )
 
             recommendation = SkillRecommendation(
-                skill=skill,
-                priority=priority,
-                reason=reason,
-                expected_impact=expected_impact
+                skill=skill, priority=priority, reason=reason, expected_impact=expected_impact
             )
             recommendations.append(recommendation)
 
@@ -419,7 +405,7 @@ class SkillGeneratorAgent:
         self,
         skill_id: str,
         feedback: Optional[str] = None,
-        effectiveness_score: Optional[float] = None
+        effectiveness_score: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
         Evaluate a skill's effectiveness after application.
@@ -435,11 +421,7 @@ class SkillGeneratorAgent:
             Dictionary with evaluation result and updated skill info
         """
         if skill_id not in self.generated_skills:
-            return {
-                "status": "error",
-                "agent": self.name,
-                "message": f"Skill {skill_id} not found"
-            }
+            return {"status": "error", "agent": self.name, "message": f"Skill {skill_id} not found"}
 
         skill = self.generated_skills[skill_id]
 
@@ -455,13 +437,11 @@ class SkillGeneratorAgent:
             "skill_id": skill_id,
             "feedback": feedback,
             "effectiveness_score": skill.effectiveness_score,
-            "skill": self._skill_to_dict(skill)
+            "skill": self._skill_to_dict(skill),
         }
 
     def list_active_skills(
-        self,
-        agent_name: Optional[str] = None,
-        phase: Optional[str] = None
+        self, agent_name: Optional[str] = None, phase: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         List all generated skills with optional filtering.
@@ -488,7 +468,7 @@ class SkillGeneratorAgent:
             "agent_filter": agent_name,
             "phase_filter": phase,
             "skills_count": len(filtered_skills),
-            "skills": [self._skill_to_dict(s) for s in filtered_skills]
+            "skills": [self._skill_to_dict(s) for s in filtered_skills],
         }
 
     def _skill_to_dict(self, skill: AgentSkill) -> Dict[str, Any]:

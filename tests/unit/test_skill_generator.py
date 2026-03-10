@@ -46,23 +46,22 @@ class TestSkillGeneration:
         """Test skill generation for discovery phase with weak categories."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {
-                    "problem_definition": 0.3,
-                    "scope": 0.7,
-                    "target_audience": 0.8
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.75
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {
+                        "problem_definition": 0.3,
+                        "scope": 0.7,
+                        "target_audience": 0.8,
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
             }
-        })
+        )
 
         assert result["status"] == "success"
         assert result["agent"] == "SkillGeneratorAgent"
@@ -75,23 +74,22 @@ class TestSkillGeneration:
         """Test skill generation for analysis phase."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "analysis",
-                "completion_percent": 50,
-                "weak_categories": ["functional_requirements", "data_requirements"],
-                "category_scores": {
-                    "functional_requirements": 0.4,
-                    "non_functional_requirements": 0.7,
-                    "data_requirements": 0.3
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "high",
-                "engagement_score": 0.85
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "analysis",
+                    "completion_percent": 50,
+                    "weak_categories": ["functional_requirements", "data_requirements"],
+                    "category_scores": {
+                        "functional_requirements": 0.4,
+                        "non_functional_requirements": 0.7,
+                        "data_requirements": 0.3,
+                    },
+                },
+                "learning_data": {"learning_velocity": "high", "engagement_score": 0.85},
             }
-        })
+        )
 
         assert result["status"] == "success"
         assert result["skills_generated"] == 2
@@ -101,23 +99,22 @@ class TestSkillGeneration:
         """Test skill generation when no weak categories."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 100,
-                "weak_categories": [],
-                "category_scores": {
-                    "problem_definition": 0.9,
-                    "scope": 0.9,
-                    "target_audience": 0.9
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.5
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 100,
+                    "weak_categories": [],
+                    "category_scores": {
+                        "problem_definition": 0.9,
+                        "scope": 0.9,
+                        "target_audience": 0.9,
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.5},
             }
-        })
+        )
 
         assert result["status"] == "success"
         assert result["skills_generated"] == 0
@@ -127,10 +124,7 @@ class TestSkillGeneration:
         """Test error handling for missing maturity_data."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": None
-        })
+        result = agent.process({"action": "generate", "maturity_data": None})
 
         assert result["status"] == "error"
         assert "maturity_data required" in result["message"]
@@ -139,23 +133,22 @@ class TestSkillGeneration:
         """Test skill generation for design phase."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "design",
-                "completion_percent": 70,
-                "weak_categories": ["architecture", "integrations"],
-                "category_scores": {
-                    "architecture": 0.2,
-                    "technology_stack": 0.6,
-                    "integrations": 0.4
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.6
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "design",
+                    "completion_percent": 70,
+                    "weak_categories": ["architecture", "integrations"],
+                    "category_scores": {
+                        "architecture": 0.2,
+                        "technology_stack": 0.6,
+                        "integrations": 0.4,
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.6},
             }
-        })
+        )
 
         assert result["status"] == "success"
         assert result["skills_generated"] == 2
@@ -164,23 +157,22 @@ class TestSkillGeneration:
         """Test skill generation for implementation phase."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "implementation",
-                "completion_percent": 85,
-                "weak_categories": ["code_quality", "testing_coverage"],
-                "category_scores": {
-                    "code_quality": 0.5,
-                    "testing_coverage": 0.4,
-                    "documentation": 0.7
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "low",
-                "engagement_score": 0.45
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "implementation",
+                    "completion_percent": 85,
+                    "weak_categories": ["code_quality", "testing_coverage"],
+                    "category_scores": {
+                        "code_quality": 0.5,
+                        "testing_coverage": 0.4,
+                        "documentation": 0.7,
+                    },
+                },
+                "learning_data": {"learning_velocity": "low", "engagement_score": 0.45},
             }
-        })
+        )
 
         assert result["status"] == "success"
         assert result["skills_generated"] == 2
@@ -193,23 +185,25 @@ class TestSkillPrioritization:
         """Test high priority skills are identified."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 20,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {
-                    "problem_definition": 0.1,  # Very weak
-                    "scope": 0.8,
-                    "target_audience": 0.8
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.9  # High engagement
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 20,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {
+                        "problem_definition": 0.1,  # Very weak
+                        "scope": 0.8,
+                        "target_audience": 0.8,
+                    },
+                },
+                "learning_data": {
+                    "learning_velocity": "medium",
+                    "engagement_score": 0.9,  # High engagement
+                },
             }
-        })
+        )
 
         assert result["recommendations"][0]["priority"] == "high"
 
@@ -217,23 +211,25 @@ class TestSkillPrioritization:
         """Test medium priority skills are identified."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 40,
-                "weak_categories": ["scope"],
-                "category_scores": {
-                    "problem_definition": 0.7,
-                    "scope": 0.4,  # Moderately weak (weakness = 0.6)
-                    "target_audience": 0.8
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.6  # Higher engagement for medium priority
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 40,
+                    "weak_categories": ["scope"],
+                    "category_scores": {
+                        "problem_definition": 0.7,
+                        "scope": 0.4,  # Moderately weak (weakness = 0.6)
+                        "target_audience": 0.8,
+                    },
+                },
+                "learning_data": {
+                    "learning_velocity": "medium",
+                    "engagement_score": 0.6,  # Higher engagement for medium priority
+                },
             }
-        })
+        )
 
         assert result["recommendations"][0]["priority"] == "medium"
 
@@ -241,23 +237,22 @@ class TestSkillPrioritization:
         """Test recommendations include expected impact scores."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 30,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {
-                    "problem_definition": 0.2,
-                    "scope": 0.7,
-                    "target_audience": 0.8
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.7
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 30,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {
+                        "problem_definition": 0.2,
+                        "scope": 0.7,
+                        "target_audience": 0.8,
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.7},
             }
-        })
+        )
 
         rec = result["recommendations"][0]
         assert "expected_impact" in rec
@@ -267,23 +262,22 @@ class TestSkillPrioritization:
         """Test recommendations are sorted by priority."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 30,
-                "weak_categories": ["problem_definition", "scope", "target_audience"],
-                "category_scores": {
-                    "problem_definition": 0.1,  # Very weak -> high priority
-                    "scope": 0.5,  # Medium -> medium priority
-                    "target_audience": 0.8  # Strong -> low priority
-                }
-            },
-            "learning_data": {
-                "learning_velocity": "medium",
-                "engagement_score": 0.6
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 30,
+                    "weak_categories": ["problem_definition", "scope", "target_audience"],
+                    "category_scores": {
+                        "problem_definition": 0.1,  # Very weak -> high priority
+                        "scope": 0.5,  # Medium -> medium priority
+                        "target_audience": 0.8,  # Strong -> low priority
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.6},
             }
-        })
+        )
 
         recs = result["recommendations"]
         # Should be sorted by priority (high -> medium -> low)
@@ -304,26 +298,30 @@ class TestSkillEvaluation:
         agent = SkillGeneratorAgent()
 
         # First generate a skill
-        gen_result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        gen_result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         skill_id = gen_result["skills"][0]["id"]
 
         # Then evaluate it
-        eval_result = agent.process({
-            "action": "evaluate",
-            "skill_id": skill_id,
-            "feedback": "helped",
-            "effectiveness_score": 0.85
-        })
+        eval_result = agent.process(
+            {
+                "action": "evaluate",
+                "skill_id": skill_id,
+                "feedback": "helped",
+                "effectiveness_score": 0.85,
+            }
+        )
 
         assert eval_result["status"] == "success"
         assert eval_result["skill_id"] == skill_id
@@ -334,12 +332,14 @@ class TestSkillEvaluation:
         """Test evaluation of non-existent skill."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "evaluate",
-            "skill_id": "nonexistent_skill_id",
-            "feedback": "no effect",
-            "effectiveness_score": 0.5
-        })
+        result = agent.process(
+            {
+                "action": "evaluate",
+                "skill_id": "nonexistent_skill_id",
+                "feedback": "no effect",
+                "effectiveness_score": 0.5,
+            }
+        )
 
         assert result["status"] == "error"
         assert "not found" in result["message"]
@@ -349,25 +349,29 @@ class TestSkillEvaluation:
         agent = SkillGeneratorAgent()
 
         # Generate a skill
-        gen_result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        gen_result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         skill_id = gen_result["skills"][0]["id"]
 
         # Evaluate with out-of-bounds score (should be clamped)
-        result = agent.process({
-            "action": "evaluate",
-            "skill_id": skill_id,
-            "effectiveness_score": 1.5  # Greater than 1.0
-        })
+        result = agent.process(
+            {
+                "action": "evaluate",
+                "skill_id": skill_id,
+                "effectiveness_score": 1.5,  # Greater than 1.0
+            }
+        )
 
         assert result["effectiveness_score"] == 1.0
 
@@ -376,25 +380,25 @@ class TestSkillEvaluation:
         agent = SkillGeneratorAgent()
 
         # Generate a skill
-        gen_result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        gen_result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         skill_id = gen_result["skills"][0]["id"]
 
         # Evaluate with only feedback
-        result = agent.process({
-            "action": "evaluate",
-            "skill_id": skill_id,
-            "feedback": "no effect"
-        })
+        result = agent.process(
+            {"action": "evaluate", "skill_id": skill_id, "feedback": "no effect"}
+        )
 
         assert result["status"] == "success"
         assert result["feedback"] == "no effect"
@@ -408,25 +412,25 @@ class TestSkillListing:
         agent = SkillGeneratorAgent()
 
         # Generate skills in discovery phase
-        agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition", "scope"],
-                "category_scores": {
-                    "problem_definition": 0.3,
-                    "scope": 0.4,
-                    "target_audience": 0.8
-                }
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition", "scope"],
+                    "category_scores": {
+                        "problem_definition": 0.3,
+                        "scope": 0.4,
+                        "target_audience": 0.8,
+                    },
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         # List all skills
-        result = agent.process({
-            "action": "list"
-        })
+        result = agent.process({"action": "list"})
 
         assert result["status"] == "success"
         assert result["skills_count"] == 2
@@ -436,33 +440,34 @@ class TestSkillListing:
         agent = SkillGeneratorAgent()
 
         # Generate skills in discovery and analysis phases
-        agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
-        agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "analysis",
-                "completion_percent": 50,
-                "weak_categories": ["functional_requirements"],
-                "category_scores": {"functional_requirements": 0.4}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "analysis",
+                    "completion_percent": 50,
+                    "weak_categories": ["functional_requirements"],
+                    "category_scores": {"functional_requirements": 0.4},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         # List only discovery phase skills
-        result = agent.process({
-            "action": "list",
-            "phase": "discovery"
-        })
+        result = agent.process({"action": "list", "phase": "discovery"})
 
         assert result["status"] == "success"
         assert result["skills_count"] == 1
@@ -473,22 +478,21 @@ class TestSkillListing:
         agent = SkillGeneratorAgent()
 
         # Generate skills that target different agents
-        agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         # List only SocraticCounselor skills
-        result = agent.process({
-            "action": "list",
-            "agent_name": "SocraticCounselor"
-        })
+        result = agent.process({"action": "list", "agent_name": "SocraticCounselor"})
 
         assert result["status"] == "success"
         for skill in result["skills"]:
@@ -499,22 +503,21 @@ class TestSkillListing:
         agent = SkillGeneratorAgent()
 
         # Generate skills
-        agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         # List non-existent phase
-        result = agent.process({
-            "action": "list",
-            "phase": "nonexistent"
-        })
+        result = agent.process({"action": "list", "phase": "nonexistent"})
 
         assert result["status"] == "success"
         assert result["skills_count"] == 0
@@ -527,9 +530,7 @@ class TestActionRouting:
         """Test error handling for invalid action."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "invalid_action"
-        })
+        result = agent.process({"action": "invalid_action"})
 
         assert result["status"] == "error"
         assert "Unknown action" in result["message"]
@@ -538,15 +539,17 @@ class TestActionRouting:
         """Test default action is generate when not specified."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        result = agent.process(
+            {
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         # Should succeed with generate action
         assert result["status"] == "success"
@@ -560,22 +563,32 @@ class TestSkillDataStructure:
         """Test generated skills have all required fields."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         skill = result["skills"][0]
         required_fields = [
-            "id", "target_agent", "skill_type", "config",
-            "confidence", "maturity_phase", "category_focus",
-            "generated_at", "effectiveness_score", "applied", "feedback"
+            "id",
+            "target_agent",
+            "skill_type",
+            "config",
+            "confidence",
+            "maturity_phase",
+            "category_focus",
+            "generated_at",
+            "effectiveness_score",
+            "applied",
+            "feedback",
         ]
 
         for field in required_fields:
@@ -585,16 +598,18 @@ class TestSkillDataStructure:
         """Test skill confidence is in valid range [0, 1]."""
         agent = SkillGeneratorAgent()
 
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75}
-        })
+        result = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "medium", "engagement_score": 0.75},
+            }
+        )
 
         for skill in result["skills"]:
             assert 0.0 <= skill["confidence"] <= 1.0
@@ -604,28 +619,32 @@ class TestSkillDataStructure:
         agent = SkillGeneratorAgent()
 
         # High learning velocity
-        result_high = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "high", "engagement_score": 0.75}
-        })
+        result_high = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "high", "engagement_score": 0.75},
+            }
+        )
 
         # Low learning velocity
-        result_low = agent.process({
-            "action": "generate",
-            "maturity_data": {
-                "current_phase": "discovery",
-                "completion_percent": 35,
-                "weak_categories": ["problem_definition"],
-                "category_scores": {"problem_definition": 0.3}
-            },
-            "learning_data": {"learning_velocity": "low", "engagement_score": 0.75}
-        })
+        result_low = agent.process(
+            {
+                "action": "generate",
+                "maturity_data": {
+                    "current_phase": "discovery",
+                    "completion_percent": 35,
+                    "weak_categories": ["problem_definition"],
+                    "category_scores": {"problem_definition": 0.3},
+                },
+                "learning_data": {"learning_velocity": "low", "engagement_score": 0.75},
+            }
+        )
 
         # Both should have intensity customized
         assert result_high["skills"][0]["config"]["intensity"] == "high"
