@@ -27,7 +27,7 @@ from socratic_agents import (
 class SocraticAgentsSkill:
     """
     Openclaw skill for multi-agent orchestration using Socratic Agents.
-    
+
     Provides access to all 18 agents through a unified Openclaw skill interface.
     """
 
@@ -55,7 +55,7 @@ class SocraticAgentsSkill:
     def __init__(self, llm_client: Optional[Any] = None, **kwargs):
         """
         Initialize the Socratic Agents skill.
-        
+
         Args:
             llm_client: Optional LLMClient from Socrates Nexus
             **kwargs: Additional configuration options
@@ -63,7 +63,7 @@ class SocraticAgentsSkill:
         self.llm_client = llm_client
         self.config = kwargs
         self.agents: Dict[str, BaseAgent] = {}
-        
+
         # Initialize agents with LLM client
         for agent_name, agent_class in self.AGENTS.items():
             self.agents[agent_name] = agent_class(llm_client=llm_client)
@@ -76,59 +76,51 @@ class SocraticAgentsSkill:
         """List all available agents."""
         return list(self.AGENTS.keys())
 
-    def execute_workflow(
-        self,
-        task: str,
-        agents: List[str],
-        **kwargs
-    ) -> Dict[str, Any]:
+    def execute_workflow(self, task: str, agents: List[str], **kwargs) -> Dict[str, Any]:
         """
         Execute a multi-agent workflow.
-        
+
         Args:
             task: Description of the task
             agents: List of agent names to use
             **kwargs: Additional parameters for agents
-            
+
         Returns:
             Workflow execution result
         """
         results = {}
-        
+
         for agent_name in agents:
             agent = self.get_agent(agent_name)
             if not agent:
                 results[agent_name] = {
                     "status": "error",
-                    "message": f"Agent '{agent_name}' not found"
+                    "message": f"Agent '{agent_name}' not found",
                 }
                 continue
-            
+
             try:
                 request = {"task": task, **kwargs}
                 result = agent.process(request)
                 results[agent_name] = result
             except Exception as e:
-                results[agent_name] = {
-                    "status": "error",
-                    "message": str(e)
-                }
-        
+                results[agent_name] = {"status": "error", "message": str(e)}
+
         return {
             "status": "success",
             "task": task,
             "agents_executed": len([r for r in results.values() if r.get("status") == "success"]),
-            "results": results
+            "results": results,
         }
 
     def guide(self, topic: str, level: str = "beginner") -> Dict[str, Any]:
         """
         Use Socratic Counselor to guide learning.
-        
+
         Args:
             topic: Topic to learn about
             level: Learning level (beginner, intermediate, advanced)
-            
+
         Returns:
             Guiding questions
         """
@@ -138,11 +130,11 @@ class SocraticAgentsSkill:
     def generate_code(self, prompt: str, language: str = "python") -> str:
         """
         Generate code using CodeGenerator agent.
-        
+
         Args:
             prompt: Description of code to generate
             language: Programming language
-            
+
         Returns:
             Generated code
         """
@@ -153,11 +145,11 @@ class SocraticAgentsSkill:
     def validate_code(self, code: str, language: str = "python") -> Dict[str, Any]:
         """
         Validate code using CodeValidator agent.
-        
+
         Args:
             code: Code to validate
             language: Programming language
-            
+
         Returns:
             Validation results
         """

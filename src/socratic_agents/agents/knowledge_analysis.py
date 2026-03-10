@@ -31,7 +31,12 @@ class KnowledgeAnalysis(BaseAgent):
             return {"status": "error", "message": "Knowledge content required"}
         topics = knowledge.split()[:3]
         self.topics = {t: {"count": knowledge.count(t)} for t in topics}
-        return {"status": "success", "agent": self.name, "topics": list(self.topics.keys()), "analysis_complete": True}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "topics": list(self.topics.keys()),
+            "analysis_complete": True,
+        }
 
     def extract_insights(self, content: str) -> Dict[str, Any]:
         """Extract insights from content."""
@@ -39,8 +44,19 @@ class KnowledgeAnalysis(BaseAgent):
             return {"status": "error", "message": "Content required"}
         insights = ["Key patterns identified", "Relationships discovered", "Trends emerging"]
         self.insights.extend(insights)
-        return {"status": "success", "agent": self.name, "insights": insights, "total_insights": len(self.insights)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "insights": insights,
+            "total_insights": len(self.insights),
+        }
 
     def list_insights(self) -> Dict[str, Any]:
         """List all insights."""
-        return {"status": "success", "agent": self.name, "insights": self.insights, "insight_count": len(self.insights), "topics": list(self.topics.keys())}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "insights": self.insights,
+            "insight_count": len(self.insights),
+            "topics": list(self.topics.keys()),
+        }

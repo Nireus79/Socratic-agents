@@ -32,15 +32,35 @@ class KnowledgeManager(BaseAgent):
         doc_id = f"doc_{self.document_count + 1}"
         self.knowledge_base[doc_id] = {"content": document, "metadata": metadata or {}}
         self.document_count += 1
-        return {"status": "success", "agent": self.name, "document_id": doc_id, "total_documents": self.document_count}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "document_id": doc_id,
+            "total_documents": self.document_count,
+        }
 
     def search_documents(self, query: str) -> Dict[str, Any]:
         """Search documents by query."""
         if not query:
             return {"status": "error", "message": "Query required"}
-        results = [{"id": doc_id, "content": doc["content"][:200]} for doc_id, doc in self.knowledge_base.items() if query.lower() in doc["content"].lower()]
-        return {"status": "success", "agent": self.name, "query": query, "results_count": len(results), "results": results}
+        results = [
+            {"id": doc_id, "content": doc["content"][:200]}
+            for doc_id, doc in self.knowledge_base.items()
+            if query.lower() in doc["content"].lower()
+        ]
+        return {
+            "status": "success",
+            "agent": self.name,
+            "query": query,
+            "results_count": len(results),
+            "results": results,
+        }
 
     def list_documents(self) -> Dict[str, Any]:
         """List all documents in knowledge base."""
-        return {"status": "success", "agent": self.name, "total_documents": self.document_count, "documents": list(self.knowledge_base.keys())}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "total_documents": self.document_count,
+            "documents": list(self.knowledge_base.keys()),
+        }

@@ -33,7 +33,12 @@ class DocumentProcessor(BaseAgent):
             return {"status": "error", "message": f"Unsupported format: {format}"}
         doc = {"content": content, "format": format, "lines": len(content.split("\n"))}
         self.documents.append(doc)
-        return {"status": "success", "agent": self.name, "format": format, "documents_processed": len(self.documents)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "format": format,
+            "documents_processed": len(self.documents),
+        }
 
     def extract_text(self, content: str) -> Dict[str, Any]:
         """Extract text from content."""
@@ -41,8 +46,19 @@ class DocumentProcessor(BaseAgent):
             return {"status": "error", "message": "Content required"}
         lines = content.split("\n")
         paragraphs = [l for l in lines if l.strip()]
-        return {"status": "success", "agent": self.name, "text_extracted": True, "paragraphs": len(paragraphs), "lines": len(lines)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "text_extracted": True,
+            "paragraphs": len(paragraphs),
+            "lines": len(lines),
+        }
 
     def list_documents(self) -> Dict[str, Any]:
         """List processed documents."""
-        return {"status": "success", "agent": self.name, "documents_count": len(self.documents), "supported_formats": self.supported_formats}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "documents_count": len(self.documents),
+            "supported_formats": self.supported_formats,
+        }

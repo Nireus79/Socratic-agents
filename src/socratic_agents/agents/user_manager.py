@@ -31,7 +31,12 @@ class UserManager(BaseAgent):
         if not user_id:
             return {"status": "error", "message": "User ID required"}
         self.users[user_id] = {"id": user_id, "preferences": preferences or {}}
-        return {"status": "success", "agent": self.name, "user_id": user_id, "total_users": len(self.users)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "user_id": user_id,
+            "total_users": len(self.users),
+        }
 
     def update_preferences(self, user_id: str, preferences: Dict[str, Any]) -> Dict[str, Any]:
         """Update user preferences."""
@@ -40,7 +45,12 @@ class UserManager(BaseAgent):
         if user_id not in self.users:
             return {"status": "error", "message": f"User {user_id} not found"}
         self.users[user_id]["preferences"].update(preferences or {})
-        return {"status": "success", "agent": self.name, "user_id": user_id, "preferences_updated": True}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "user_id": user_id,
+            "preferences_updated": True,
+        }
 
     def get_user(self, user_id: str) -> Dict[str, Any]:
         """Get user info."""
@@ -52,4 +62,9 @@ class UserManager(BaseAgent):
 
     def list_users(self) -> Dict[str, Any]:
         """List all users."""
-        return {"status": "success", "agent": self.name, "users": list(self.users.keys()), "user_count": len(self.users)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "users": list(self.users.keys()),
+            "user_count": len(self.users),
+        }

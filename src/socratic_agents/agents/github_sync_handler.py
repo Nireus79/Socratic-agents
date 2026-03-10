@@ -31,7 +31,13 @@ class GithubSyncHandler(BaseAgent):
             return {"status": "error", "message": "Repository name required"}
         if repo not in self.synced_repos:
             self.synced_repos.append(repo)
-        return {"status": "success", "agent": self.name, "repository": repo, "synced": True, "total_repos": len(self.synced_repos)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "repository": repo,
+            "synced": True,
+            "total_repos": len(self.synced_repos),
+        }
 
     def record_commit(self, message: str) -> Dict[str, Any]:
         """Record a commit."""
@@ -39,8 +45,19 @@ class GithubSyncHandler(BaseAgent):
             return {"status": "error", "message": "Commit message required"}
         commit = {"message": message, "id": len(self.commits) + 1}
         self.commits.append(commit)
-        return {"status": "success", "agent": self.name, "commit_id": commit["id"], "total_commits": len(self.commits)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "commit_id": commit["id"],
+            "total_commits": len(self.commits),
+        }
 
     def sync_status(self) -> Dict[str, Any]:
         """Get sync status."""
-        return {"status": "success", "agent": self.name, "synced_repos": len(self.synced_repos), "commits": len(self.commits), "repositories": self.synced_repos}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "synced_repos": len(self.synced_repos),
+            "commits": len(self.commits),
+            "repositories": self.synced_repos,
+        }

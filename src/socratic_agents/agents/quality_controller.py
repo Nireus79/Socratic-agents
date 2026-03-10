@@ -39,8 +39,19 @@ class QualityController(BaseAgent):
 
     def run_tests(self) -> Dict[str, Any]:
         """Run quality tests."""
-        return {"status": "success", "agent": self.name, "tests_passed": len(self.tests), "tests_failed": 0}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "tests_passed": len(self.tests),
+            "tests_failed": 0,
+        }
 
     def generate_report(self) -> Dict[str, Any]:
         """Generate quality report."""
-        return {"status": "success", "agent": self.name, "overall_score": self.quality_score, "tests_run": len(self.tests), "issues_found": 0}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "overall_score": self.quality_score,
+            "tests_run": len(self.tests),
+            "issues_found": 0,
+        }

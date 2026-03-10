@@ -7,7 +7,7 @@ from .base import BaseAgent
 class SocraticCounselor(BaseAgent):
     """
     Agent that guides learning through Socratic questioning.
-    
+
     Helps users understand concepts by asking guiding questions
     rather than providing direct answers.
     """
@@ -20,29 +20,29 @@ class SocraticCounselor(BaseAgent):
         """Process a learning request through Socratic questioning."""
         topic = request.get("topic", "")
         level = request.get("level", "beginner")
-        
+
         if not topic:
             return {"status": "error", "message": "Topic required"}
 
         # Generate questions to guide learning
         questions = self._generate_guiding_questions(topic, level)
-        
+
         return {
             "status": "success",
             "agent": self.name,
             "topic": topic,
             "level": level,
-            "questions": questions
+            "questions": questions,
         }
 
     def guide(self, topic: str, level: str = "beginner") -> Dict[str, Any]:
         """
         Guide learning on a topic through questioning.
-        
+
         Args:
             topic: The topic to learn about
             level: Learning level (beginner, intermediate, advanced)
-            
+
         Returns:
             Dictionary with guiding questions
         """
@@ -65,6 +65,6 @@ class SocraticCounselor(BaseAgent):
                 f"What are the limitations of {topic}?",
                 f"How could {topic} be improved or extended?",
                 f"What are the connections between {topic} and related concepts?",
-            ]
+            ],
         }
         return questions.get(level, questions["beginner"])

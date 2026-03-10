@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional
 class BaseAgent(ABC):
     """
     Abstract base class for all agents in Socratic Agents.
-    
+
     Agents are specialized components that handle different aspects of AI workflows.
     Each agent has a specific purpose and can work independently or be orchestrated
     with other agents.

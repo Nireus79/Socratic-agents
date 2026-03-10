@@ -30,16 +30,38 @@ class LearningAgent(BaseAgent):
         if not interaction:
             return {"status": "error", "message": "Interaction required"}
         self.interactions.append({"data": interaction})
-        return {"status": "success", "agent": self.name, "recorded": True, "total_interactions": len(self.interactions)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "recorded": True,
+            "total_interactions": len(self.interactions),
+        }
 
     def analyze_patterns(self) -> Dict[str, Any]:
         """Analyze patterns in recorded interactions."""
         if not self.interactions:
-            return {"status": "success", "agent": self.name, "patterns": [], "message": "No interactions recorded"}
-        self.patterns = [f"{len(self.interactions)} interactions recorded", "Learning system active"]
-        return {"status": "success", "agent": self.name, "patterns_found": len(self.patterns), "patterns": self.patterns}
+            return {
+                "status": "success",
+                "agent": self.name,
+                "patterns": [],
+                "message": "No interactions recorded",
+            }
+        self.patterns = [
+            f"{len(self.interactions)} interactions recorded",
+            "Learning system active",
+        ]
+        return {
+            "status": "success",
+            "agent": self.name,
+            "patterns_found": len(self.patterns),
+            "patterns": self.patterns,
+        }
 
     def suggest_improvements(self) -> Dict[str, Any]:
         """Suggest improvements based on learning."""
-        suggestions = ["Record more interactions for patterns", "Analyze recent interactions", "Share learnings with agents"]
+        suggestions = [
+            "Record more interactions for patterns",
+            "Analyze recent interactions",
+            "Share learnings with agents",
+        ]
         return {"status": "success", "agent": self.name, "suggestions": suggestions}

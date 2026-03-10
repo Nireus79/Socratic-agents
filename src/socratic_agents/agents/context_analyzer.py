@@ -29,14 +29,25 @@ class ContextAnalyzer(BaseAgent):
         if not content:
             return {"status": "error", "message": "Content required"}
         keywords = content.split()[:5]
-        return {"status": "success", "agent": self.name, "keywords": keywords, "content_length": len(content), "word_count": len(keywords)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "keywords": keywords,
+            "content_length": len(content),
+            "word_count": len(keywords),
+        }
 
     def store_context(self, name: str, content: str) -> Dict[str, Any]:
         """Store a context."""
         if not name or not content:
             return {"status": "error", "message": "Name and content required"}
         self.contexts[name] = content
-        return {"status": "success", "agent": self.name, "context_stored": name, "contexts_count": len(self.contexts)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "context_stored": name,
+            "contexts_count": len(self.contexts),
+        }
 
     def retrieve_context(self, name: str) -> Dict[str, Any]:
         """Retrieve a stored context."""

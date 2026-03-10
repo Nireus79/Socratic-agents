@@ -27,7 +27,13 @@ class SystemMonitor(BaseAgent):
 
     def get_status(self) -> Dict[str, Any]:
         """Get system status."""
-        return {"status": "success", "agent": self.name, "health_score": self.health_score, "system_status": "healthy", "uptime": "100%"}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "health_score": self.health_score,
+            "system_status": "healthy",
+            "uptime": "100%",
+        }
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get system metrics."""
@@ -37,4 +43,9 @@ class SystemMonitor(BaseAgent):
     def check_alerts(self) -> Dict[str, Any]:
         """Check for system alerts."""
         alerts = [] if self.health_score > 80 else ["System performance degraded"]
-        return {"status": "success", "agent": self.name, "alerts": alerts, "alert_count": len(alerts)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "alerts": alerts,
+            "alert_count": len(alerts),
+        }

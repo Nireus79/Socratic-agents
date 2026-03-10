@@ -7,40 +7,35 @@ from socratic_agents import BaseAgent, SocraticCounselor, CodeGenerator, CodeVal
 class SocraticAgentsTool:
     """
     LangChain tool for using Socratic Agents within LangChain workflows.
-    
+
     Can be used in LangChain chains and agents to leverage multi-agent orchestration.
     """
 
     def __init__(self, llm_client: Optional[Any] = None, **kwargs):
         """
         Initialize the Socratic Agents tool.
-        
+
         Args:
             llm_client: Optional LLMClient from Socrates Nexus
             **kwargs: Additional configuration
         """
         self.llm_client = llm_client
         self.config = kwargs
-        
+
         # Initialize key agents
         self.counselor = SocraticCounselor(llm_client=llm_client)
         self.code_generator = CodeGenerator(llm_client=llm_client)
         self.code_validator = CodeValidator(llm_client=llm_client)
 
-    def _run(
-        self,
-        agent_type: str = "counselor",
-        task: str = "",
-        **kwargs
-    ) -> str:
+    def _run(self, agent_type: str = "counselor", task: str = "", **kwargs) -> str:
         """
         Execute an agent synchronously.
-        
+
         Args:
             agent_type: Type of agent to use (counselor, code_generator, code_validator)
             task: Task description or prompt
             **kwargs: Additional parameters
-            
+
         Returns:
             String result from the agent
         """
@@ -51,16 +46,13 @@ class SocraticAgentsTool:
                 result = self.counselor.guide(topic, level)
                 questions = result.get("questions", [])
                 return "\n".join(questions)
-            
+
             elif agent_type == "code_generator":
                 prompt = kwargs.get("prompt", task)
                 language = kwargs.get("language", "python")
-                result = self.code_generator.process({
-                    "prompt": prompt,
-                    "language": language
-                })
+                result = self.code_generator.process({"prompt": prompt, "language": language})
                 return result.get("code", "")
-            
+
             elif agent_type == "code_validator":
                 code = kwargs.get("code", task)
                 language = kwargs.get("language", "python")
@@ -72,27 +64,22 @@ class SocraticAgentsTool:
                     return f"Found {len(issues)} issues:\n" + "\n".join(
                         str(issue) for issue in issues
                     )
-            
+
             else:
                 return f"Unknown agent type: {agent_type}"
-        
+
         except Exception as e:
             return f"Error: {str(e)}"
 
-    async def _arun(
-        self,
-        agent_type: str = "counselor",
-        task: str = "",
-        **kwargs
-    ) -> str:
+    async def _arun(self, agent_type: str = "counselor", task: str = "", **kwargs) -> str:
         """
         Execute an agent asynchronously.
-        
+
         Args:
             agent_type: Type of agent to use
             task: Task description or prompt
             **kwargs: Additional parameters
-            
+
         Returns:
             String result from the agent
         """
@@ -103,11 +90,11 @@ class SocraticAgentsTool:
     def guide_learning(self, topic: str, level: str = "beginner") -> str:
         """
         Get Socratic guidance on a topic.
-        
+
         Args:
             topic: Topic to learn about
             level: Learning level
-            
+
         Returns:
             Guiding questions
         """
@@ -116,11 +103,11 @@ class SocraticAgentsTool:
     def generate_code(self, prompt: str, language: str = "python") -> str:
         """
         Generate code using the code generator agent.
-        
+
         Args:
             prompt: Description of code to generate
             language: Programming language
-            
+
         Returns:
             Generated code
         """
@@ -129,11 +116,11 @@ class SocraticAgentsTool:
     def validate_code(self, code: str, language: str = "python") -> str:
         """
         Validate code using the code validator agent.
-        
+
         Args:
             code: Code to validate
             language: Programming language
-            
+
         Returns:
             Validation result
         """
@@ -144,15 +131,15 @@ class SocraticAgentsTool:
 def create_socratic_tools(llm_client: Optional[Any] = None) -> List[Dict[str, Any]]:
     """
     Create a list of LangChain-compatible tools from Socratic Agents.
-    
+
     Args:
         llm_client: Optional LLMClient from Socrates Nexus
-        
+
     Returns:
         List of tool dictionaries for LangChain agents
     """
     agents_tool = SocraticAgentsTool(llm_client=llm_client)
-    
+
     return [
         {
             "name": "socratic_guide",

@@ -31,17 +31,32 @@ class ConflictDetector(BaseAgent):
         conflicts = []
         if len(items) > 1:
             for i, item in enumerate(items[:-1]):
-                for j, other in enumerate(items[i+1:]):
+                for j, other in enumerate(items[i + 1 :]):
                     if str(item) == str(other):
-                        conflicts.append({"type": "duplicate", "items": [i, j+i+1]})
-        return {"status": "success", "agent": self.name, "conflicts_found": len(conflicts), "conflicts": conflicts}
+                        conflicts.append({"type": "duplicate", "items": [i, j + i + 1]})
+        return {
+            "status": "success",
+            "agent": self.name,
+            "conflicts_found": len(conflicts),
+            "conflicts": conflicts,
+        }
 
     def resolve_conflict(self, conflict_id: str) -> Dict[str, Any]:
         """Resolve a conflict."""
         if not conflict_id:
             return {"status": "error", "message": "Conflict ID required"}
-        return {"status": "success", "agent": self.name, "conflict_id": conflict_id, "resolved": True}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "conflict_id": conflict_id,
+            "resolved": True,
+        }
 
     def list_conflicts(self) -> Dict[str, Any]:
         """List detected conflicts."""
-        return {"status": "success", "agent": self.name, "conflicts_count": len(self.conflicts), "conflicts": self.conflicts}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "conflicts_count": len(self.conflicts),
+            "conflicts": self.conflicts,
+        }

@@ -31,7 +31,12 @@ class ProjectManager(BaseAgent):
             return {"status": "error", "message": "Project name required"}
         project_id = f"proj_{len(self.projects) + 1}"
         self.projects[project_id] = {"name": name, "description": description, "tasks": []}
-        return {"status": "success", "agent": self.name, "project_id": project_id, "project_name": name}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "project_id": project_id,
+            "project_name": name,
+        }
 
     def add_task(self, project_id: str, task: str) -> Dict[str, Any]:
         """Add a task to a project."""
@@ -42,8 +47,19 @@ class ProjectManager(BaseAgent):
         task_obj = {"id": len(self.tasks) + 1, "task": task, "status": "pending"}
         self.tasks.append(task_obj)
         self.projects[project_id]["tasks"].append(task_obj["id"])
-        return {"status": "success", "agent": self.name, "task_id": task_obj["id"], "project_id": project_id}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "task_id": task_obj["id"],
+            "project_id": project_id,
+        }
 
     def list_projects(self) -> Dict[str, Any]:
         """List all projects."""
-        return {"status": "success", "agent": self.name, "projects": list(self.projects.keys()), "project_count": len(self.projects), "task_count": len(self.tasks)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "projects": list(self.projects.keys()),
+            "project_count": len(self.projects),
+            "task_count": len(self.tasks),
+        }

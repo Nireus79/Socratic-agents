@@ -35,7 +35,12 @@ class QuestionQueueAgent(BaseAgent):
         q_obj = {"id": q_id, "question": question, "priority": priority, "status": "queued"}
         self.queue.append(q_obj)
         self.queue.sort(key=lambda x: {"high": 0, "normal": 1, "low": 2}.get(x["priority"], 1))
-        return {"status": "success", "agent": self.name, "question_id": q_id, "queue_size": len(self.queue)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "question_id": q_id,
+            "queue_size": len(self.queue),
+        }
 
     def get_next_question(self) -> Dict[str, Any]:
         """Get the next question to process."""
@@ -53,8 +58,19 @@ class QuestionQueueAgent(BaseAgent):
         self.queue.remove(q_obj)
         q_obj["status"] = "processed"
         self.processed.append(q_obj)
-        return {"status": "success", "agent": self.name, "question_id": question_id, "processed": True}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "question_id": question_id,
+            "processed": True,
+        }
 
     def list_queue(self) -> Dict[str, Any]:
         """List the question queue."""
-        return {"status": "success", "agent": self.name, "queued": len(self.queue), "processed": len(self.processed), "queue": self.queue}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "queued": len(self.queue),
+            "processed": len(self.processed),
+            "queue": self.queue,
+        }

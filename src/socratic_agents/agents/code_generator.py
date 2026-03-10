@@ -17,29 +17,29 @@ class CodeGenerator(BaseAgent):
         """Process a code generation request."""
         prompt = request.get("prompt", "")
         language = request.get("language", "python")
-        
+
         if not prompt:
             return {"status": "error", "message": "Prompt required"}
 
         # Use LLM to generate code if available
         code = self._generate_code(prompt, language)
-        
+
         return {
             "status": "success",
             "agent": self.name,
             "language": language,
             "code": code,
-            "prompt": prompt
+            "prompt": prompt,
         }
 
     def generate(self, prompt: str, language: str = "python") -> str:
         """
         Generate code for a given prompt.
-        
+
         Args:
             prompt: Description of the code to generate
             language: Programming language (default: python)
-            
+
         Returns:
             Generated code
         """

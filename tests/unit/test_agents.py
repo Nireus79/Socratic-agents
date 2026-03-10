@@ -39,7 +39,7 @@ class TestSocraticCounselor:
         """Test guiding learning on a topic."""
         counselor = SocraticCounselor()
         result = counselor.guide("recursion", level="beginner")
-        
+
         assert result["status"] == "success"
         assert result["topic"] == "recursion"
         assert "questions" in result
@@ -49,7 +49,7 @@ class TestSocraticCounselor:
     def test_guide_learning_different_levels(self):
         """Test guidance at different levels."""
         counselor = SocraticCounselor()
-        
+
         for level in ["beginner", "intermediate", "advanced"]:
             result = counselor.guide("Python", level=level)
             assert result["level"] == level
@@ -60,7 +60,7 @@ class TestSocraticCounselor:
         """Test guidance without topic fails gracefully."""
         counselor = SocraticCounselor()
         result = counselor.process({"topic": ""})
-        
+
         assert result["status"] == "error"
 
 
@@ -77,11 +77,10 @@ class TestCodeGenerator:
     def test_generate_code(self):
         """Test code generation."""
         generator = CodeGenerator()
-        result = generator.process({
-            "prompt": "Create a function to add two numbers",
-            "language": "python"
-        })
-        
+        result = generator.process(
+            {"prompt": "Create a function to add two numbers", "language": "python"}
+        )
+
         assert result["status"] == "success"
         assert "code" in result
         assert result["language"] == "python"
@@ -91,7 +90,7 @@ class TestCodeGenerator:
         """Test generation without prompt fails gracefully."""
         generator = CodeGenerator()
         result = generator.process({"prompt": ""})
-        
+
         assert result["status"] == "error"
 
 
@@ -110,7 +109,7 @@ class TestCodeValidator:
         validator = CodeValidator()
         code = "def add(a, b):\n    return a + b"
         result = validator.validate(code, language="python")
-        
+
         assert result["status"] == "success"
         assert "issues" in result
         assert "valid" in result
@@ -129,5 +128,5 @@ class TestCodeValidator:
         """Test validation without code fails gracefully."""
         validator = CodeValidator()
         result = validator.process({"code": ""})
-        
+
         assert result["status"] == "error"

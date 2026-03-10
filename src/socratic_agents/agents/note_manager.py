@@ -32,9 +32,18 @@ class NoteManager(BaseAgent):
         if not title:
             return {"status": "error", "message": "Title required"}
         note_id = f"note_{self.note_count + 1}"
-        self.notes[note_id] = {"title": title, "content": content or "", "created_at": str(self.created_at)}
+        self.notes[note_id] = {
+            "title": title,
+            "content": content or "",
+            "created_at": str(self.created_at),
+        }
         self.note_count += 1
-        return {"status": "success", "agent": self.name, "note_id": note_id, "total_notes": len(self.notes)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "note_id": note_id,
+            "total_notes": len(self.notes),
+        }
 
     def get_note(self, note_id: str) -> Dict[str, Any]:
         """Get a note."""
@@ -56,4 +65,9 @@ class NoteManager(BaseAgent):
     def list_notes(self) -> Dict[str, Any]:
         """List all notes."""
         note_list = [{"id": nid, "title": n["title"]} for nid, n in self.notes.items()]
-        return {"status": "success", "agent": self.name, "notes": note_list, "note_count": len(self.notes)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "notes": note_list,
+            "note_count": len(self.notes),
+        }

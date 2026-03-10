@@ -28,9 +28,18 @@ class DocumentContextAnalyzer(BaseAgent):
         """Analyze document context."""
         if not document:
             return {"status": "error", "message": "Document required"}
-        analysis = {"doc_length": len(document), "paragraphs": len(document.split("\n")), "sentences": document.count(".")}
+        analysis = {
+            "doc_length": len(document),
+            "paragraphs": len(document.split("\n")),
+            "sentences": document.count("."),
+        }
         self.analyzed_docs.append(analysis)
-        return {"status": "success", "agent": self.name, "analysis": analysis, "documents_analyzed": len(self.analyzed_docs)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "analysis": analysis,
+            "documents_analyzed": len(self.analyzed_docs),
+        }
 
     def extract_context(self, document: str) -> Dict[str, Any]:
         """Extract context from document."""
@@ -38,8 +47,18 @@ class DocumentContextAnalyzer(BaseAgent):
             return {"status": "error", "message": "Document required"}
         lines = document.split("\n")
         context_lines = [l for l in lines if len(l.strip()) > 5]
-        return {"status": "success", "agent": self.name, "context_extracted": len(context_lines), "context_density": round(len(context_lines)/max(len(lines), 1)*100, 1)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "context_extracted": len(context_lines),
+            "context_density": round(len(context_lines) / max(len(lines), 1) * 100, 1),
+        }
 
     def list_analyzed(self) -> Dict[str, Any]:
         """List analyzed documents."""
-        return {"status": "success", "agent": self.name, "documents_analyzed": len(self.analyzed_docs), "total_length": sum(d.get("doc_length", 0) for d in self.analyzed_docs)}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "documents_analyzed": len(self.analyzed_docs),
+            "total_length": sum(d.get("doc_length", 0) for d in self.analyzed_docs),
+        }

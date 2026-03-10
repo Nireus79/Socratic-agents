@@ -19,7 +19,7 @@ class TestOpenclawIntegration:
         """Test listing available agents."""
         skill = SocraticAgentsSkill()
         agents = skill.list_agents()
-        
+
         assert isinstance(agents, list)
         assert len(agents) == 18
         assert "counselor" in agents
@@ -30,7 +30,7 @@ class TestOpenclawIntegration:
         """Test getting a specific agent."""
         skill = SocraticAgentsSkill()
         agent = skill.get_agent("counselor")
-        
+
         assert agent is not None
         assert agent.name == "SocraticCounselor"
 
@@ -39,7 +39,7 @@ class TestOpenclawIntegration:
         """Test getting a nonexistent agent."""
         skill = SocraticAgentsSkill()
         agent = skill.get_agent("nonexistent")
-        
+
         assert agent is None
 
     @pytest.mark.integration
@@ -47,7 +47,7 @@ class TestOpenclawIntegration:
         """Test using guide method through skill."""
         skill = SocraticAgentsSkill()
         result = skill.guide("Python functions", level="beginner")
-        
+
         assert result["status"] == "success"
         assert "questions" in result
 
@@ -56,7 +56,7 @@ class TestOpenclawIntegration:
         """Test generating code through skill."""
         skill = SocraticAgentsSkill()
         code = skill.generate_code("Create a hello world program")
-        
+
         assert isinstance(code, str)
 
     @pytest.mark.integration
@@ -64,7 +64,7 @@ class TestOpenclawIntegration:
         """Test validating code through skill."""
         skill = SocraticAgentsSkill()
         result = skill.validate_code("print('hello')", language="python")
-        
+
         assert result["status"] == "success"
         assert "valid" in result
 
@@ -74,7 +74,7 @@ class TestOpenclawIntegration:
         skill = SocraticAgentsSkill()
         result = skill.execute_workflow(
             task="Create and validate code",
-            agents=["counselor"]  # Use counselor which we know works
+            agents=["counselor"],  # Use counselor which we know works
         )
 
         assert result["status"] == "success"
@@ -97,7 +97,7 @@ class TestLangChainIntegration:
         """Test guide_learning method."""
         tool = SocraticAgentsTool()
         result = tool.guide_learning("Data structures")
-        
+
         assert isinstance(result, str)
 
     @pytest.mark.integration
@@ -105,7 +105,7 @@ class TestLangChainIntegration:
         """Test generate_code method."""
         tool = SocraticAgentsTool()
         result = tool.generate_code("Palindrome checker")
-        
+
         assert isinstance(result, str)
 
     @pytest.mark.integration
@@ -113,17 +113,17 @@ class TestLangChainIntegration:
         """Test validate_code method."""
         tool = SocraticAgentsTool()
         result = tool.validate_code("x = 5")
-        
+
         assert isinstance(result, str)
 
     @pytest.mark.integration
     def test_create_socratic_tools(self):
         """Test creating tools for LangChain."""
         tools = create_socratic_tools()
-        
+
         assert isinstance(tools, list)
         assert len(tools) == 3
-        
+
         tool_names = [t["name"] for t in tools]
         assert "socratic_guide" in tool_names
         assert "code_generator" in tool_names
@@ -133,7 +133,7 @@ class TestLangChainIntegration:
     def test_tool_has_descriptions(self):
         """Test that tools have descriptions."""
         tools = create_socratic_tools()
-        
+
         for tool in tools:
             assert "name" in tool
             assert "description" in tool

@@ -34,7 +34,12 @@ class MultiLlmAgent(BaseAgent):
 
     def list_providers(self) -> Dict[str, Any]:
         """List available LLM providers."""
-        return {"status": "success", "agent": self.name, "providers": self.providers, "active_provider": self.active_provider}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "providers": self.providers,
+            "active_provider": self.active_provider,
+        }
 
     def query_llm(self, prompt: str) -> Dict[str, Any]:
         """Query the active LLM provider."""
@@ -43,7 +48,17 @@ class MultiLlmAgent(BaseAgent):
         if self.llm_client:
             try:
                 response = self.llm_client.chat(prompt)
-                return {"status": "success", "agent": self.name, "provider": self.active_provider, "response": response.content}
+                return {
+                    "status": "success",
+                    "agent": self.name,
+                    "provider": self.active_provider,
+                    "response": response.content,
+                }
             except Exception as e:
                 self.logger.error(f"LLM error: {e}")
-        return {"status": "success", "agent": self.name, "provider": self.active_provider, "message": "Query ready"}
+        return {
+            "status": "success",
+            "agent": self.name,
+            "provider": self.active_provider,
+            "message": "Query ready",
+        }
