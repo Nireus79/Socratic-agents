@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "socratic-agents"
+version = "0.1.0"
+description = "Multi-agent orchestration system with 18 specialized agents for AI workflows. Built-in integrations with Openclaw and LangChain."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Socratic Agents Contributors"}
+]
+keywords = [
+    "agents",
+    "ai",
+    "orchestration",
+    "multi-agent",
+    "langchain",
+    "openclaw",
+    "production",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+
+dependencies = [
+    "socrates-nexus>=0.3.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+# Framework integrations
+openclaw = []
+langchain = ["langchain>=0.1.0"]
+nexus = ["socrates-nexus>=0.3.0"]
+
+# All features
+all = [
+    "langchain>=0.1.0",
+    "socrates-nexus>=0.3.0",
+]
+
+# Development
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Nireus79/Socratic-agents"
+Repository = "https://github.com/Nireus79/Socratic-agents"
+Documentation = "https://github.com/Nireus79/Socratic-agents#readme"
+Issues = "https://github.com/Nireus79/Socratic-agents/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages]
+find = {where = ["src"]}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow tests",
+]
+addopts = "-v --strict-markers"
+
+[tool.black]
+line-length = 100
+target-version = ["py38"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+ignore_missing_imports = true
