@@ -23,7 +23,7 @@ class EffectivenessTrendAnalyzer:
             raise ValueError("effectiveness must be between 0.0 and 1.0")
 
         ts = timestamp or datetime.now(UTC).isoformat()
-        
+
         data_point = {"effectiveness": effectiveness, "timestamp": ts}
         self._effectiveness_data[skill_id].append(data_point)
 
@@ -47,7 +47,9 @@ class EffectivenessTrendAnalyzer:
             raise ValueError(f"No data found for skill: {skill_id}")
         data = self._effectiveness_data[skill_id]
         if len(data) < window_size:
-            raise ValueError(f"Insufficient data for trend analysis. Need {window_size}, found {len(data)}")
+            raise ValueError(
+                f"Insufficient data for trend analysis. Need {window_size}, found {len(data)}"
+            )
         moving_avgs = self.get_moving_average(skill_id, window_size)
         if len(moving_avgs) < 2:
             raise ValueError("Insufficient moving averages for trend calculation")
@@ -66,9 +68,7 @@ class EffectivenessTrendAnalyzer:
             "current_effectiveness": data[-1]["effectiveness"],
         }
 
-    def detect_anomalies(
-        self, skill_id: str, threshold: float = 2.0
-    ) -> List[Dict[str, Any]]:
+    def detect_anomalies(self, skill_id: str, threshold: float = 2.0) -> List[Dict[str, Any]]:
         """Detect anomalies in skill effectiveness data."""
         if skill_id not in self._effectiveness_data:
             return []
@@ -88,13 +88,15 @@ class EffectivenessTrendAnalyzer:
                 value = data[j]["effectiveness"]
                 deviation = abs(value - avg)
                 if deviation > threshold * std_dev:
-                    anomalies.append({
-                        "index": j,
-                        "value": value,
-                        "moving_average": avg,
-                        "deviation": deviation,
-                        "timestamp": data[j]["timestamp"],
-                    })
+                    anomalies.append(
+                        {
+                            "index": j,
+                            "value": value,
+                            "moving_average": avg,
+                            "deviation": deviation,
+                            "timestamp": data[j]["timestamp"],
+                        }
+                    )
         return anomalies
 
     def forecast_effectiveness(self, skill_id: str, periods: int = 5) -> List[float]:
@@ -108,7 +110,9 @@ class EffectivenessTrendAnalyzer:
         y_values = [d["effectiveness"] for d in data]
         x_mean = statistics.mean(x_values)
         y_mean = statistics.mean(y_values)
-        numerator = sum((x_values[i] - x_mean) * (y_values[i] - y_mean) for i in range(len(x_values)))
+        numerator = sum(
+            (x_values[i] - x_mean) * (y_values[i] - y_mean) for i in range(len(x_values))
+        )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
         slope = 0 if denominator == 0 else numerator / denominator
         intercept = y_mean - slope * x_mean

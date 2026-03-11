@@ -106,9 +106,7 @@ class SkillInteractionTracker:
         if not self._interaction_history:
             return []
 
-        best_interaction = max(
-            self._interaction_history, key=lambda x: x["effectiveness"]
-        )
+        best_interaction = max(self._interaction_history, key=lambda x: x["effectiveness"])
 
         return best_interaction["skill_ids"]
 
