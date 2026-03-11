@@ -1,12 +1,14 @@
 """Phase 4.5: Extended SkillGeneratorAgent with LLM-Powered Skill Generation Integration."""
 
 import logging
+import uuid
 from typing import Any, Dict, List, Optional
 
 from ..models.skill_models import AgentSkill
 from ..skill_generation.llm_skill_generator import LLMSkillGenerator
 from ..skill_generation.skill_prompt_engine import SkillPromptEngine
 from ..skill_generation.skill_validation_engine import SkillValidationEngine
+from ..skill_generation.skill_version_manager import SkillVersionManager
 from .skill_generator_agent import SkillGeneratorAgent
 
 
@@ -45,6 +47,9 @@ class SkillGeneratorAgentV2(SkillGeneratorAgent):
         self.llm_generator = LLMSkillGenerator(llm_client) if llm_client else None
         self.prompt_engine = SkillPromptEngine()
         self.validation_engine = SkillValidationEngine()
+
+        # Phase 6: Version management
+        self.version_manager = SkillVersionManager()
 
         # Tracking
         self.llm_skills_generated = 0
@@ -263,13 +268,12 @@ class SkillGeneratorAgentV2(SkillGeneratorAgent):
             ),
         }
 
-    def _refine_skill(
-        self, skill_id: Optional[str], feedback: Optional[str]
-    ) -> Dict[str, Any]:
+    def _refine_skill(self, skill_id: Optional[str], feedback: Optional[str]) -> Dict[str, Any]:
         """
         Refine an existing skill based on feedback.
 
         Phase 4 feature: Uses LLM to improve skills iteratively.
+        Phase 6 update: Creates new versions instead of overwriting.
         """
         if not skill_id:
             return {
@@ -311,16 +315,41 @@ class SkillGeneratorAgentV2(SkillGeneratorAgent):
             )
 
             if refined_skill:
+                # Phase 6: Determine version increment from feedback
+                version_part = self._determine_version_increment(feedback)
+                new_version = self.version_manager.increment_version(skill.version, version_part)
+
+                # Update refined skill with version information
+                refined_skill.version = new_version
+                refined_skill.parent_skill_id = skill.id
+                refined_skill.parent_version = skill.version
+
+                # Generate new unique ID for refined skill version
+                refined_skill.id = (
+                    f"{skill.id}_v{new_version.replace('.', '_')}_{uuid.uuid4().hex[:8]}"
+                )
+
                 # Validate refined skill
                 validation = self.validation_engine.validate_skill(refined_skill)
 
                 if validation.is_valid:
+                    # Register version with manager
+                    self.version_manager.register_version(
+                        refined_skill,
+                        changelog=f"Refined based on feedback: {feedback[:50]}",
+                        created_by="SkillGeneratorAgentV2",
+                    )
+
+                    # Store with new ID
                     self.generated_skills[refined_skill.id] = refined_skill
+
                     return {
                         "status": "success",
                         "agent": self.name,
                         "original_skill": skill_id,
+                        "original_version": skill.version,
                         "refined_skill": self._skill_to_dict(refined_skill),
+                        "refined_version": new_version,
                         "validation": validation.to_dict(),
                     }
                 else:
@@ -344,6 +373,29 @@ class SkillGeneratorAgentV2(SkillGeneratorAgent):
                 "agent": self.name,
                 "message": f"Refinement error: {str(e)}",
             }
+
+    def _determine_version_increment(self, feedback: str) -> str:
+        """
+        Determine which version part to increment based on feedback.
+
+        Args:
+            feedback: Feedback text
+
+        Returns:
+            "major", "minor", or "patch"
+        """
+        feedback_lower = feedback.lower()
+
+        # Major version for breaking changes
+        if any(word in feedback_lower for word in ["breaking", "incompatible", "redesign"]):
+            return "major"
+
+        # Minor version for new features
+        if any(word in feedback_lower for word in ["feature", "enhancement", "add", "new"]):
+            return "minor"
+
+        # Patch for bug fixes and improvements
+        return "patch"
 
     def _validate_skill(self, skill_id: Optional[str]) -> Dict[str, Any]:
         """
