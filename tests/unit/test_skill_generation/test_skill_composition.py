@@ -113,17 +113,13 @@ class TestSkillComposition:
     def test_optimize_skill_order_dependent(self, composition, sample_skills):
         """Test optimizing dependent skills."""
         # Try different orders
-        order1 = composition.optimize_skill_order(
-            ["skill_analyze", "skill_parse", "skill_format"]
-        )
+        order1 = composition.optimize_skill_order(["skill_analyze", "skill_parse", "skill_format"])
         # Should respect dependencies
         assert isinstance(order1, list)
 
     def test_detect_skill_conflicts_none(self, composition, sample_skills):
         """Test detecting conflicts when none exist."""
-        conflicts = composition.detect_skill_conflicts(
-            ["skill_parse", "skill_analyze"]
-        )
+        conflicts = composition.detect_skill_conflicts(["skill_parse", "skill_analyze"])
         assert isinstance(conflicts, list)
 
     def test_detect_skill_conflicts_incompatible(self, composition):
@@ -167,9 +163,7 @@ class TestSkillComposition:
 
     def test_determine_skill_order_respects_dependencies(self, composition, sample_skills):
         """Test that skill ordering respects dependencies."""
-        ordered = composition.optimize_skill_order(
-            ["skill_format", "skill_parse", "skill_analyze"]
-        )
+        ordered = composition.optimize_skill_order(["skill_format", "skill_parse", "skill_analyze"])
         # parse should come before analyze, analyze before format
         parse_idx = ordered.index("skill_parse")
         analyze_idx = ordered.index("skill_analyze")
@@ -257,9 +251,7 @@ class TestSkillCompositionIntegration:
             },
         )
 
-        conflicts = composition.detect_skill_conflicts(
-            ["parallel_skill_1", "parallel_skill_2"]
-        )
+        conflicts = composition.detect_skill_conflicts(["parallel_skill_1", "parallel_skill_2"])
         # Should detect that skills cannot run together
         assert isinstance(conflicts, list)
 

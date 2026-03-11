@@ -209,9 +209,7 @@ class TestWorkflowSkillIntegration:
         """Test validation of complex multi-step workflow."""
         steps = [
             WorkflowStep(agent_id="parser", skill_name="parse"),
-            WorkflowStep(
-                agent_id="analyzer", skill_name="analyze", dependencies=["step_0"]
-            ),
+            WorkflowStep(agent_id="analyzer", skill_name="analyze", dependencies=["step_0"]),
             WorkflowStep(
                 agent_id="formatter",
                 skill_name="format",

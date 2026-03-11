@@ -147,8 +147,7 @@ class LearningAgent(BaseAgent):
 
             # Add personalization metadata
             personalized_skill["personalization_reason"] = (
-                f"Adjusted for {learning_velocity} velocity, "
-                f"{engagement:.0%} engagement"
+                f"Adjusted for {learning_velocity} velocity, " f"{engagement:.0%} engagement"
             )
 
             personalized.append(personalized_skill)
@@ -166,9 +165,7 @@ class LearningAgent(BaseAgent):
             "personalization_profile": profile,
         }
 
-    def track_skill_feedback(
-        self, skill_id: str, feedback: str
-    ) -> Dict[str, Any]:
+    def track_skill_feedback(self, skill_id: str, feedback: str) -> Dict[str, Any]:
         """
         Track effectiveness feedback for a skill.
 
@@ -214,9 +211,7 @@ class LearningAgent(BaseAgent):
             "skill_id": skill_id,
             "feedback": feedback,
             "effectiveness_score": effectiveness,
-            "history_length": len(
-                self.skill_effectiveness_history.get(skill_id, [])
-            ),
+            "history_length": len(self.skill_effectiveness_history.get(skill_id, [])),
         }
 
     def predict_skill_effectiveness(self, skill: Dict[str, Any]) -> float:
@@ -272,9 +267,7 @@ class LearningAgent(BaseAgent):
             "penalize_harmful_skills": True,
         }
 
-    def _update_user_profile_from_feedback(
-        self, skill_id: str, effectiveness: float
-    ) -> None:
+    def _update_user_profile_from_feedback(self, skill_id: str, effectiveness: float) -> None:
         """Update user profile based on skill feedback."""
         # Adjust engagement based on effectiveness
         if effectiveness > 0.7:

@@ -91,9 +91,7 @@ class QualityController(BaseAgent):
         }
 
         # Identify weak categories (score < 0.6)
-        weak_categories = [
-            cat for cat, score in category_scores.items() if score < 0.6
-        ]
+        weak_categories = [cat for cat, score in category_scores.items() if score < 0.6]
 
         # Estimate current maturity phase
         phase = self._estimate_maturity_phase(code, category_scores)
@@ -203,9 +201,7 @@ class QualityController(BaseAgent):
             score -= 0.1
         return max(0.0, min(1.0, score))
 
-    def _estimate_maturity_phase(
-        self, code: str, category_scores: Dict[str, float]
-    ) -> str:
+    def _estimate_maturity_phase(self, code: str, category_scores: Dict[str, float]) -> str:
         """Estimate current maturity phase based on code."""
         avg_score = sum(category_scores.values()) / len(category_scores)
         if avg_score < 0.4:
