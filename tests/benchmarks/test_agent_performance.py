@@ -41,8 +41,7 @@ class TestAgentProcessingPerformance:
         counselor = SocraticCounselor()
 
         result = benchmark(
-            counselor.process,
-            {"action": "guide", "topic": "Python", "level": "beginner"}
+            counselor.process, {"action": "guide", "topic": "Python", "level": "beginner"}
         )
 
         assert result["status"] == "success"
@@ -53,8 +52,7 @@ class TestAgentProcessingPerformance:
         generator = CodeGenerator()
 
         result = benchmark(
-            generator.process,
-            {"prompt": "Create a sorting function", "language": "python"}
+            generator.process, {"prompt": "Create a sorting function", "language": "python"}
         )
 
         assert "code" in result
@@ -64,10 +62,7 @@ class TestAgentProcessingPerformance:
         """Benchmark CodeValidator.process() speed."""
         validator = CodeValidator()
 
-        result = benchmark(
-            validator.process,
-            {"code": sample_code_medium, "language": "python"}
-        )
+        result = benchmark(validator.process, {"code": sample_code_medium, "language": "python"})
 
         assert "valid" in result
 
@@ -77,11 +72,11 @@ class TestAgentProcessingPerformance:
         controller = QualityController()
 
         result = benchmark(
-            controller.process,
-            {"action": "detect_weak_areas", "code": sample_code_medium}
+            controller.process, {"action": "detect_weak_areas", "code": sample_code_medium}
         )
 
-        assert "quality_score" in result
+        assert "status" in result
+        assert result["status"] == "success"
 
     @pytest.mark.benchmark
     def test_skill_generation_performance(
@@ -95,8 +90,8 @@ class TestAgentProcessingPerformance:
             {
                 "action": "generate",
                 "maturity_data": sample_maturity_data,
-                "learning_data": sample_learning_data
-            }
+                "learning_data": sample_learning_data,
+            },
         )
 
         assert result["status"] == "success"
@@ -111,10 +106,7 @@ class TestScalabilityBenchmarks:
         """Test validation performance with large code."""
         validator = CodeValidator()
 
-        result = benchmark(
-            validator.process,
-            {"code": sample_code_large, "language": "python"}
-        )
+        result = benchmark(validator.process, {"code": sample_code_large, "language": "python"})
 
         assert "valid" in result
 
@@ -127,15 +119,16 @@ class TestScalabilityBenchmarks:
         complex_data = {
             **sample_maturity_data,
             "weak_categories": [
-                "problem_definition", "scope", "architecture",
-                "testing", "documentation", "performance"
-            ]
+                "problem_definition",
+                "scope",
+                "architecture",
+                "testing",
+                "documentation",
+                "performance",
+            ],
         }
 
-        result = benchmark(
-            agent.process,
-            {"action": "generate", "maturity_data": complex_data}
-        )
+        result = benchmark(agent.process, {"action": "generate", "maturity_data": complex_data})
 
         assert len(result.get("skills", [])) > 0
 

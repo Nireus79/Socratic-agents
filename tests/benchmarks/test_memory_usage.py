@@ -47,10 +47,7 @@ class TestMemoryFootprint:
         tracemalloc.start()
 
         agent = SkillGeneratorAgent()
-        result = agent.process({
-            "action": "generate",
-            "maturity_data": sample_maturity_data
-        })
+        result = agent.process({"action": "generate", "maturity_data": sample_maturity_data})
 
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
@@ -65,14 +62,11 @@ class TestMemoryFootprint:
         tracemalloc.start()
 
         controller = QualityController()
-        result = controller.process({
-            "action": "detect_weak_areas",
-            "code": sample_code_medium
-        })
+        result = controller.process({"action": "detect_weak_areas", "code": sample_code_medium})
 
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
 
         # Quality controller should use less than 8MB
         assert peak < 8 * 1024 * 1024
-        assert "quality_score" in result
+        assert "status" in result

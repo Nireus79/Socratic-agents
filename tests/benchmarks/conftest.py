@@ -8,12 +8,14 @@ from typing import Callable, Dict, Any
 @pytest.fixture
 def memory_tracker():
     """Track memory usage during benchmarks."""
+
     def track(func: Callable) -> Dict[str, int]:
         tracemalloc.start()
         func()
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
         return {"current_kb": current // 1024, "peak_kb": peak // 1024}
+
     return track
 
 
@@ -28,18 +30,14 @@ def sample_maturity_data():
             "problem_definition": 0.3,
             "scope": 0.4,
             "architecture": 0.8,
-        }
+        },
     }
 
 
 @pytest.fixture
 def sample_learning_data():
     """Sample learning data for benchmarks."""
-    return {
-        "learning_velocity": "medium",
-        "engagement_score": 0.75,
-        "completion_rate": 0.6
-    }
+    return {"learning_velocity": "medium", "engagement_score": 0.75, "completion_rate": 0.6}
 
 
 @pytest.fixture
@@ -77,7 +75,4 @@ class Calculator:
 def sample_code_large():
     """Large code sample for stress testing."""
     # Generate a large code block
-    return "\n".join([
-        f"def function_{i}(x):\n    return x * {i}\n"
-        for i in range(100)
-    ])
+    return "\n".join([f"def function_{i}(x):\n    return x * {i}\n" for i in range(100)])
