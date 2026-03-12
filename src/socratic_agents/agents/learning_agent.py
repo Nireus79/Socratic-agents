@@ -228,8 +228,6 @@ class LearningAgent(BaseAgent):
             Predicted effectiveness (0.0-1.0)
         """
         skill_id = skill.get("id")
-        skill_type = skill.get("skill_type")
-        category = skill.get("category_focus")
 
         # If we have history for this skill, use it
         if skill_id and skill_id in self.skill_effectiveness_history:

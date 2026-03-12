@@ -1,9 +1,8 @@
 """Analytics Module for comprehensive system metrics."""
 
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 from collections import defaultdict
+from typing import Any, Dict, Optional
 
 
 class AnalyticsModule:

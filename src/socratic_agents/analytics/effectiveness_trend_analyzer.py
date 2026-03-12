@@ -2,9 +2,9 @@
 
 import logging
 import statistics
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any
 from collections import defaultdict
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
 
 class EffectivenessTrendAnalyzer:

@@ -1,7 +1,6 @@
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any
 from collections import defaultdict
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
 
 class SkillParameterOptimizer:
@@ -45,7 +44,6 @@ class SkillParameterOptimizer:
             return {"applied": False, "reason": "locked"}
         values = data.get("effectiveness_values", [])
         avg = sum(values) / len(values) if values else 0.5
-        params = data.get("current_parameters", {})
         trend = data.get("trend", {})
         diff = self.optimize_skill_difficulty(skill_id, "moderate", trend)
         prio = self.optimize_skill_priority(skill_id, avg)

@@ -1,9 +1,9 @@
 """Skill Interaction Tracker for analyzing skill combinations and synergies."""
 
 import logging
+from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
-from collections import defaultdict
 
 
 class SkillInteractionTracker:
