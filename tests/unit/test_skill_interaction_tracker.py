@@ -1,6 +1,7 @@
 """Unit tests for Skill Interaction Tracker."""
 
 import pytest
+
 from socratic_agents.analytics import SkillInteractionTracker
 
 

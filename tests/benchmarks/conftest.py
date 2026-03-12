@@ -1,8 +1,9 @@
 """Benchmark-specific fixtures and utilities."""
 
-import pytest
 import tracemalloc
-from typing import Callable, Dict, Any
+from typing import Callable, Dict
+
+import pytest
 
 
 @pytest.fixture

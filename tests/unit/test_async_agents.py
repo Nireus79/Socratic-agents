@@ -1,8 +1,10 @@
 """Tests for async agent functionality."""
 
-import pytest
 import asyncio
-from socratic_agents import SocraticCounselor, CodeGenerator, CodeValidator
+
+import pytest
+
+from socratic_agents import CodeGenerator, CodeValidator, SocraticCounselor
 
 
 class TestAsyncBasicFunctionality:

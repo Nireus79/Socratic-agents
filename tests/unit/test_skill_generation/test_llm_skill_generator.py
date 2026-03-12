@@ -1,9 +1,11 @@
 """Tests for LLMSkillGenerator component."""
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
-from socratic_agents.skill_generation.llm_skill_generator import LLMSkillGenerator
+
 from socratic_agents.models.skill_models import AgentSkill
+from socratic_agents.skill_generation.llm_skill_generator import LLMSkillGenerator
 
 
 class TestLLMSkillGenerator:
@@ -195,7 +197,7 @@ class TestLLMSkillGeneratorIntegration:
         mock_response.content = '{"id": "cached_skill", "target_agent": "agent", "skill_type": "behavior_parameter", "config": {}, "confidence": 0.7, "maturity_phase": "discovery"}'
         mock_client.chat.return_value = mock_response
 
-        skill = gen.generate_skill({}, "test_area", "prompt")
+        _ = gen.generate_skill({}, "test_area", "prompt")
         assert len(gen.skill_cache) >= 0
 
         gen.clear_cache()

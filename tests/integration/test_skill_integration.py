@@ -1,9 +1,8 @@
+
 import pytest
-from unittest.mock import Mock
-from socratic_agents.integrations.skill_orchestrator import SkillOrchestrator
+
 from socratic_agents.agents.quality_controller import QualityController
-from socratic_agents.agents.skill_generator_agent import SkillGeneratorAgent
-from socratic_agents.agents.learning_agent import LearningAgent
+from socratic_agents.integrations.skill_orchestrator import SkillOrchestrator
 
 
 class TestSkillOrchestrationFlow:

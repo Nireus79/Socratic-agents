@@ -1,4 +1,5 @@
 import pytest
+
 from socratic_agents.analytics.skill_parameter_optimizer import SkillParameterOptimizer
 
 
@@ -56,14 +57,14 @@ class TestSkillParameterOptimizer:
             "current_parameters": {"difficulty": 0.5, "priority": "medium", "confidence": 0.75},
         }
         result = optimizer.auto_adjust_skill_parameters("skill_a", data)
-        assert result["applied"] == True
+        assert result["applied"]
         assert "difficulty" in result
 
     def test_auto_adjust_locked_skill(self, optimizer):
         data = {"effectiveness_values": [0.5], "trend": {}, "current_parameters": {}}
         optimizer.auto_adjust_skill_parameters("skill_locked", data)
         result = optimizer.auto_adjust_skill_parameters("skill_locked", data)
-        assert result["applied"] == False
+        assert not result["applied"]
 
     def test_analyze_optimization_impact(self, optimizer):
         before = {"difficulty": 0.5, "confidence": 0.75}

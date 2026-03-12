@@ -1,12 +1,13 @@
 """Performance benchmarks for core agents."""
 
 import pytest
+
 from socratic_agents import (
-    SocraticCounselor,
     CodeGenerator,
     CodeValidator,
     QualityController,
     SkillGeneratorAgent,
+    SocraticCounselor,
 )
 
 

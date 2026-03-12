@@ -1,11 +1,13 @@
 """Memory usage benchmarks."""
 
-import pytest
 import tracemalloc
+
+import pytest
+
 from socratic_agents import (
-    SocraticCounselor,
-    SkillGeneratorAgent,
     QualityController,
+    SkillGeneratorAgent,
+    SocraticCounselor,
 )
 
 

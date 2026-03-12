@@ -1,6 +1,7 @@
 """Tests for SkillPromptEngine component."""
 
 import pytest
+
 from socratic_agents.skill_generation.skill_prompt_engine import SkillPromptEngine
 
 

@@ -1,6 +1,7 @@
 """Unit tests for Effectiveness Trend Analyzer."""
 
 import pytest
+
 from socratic_agents.analytics import EffectivenessTrendAnalyzer
 
 

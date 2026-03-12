@@ -1,6 +1,7 @@
 """Unit tests for AnalyticsModule."""
 
 import pytest
+
 from socratic_agents.analytics.analytics_module import AnalyticsModule
 
 

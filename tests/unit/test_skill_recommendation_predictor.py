@@ -1,4 +1,5 @@
 import pytest
+
 from socratic_agents.analytics.skill_recommendation_predictor import SkillRecommendationPredictor
 
 

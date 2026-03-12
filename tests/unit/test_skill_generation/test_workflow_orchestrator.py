@@ -219,7 +219,7 @@ class TestWorkflowOrchestrator:
         orchestrator.register_agent("agent_1", mock_agents["agent_1"])
         orchestrator.register_agent("agent_2", mock_agents["agent_2"])
 
-        result = orchestrator.execute_workflow(simple_workflow, {})
+        _ = orchestrator.execute_workflow(simple_workflow, {})
         history = orchestrator.get_execution_history(limit=10)
         assert len(history) >= 1
 

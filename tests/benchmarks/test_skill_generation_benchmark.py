@@ -1,6 +1,7 @@
 """Benchmarks for skill generation agent."""
 
 import pytest
+
 from socratic_agents import SkillGeneratorAgent
 
 

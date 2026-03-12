@@ -1,11 +1,12 @@
 """Tests for SkillValidationEngine component."""
 
 import pytest
+
+from socratic_agents.models.skill_models import AgentSkill
 from socratic_agents.skill_generation.skill_validation_engine import (
     SkillValidationEngine,
     ValidationResult,
 )
-from socratic_agents.models.skill_models import AgentSkill
 
 
 class TestValidationResult:

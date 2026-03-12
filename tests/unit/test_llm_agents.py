@@ -1,11 +1,12 @@
 """Unit tests for LLM-enhanced agent wrappers."""
 
 import pytest
+
 from socratic_agents.llm_agents import (
-    LLMPoweredCounselor,
+    LLMAgentError,
     LLMPoweredCodeGenerator,
     LLMPoweredCodeValidator,
-    LLMAgentError,
+    LLMPoweredCounselor,
 )
 
 

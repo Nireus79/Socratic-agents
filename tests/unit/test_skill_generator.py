@@ -1,9 +1,6 @@
 """Unit tests for SkillGeneratorAgent."""
 
-import pytest
-from datetime import datetime
-
-from socratic_agents import SkillGeneratorAgent, AgentSkill, SkillRecommendation
+from socratic_agents import SkillGeneratorAgent
 
 
 class TestSkillGeneratorAgentInitialization:
@@ -284,8 +281,6 @@ class TestSkillPrioritization:
         priorities = [rec["priority"] for rec in recs]
         # First should be high, then medium (if exists)
         if len(priorities) > 1:
-            high_priority_count = len([p for p in priorities if p == "high"])
-            medium_priority_count = len([p for p in priorities if p == "medium"])
             # Verify they're in correct order
             assert priorities[0] == "high" or priorities[0] == "medium"
 

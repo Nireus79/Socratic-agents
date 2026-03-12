@@ -1,7 +1,8 @@
 """Pytest configuration and fixtures for Socratic Agents tests."""
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 
 @pytest.fixture

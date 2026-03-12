@@ -1,6 +1,5 @@
 """Integration tests for SkillGeneratorAgent - testing skill generation and application flow."""
 
-import pytest
 from socratic_agents import SkillGeneratorAgent
 
 
@@ -172,7 +171,7 @@ class TestSkillGenerationAndApplicationFlow:
             }
         )
 
-        discovery_skill_id = discovery_result["skills"][0]["id"]
+        _ = discovery_result["skills"][0]["id"]
 
         # Phase 2: Analysis
         analysis_result = agent.process(
@@ -188,7 +187,7 @@ class TestSkillGenerationAndApplicationFlow:
             }
         )
 
-        analysis_skill_id = analysis_result["skills"][0]["id"]
+        _ = analysis_result["skills"][0]["id"]
 
         # Phase 3: Design
         design_result = agent.process(
@@ -204,7 +203,7 @@ class TestSkillGenerationAndApplicationFlow:
             }
         )
 
-        design_skill_id = design_result["skills"][0]["id"]
+        _ = design_result["skills"][0]["id"]
 
         # Verify all skills are generated in the system
         all_skills_result = agent.process({"action": "list"})

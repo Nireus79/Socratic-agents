@@ -1,8 +1,6 @@
-import pytest
-from socratic_agents.analytics.skill_interaction_tracker import SkillInteractionTracker
-from socratic_agents.analytics.skill_recommendation_predictor import SkillRecommendationPredictor
-from socratic_agents.analytics.skill_parameter_optimizer import SkillParameterOptimizer
 from socratic_agents.analytics.analytics_module import AnalyticsModule
+from socratic_agents.analytics.skill_interaction_tracker import SkillInteractionTracker
+from socratic_agents.analytics.skill_parameter_optimizer import SkillParameterOptimizer
 
 
 class TestAnalyticsIntegration:
@@ -12,7 +10,7 @@ class TestAnalyticsIntegration:
 
         for _ in range(3):
             tracker.record_skill_interaction(["skill_a", "skill_b"], 0.9)
-        synergies = tracker.identify_skill_synergies(threshold=0.7)
+        _ = tracker.identify_skill_synergies(threshold=0.7)
 
         effectiveness_data = {
             "effectiveness_values": [0.85 + (i * 0.01) for i in range(10)],
