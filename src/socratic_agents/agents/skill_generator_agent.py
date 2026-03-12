@@ -59,7 +59,7 @@ class SkillGeneratorAgent:
             )
         elif action == "evaluate":
             return self.evaluate_skill_effectiveness(
-                skill_id=request.get("skill_id"),
+                skill_id=request.get("skill_id", ""),
                 feedback=request.get("feedback"),
                 effectiveness_score=request.get("effectiveness_score"),
             )

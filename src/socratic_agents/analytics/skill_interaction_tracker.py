@@ -70,11 +70,12 @@ class SkillInteractionTracker:
         processed_pairs = set()
         for skill_a, pairs in interaction_matrix.items():
             for skill_b, score in pairs.items():
-                pair = tuple(sorted([skill_a, skill_b]))
+                pair = tuple(sorted([skill_a, skill_b]))  # type: ignore
                 if pair in processed_pairs:
                     continue
                 if score >= threshold:
-                    synergies.append((*pair, score))
+                    sorted_pair = sorted([skill_a, skill_b])
+                    synergies.append((sorted_pair[0], sorted_pair[1], score))
                     processed_pairs.add(pair)
 
         synergies.sort(key=lambda x: x[2], reverse=True)
@@ -91,11 +92,12 @@ class SkillInteractionTracker:
         processed_pairs = set()
         for skill_a, pairs in interaction_matrix.items():
             for skill_b, score in pairs.items():
-                pair = tuple(sorted([skill_a, skill_b]))
+                pair = tuple(sorted([skill_a, skill_b]))  # type: ignore
                 if pair in processed_pairs:
                     continue
                 if score <= threshold:
-                    conflicts.append((*pair, score))
+                    sorted_pair = sorted([skill_a, skill_b])
+                    conflicts.append((sorted_pair[0], sorted_pair[1], score))
                     processed_pairs.add(pair)
 
         conflicts.sort(key=lambda x: x[2])
@@ -112,12 +114,12 @@ class SkillInteractionTracker:
 
     def get_interaction_strength(self, skill_id_1: str, skill_id_2: str) -> float:
         """Get the interaction strength between two skills."""
-        pair_key = tuple(sorted([skill_id_1, skill_id_2]))
+        pair_key = tuple(sorted([skill_id_1, skill_id_2]))  # type: ignore
 
         if pair_key not in self._skill_pair_stats:
             return 0.0
 
-        scores = self._skill_pair_stats[pair_key]
+        scores = self._skill_pair_stats[pair_key]  # type: ignore
         return sum(scores) / len(scores) if scores else 0.0
 
     def get_interaction_history(self) -> List[Dict]:
