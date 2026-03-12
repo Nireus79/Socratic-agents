@@ -113,16 +113,12 @@ class LLMPoweredCounselor:
 
         try:
             response = self.llm.chat(prompt)
-            llm_questions = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            llm_questions = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             llm_questions = f"[LLM generation failed: {e}]"
 
         # Get basic questions from agent
-        basic_result = self.agent.process(
-            {"action": "guide", "topic": topic, "level": level}
-        )
+        basic_result = self.agent.process({"action": "guide", "topic": topic, "level": level})
 
         return {
             **basic_result,
@@ -147,9 +143,7 @@ class LLMPoweredCounselor:
             Dict with personalized questions and guidance
         """
         style_context = (
-            f"Learner style: {learning_style}"
-            if learning_style
-            else "Adapt to learner's needs"
+            f"Learner style: {learning_style}" if learning_style else "Adapt to learner's needs"
         )
         return self.guide_with_context(topic, level=user_level, context=style_context)
 
@@ -222,9 +216,7 @@ class LLMPoweredCodeGenerator:
                 - specification: Original specification
         """
         doc_instruction = (
-            "\n- Include comprehensive docstrings and inline comments"
-            if include_docs
-            else ""
+            "\n- Include comprehensive docstrings and inline comments" if include_docs else ""
         )
         error_instruction = (
             "\n- Include proper error handling and edge case management"
@@ -245,9 +237,7 @@ class LLMPoweredCodeGenerator:
 
         try:
             response = self.llm.chat(prompt)
-            generated_code = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            generated_code = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             generated_code = f"# Error generating code: {e}"
 
@@ -285,9 +275,7 @@ class LLMPoweredCodeGenerator:
 
         try:
             response = self.llm.chat(prompt)
-            response_text = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            response_text = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             response_text = f"Error: {e}"
 
@@ -350,9 +338,7 @@ class LLMPoweredCodeValidator:
         """
         focus_str = ""
         if focus_areas:
-            focus_str = (
-                f"\nFocus particularly on: {', '.join(focus_areas)}\n"
-            )
+            focus_str = f"\nFocus particularly on: {', '.join(focus_areas)}\n"
 
         prompt = (
             f"Review this {language} code and provide:\n"
@@ -444,9 +430,7 @@ class LLMPoweredProjectManager:
 
         try:
             response = self.llm.chat(prompt)
-            breakdown = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            breakdown = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             breakdown = f"[Project breakdown failed: {e}]"
 
@@ -470,9 +454,7 @@ class LLMPoweredProjectManager:
         Returns:
             Dict with identified risks, severity, and mitigation strategies
         """
-        tasks_str = "\n".join(
-            [f"- {task.get('description', task)}" for task in (tasks or [])]
-        )
+        tasks_str = "\n".join([f"- {task.get('description', task)}" for task in (tasks or [])])
 
         prompt = (
             f"Analyze this project for risks and challenges:\n\n"
@@ -488,9 +470,7 @@ class LLMPoweredProjectManager:
 
         try:
             response = self.llm.chat(prompt)
-            risk_analysis = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            risk_analysis = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             risk_analysis = f"[Risk analysis failed: {e}]"
 
@@ -570,9 +550,7 @@ class LLMPoweredQualityController:
         except Exception as e:
             review = f"[Review failed: {e}]"
 
-        basic_result = self.agent.process(
-            {"action": "detect_weak_areas", "code": code}
-        )
+        basic_result = self.agent.process({"action": "detect_weak_areas", "code": code})
 
         return {
             **basic_result,
@@ -604,9 +582,7 @@ class LLMPoweredQualityController:
 
         try:
             response = self.llm.chat(prompt)
-            suggestions = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            suggestions = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             suggestions = f"[Refactoring analysis failed: {e}]"
 
@@ -693,9 +669,7 @@ class LLMPoweredKnowledgeManager:
 
         try:
             response = self.llm.chat(prompt)
-            semantic_ranking = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            semantic_ranking = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             semantic_ranking = f"[Semantic search failed: {e}]"
 
@@ -731,10 +705,7 @@ class LLMPoweredKnowledgeManager:
             }
 
         context = "\n\n".join(
-            [
-                f"Source {i+1}:\n{doc.get('content', '')[:300]}..."
-                for i, doc in enumerate(documents)
-            ]
+            [f"Source {i+1}:\n{doc.get('content', '')[:300]}..." for i, doc in enumerate(documents)]
         )
 
         prompt = (
@@ -816,9 +787,7 @@ class LLMPoweredContextAnalyzer:
         ]
 
         if include_entities:
-            analysis_items.append(
-                "- Named entities (people, places, organizations, concepts)"
-            )
+            analysis_items.append("- Named entities (people, places, organizations, concepts)")
 
         if include_sentiment:
             analysis_items.append("- Tone and sentiment")
@@ -826,10 +795,7 @@ class LLMPoweredContextAnalyzer:
         analysis_str = "\n".join(analysis_items)
 
         prompt = (
-            f"Analyze this content in depth:\n\n"
-            f"{content}\n\n"
-            f"Provide:\n"
-            f"{analysis_str}"
+            f"Analyze this content in depth:\n\n" f"{content}\n\n" f"Provide:\n" f"{analysis_str}"
         )
 
         try:
@@ -880,9 +846,7 @@ class LLMPoweredContextAnalyzer:
 
         try:
             response = self.llm.chat(prompt)
-            intent_analysis = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            intent_analysis = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             intent_analysis = f"[Intent detection failed: {e}]"
 
@@ -927,9 +891,7 @@ class LLMPoweredContextAnalyzer:
 
         try:
             response = self.llm.chat(prompt)
-            recommendations = (
-                response.content if hasattr(response, "content") else str(response)
-            )
+            recommendations = response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             recommendations = f"[Recommendation generation failed: {e}]"
 

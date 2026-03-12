@@ -42,9 +42,7 @@ class TestLLMPoweredCounselor:
         """Test guide_with_context method."""
         counselor = LLMPoweredCounselor(llm_client=mock_llm_client)
         result = counselor.guide_with_context(
-            topic="Python recursion",
-            level="beginner",
-            context="for someone new to programming"
+            topic="Python recursion", level="beginner", context="for someone new to programming"
         )
 
         assert "questions" in result
@@ -58,10 +56,7 @@ class TestLLMPoweredCounselor:
     def test_guide_with_context_without_context_param(self, mock_llm_client):
         """Test guide_with_context without optional context parameter."""
         counselor = LLMPoweredCounselor(llm_client=mock_llm_client)
-        result = counselor.guide_with_context(
-            topic="machine learning",
-            level="intermediate"
-        )
+        result = counselor.guide_with_context(topic="machine learning", level="intermediate")
 
         assert result["context_aware"] is False
         assert result["context"] is None
@@ -71,9 +66,7 @@ class TestLLMPoweredCounselor:
         """Test personalized_guide method."""
         counselor = LLMPoweredCounselor(llm_client=mock_llm_client)
         result = counselor.personalized_guide(
-            topic="algorithms",
-            user_level="intermediate",
-            learning_style="practical"
+            topic="algorithms", user_level="intermediate", learning_style="practical"
         )
 
         assert "questions" in result
@@ -83,10 +76,7 @@ class TestLLMPoweredCounselor:
     def test_guide_with_llm_error_handling(self, mock_llm_client_error):
         """Test that guide handles LLM errors gracefully."""
         counselor = LLMPoweredCounselor(llm_client=mock_llm_client_error)
-        result = counselor.guide_with_context(
-            topic="testing",
-            level="beginner"
-        )
+        result = counselor.guide_with_context(topic="testing", level="beginner")
 
         # Should still return something despite LLM error
         assert "questions" in result
@@ -111,8 +101,7 @@ class TestLLMPoweredCodeGenerator:
         """Test generate_with_tests method."""
         generator = LLMPoweredCodeGenerator(llm_client=mock_llm_client)
         result = generator.generate_with_tests(
-            specification="Binary search algorithm",
-            language="python"
+            specification="Binary search algorithm", language="python"
         )
 
         assert "code" in result
@@ -127,9 +116,7 @@ class TestLLMPoweredCodeGenerator:
         """Test generate_with_tests without documentation."""
         generator = LLMPoweredCodeGenerator(llm_client=mock_llm_client)
         result = generator.generate_with_tests(
-            specification="Quicksort",
-            language="python",
-            include_docs=False
+            specification="Quicksort", language="python", include_docs=False
         )
 
         assert result["has_docs"] is False
@@ -139,9 +126,7 @@ class TestLLMPoweredCodeGenerator:
         """Test generate_with_tests without error handling."""
         generator = LLMPoweredCodeGenerator(llm_client=mock_llm_client)
         result = generator.generate_with_tests(
-            specification="Stack implementation",
-            language="python",
-            include_error_handling=False
+            specification="Stack implementation", language="python", include_error_handling=False
         )
 
         assert result["has_error_handling"] is False
@@ -150,8 +135,7 @@ class TestLLMPoweredCodeGenerator:
         """Test generate_with_explanation method."""
         generator = LLMPoweredCodeGenerator(llm_client=mock_llm_client)
         result = generator.generate_with_explanation(
-            specification="Merge sort algorithm",
-            language="python"
+            specification="Merge sort algorithm", language="python"
         )
 
         assert "code" in result
@@ -162,10 +146,7 @@ class TestLLMPoweredCodeGenerator:
     def test_generate_with_llm_error_handling(self, mock_llm_client_error):
         """Test that generate handles LLM errors gracefully."""
         generator = LLMPoweredCodeGenerator(llm_client=mock_llm_client_error)
-        result = generator.generate_with_tests(
-            specification="Any function",
-            language="python"
-        )
+        result = generator.generate_with_tests(specification="Any function", language="python")
 
         # Should return error message in code field
         assert "code" in result
@@ -189,10 +170,7 @@ class TestLLMPoweredCodeValidator:
     def test_review_with_suggestions(self, mock_llm_client, sample_code):
         """Test review_with_suggestions method."""
         validator = LLMPoweredCodeValidator(llm_client=mock_llm_client)
-        result = validator.review_with_suggestions(
-            code=sample_code,
-            language="python"
-        )
+        result = validator.review_with_suggestions(code=sample_code, language="python")
 
         assert "llm_review" in result
         assert result["suggestions_provided"] is True
@@ -204,9 +182,7 @@ class TestLLMPoweredCodeValidator:
         validator = LLMPoweredCodeValidator(llm_client=mock_llm_client)
         focus = ["performance", "readability"]
         result = validator.review_with_suggestions(
-            code=sample_code,
-            language="python",
-            focus_areas=focus
+            code=sample_code, language="python", focus_areas=focus
         )
 
         assert result["focus_areas"] == focus
@@ -215,10 +191,7 @@ class TestLLMPoweredCodeValidator:
     def test_review_with_error_handling(self, mock_llm_client_error, sample_code):
         """Test that review handles LLM errors gracefully."""
         validator = LLMPoweredCodeValidator(llm_client=mock_llm_client_error)
-        result = validator.review_with_suggestions(
-            code=sample_code,
-            language="python"
-        )
+        result = validator.review_with_suggestions(code=sample_code, language="python")
 
         # Should still return review despite error
         assert "llm_review" in result
@@ -250,10 +223,7 @@ class TestLLMWrapperIntegration:
         generated_code = gen_result.get("code", "")
 
         # Validate generated code
-        val_result = validator.review_with_suggestions(
-            code=generated_code,
-            language="python"
-        )
+        val_result = validator.review_with_suggestions(code=generated_code, language="python")
 
         assert "llm_review" in val_result
 

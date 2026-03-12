@@ -12,18 +12,16 @@ class TestAsyncBasicFunctionality:
     async def test_process_async_exists(self):
         """Test that process_async method exists on agents."""
         agent = SocraticCounselor()
-        assert hasattr(agent, 'process_async')
+        assert hasattr(agent, "process_async")
         assert callable(agent.process_async)
 
     @pytest.mark.asyncio
     async def test_single_agent_async(self):
         """Test single agent async call."""
         counselor = SocraticCounselor()
-        result = await counselor.process_async({
-            "action": "guide",
-            "topic": "testing",
-            "level": "beginner"
-        })
+        result = await counselor.process_async(
+            {"action": "guide", "topic": "testing", "level": "beginner"}
+        )
 
         assert "questions" in result
         assert isinstance(result["questions"], list)
@@ -36,7 +34,7 @@ class TestAsyncBasicFunctionality:
 
         results = await asyncio.gather(
             counselor.process_async({"action": "guide", "topic": "async"}),
-            generator.process_async({"prompt": "async function", "language": "python"})
+            generator.process_async({"prompt": "async function", "language": "python"}),
         )
 
         assert len(results) == 2
@@ -74,13 +72,23 @@ class TestAsyncResultConsistency:
 
         # Test each agent has async support
         for agent in agents:
-            assert hasattr(agent, 'process_async')
+            assert hasattr(agent, "process_async")
 
         # Test they all return results
-        results = await asyncio.gather(*[
-            agent.process_async({"action": "test"} if i == 0 else {"prompt": "test", "language": "python"} if i == 1 else {"code": "pass", "language": "python"})
-            for i, agent in enumerate(agents)
-        ])
+        results = await asyncio.gather(
+            *[
+                agent.process_async(
+                    {"action": "test"}
+                    if i == 0
+                    else (
+                        {"prompt": "test", "language": "python"}
+                        if i == 1
+                        else {"code": "pass", "language": "python"}
+                    )
+                )
+                for i, agent in enumerate(agents)
+            ]
+        )
 
         assert len(results) == 3
         assert all(isinstance(r, dict) for r in results)
