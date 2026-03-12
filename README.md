@@ -72,17 +72,34 @@ Socratic Agents provides a comprehensive agent orchestration framework with 19 p
 
 ## Installation
 
-```bash
-# Basic installation
-pip install socratic-agents
+### Basic Installation (Rule-Based Agents)
 
-# With Openclaw support
+Agents work standalone with template-based behavior:
+
+```bash
+pip install socratic-agents
+```
+
+No external dependencies required. Agents use internal templates and heuristics.
+
+### With LLM Enhancement (Recommended)
+
+Adds Socrates Nexus for intelligent, context-aware agent behavior:
+
+```bash
+pip install socratic-agents[nexus]
+```
+
+### With Framework Integration
+
+```bash
+# Openclaw integration
 pip install socratic-agents[openclaw]
 
-# With LangChain support
+# LangChain integration
 pip install socratic-agents[langchain]
 
-# With all features
+# All features
 pip install socratic-agents[all]
 
 # Development
@@ -91,22 +108,100 @@ pip install socratic-agents[dev]
 
 ## Quick Start
 
-### Basic Agent Usage
+### Standalone Usage (No LLM Required)
+
+Agents work independently using rule-based behavior and templates:
 
 ```python
-from socratic_agents import SocraticCounselor, MultiLLMAgent
+from socratic_agents import SocraticCounselor, CodeGenerator, CodeValidator
+
+# Socratic Counselor - uses question templates
+counselor = SocraticCounselor()
+result = counselor.process({
+    "action": "guide",
+    "topic": "Python recursion",
+    "level": "beginner"
+})
+print("Questions:", result["questions"])
+
+# Code Generator - returns template code
+generator = CodeGenerator()
+code_result = generator.process({
+    "prompt": "Create a fibonacci function",
+    "language": "python"
+})
+print("Code:", code_result["code"])
+
+# Code Validator - basic syntax/quality checks
+validator = CodeValidator()
+val_result = validator.process({
+    "code": "def hello(): print('world')",
+    "language": "python"
+})
+print("Valid:", val_result["valid"])
+```
+
+See `examples/01_standalone_usage.py` for full example.
+
+### With LLM Enhancement (Using Socrates Nexus)
+
+Pass an LLM client for intelligent, context-aware behavior:
+
+```python
+from socratic_agents import SocraticCounselor, CodeGenerator
 from socrates_nexus import LLMClient
 
 # Create LLM client
-llm_client = LLMClient(provider="anthropic", model="claude-opus")
+llm = LLMClient(provider="anthropic", model="claude-sonnet")
 
-# Create agents
-counselor = SocraticCounselor(llm_client)
-coordinator = MultiLLMAgent(llm_client)
+# Agents now use LLM for enhanced responses
+counselor = SocraticCounselor(llm_client=llm)
+result = counselor.process({
+    "action": "guide",
+    "topic": "machine learning gradient descent",
+    "level": "intermediate"
+})
+print("Enhanced guidance:", result)
 
-# Use agent
-response = counselor.guide("Help me understand recursion")
-print(response)
+# Code generator creates real code with LLM
+generator = CodeGenerator(llm_client=llm)
+code_result = generator.process({
+    "prompt": "Binary search algorithm",
+    "language": "python"
+})
+print("Generated code:", code_result["code"])
+```
+
+See `examples/02_with_nexus.py` for full example.
+
+### LLM-Powered Agent Wrappers
+
+Use enhanced wrappers for advanced features:
+
+```python
+from socratic_agents import LLMPoweredCounselor, LLMPoweredCodeGenerator
+from socrates_nexus import LLMClient
+
+llm = LLMClient(provider="anthropic", model="claude-sonnet")
+
+# Enhanced counselor with context awareness
+counselor = LLMPoweredCounselor(llm_client=llm)
+result = counselor.guide_with_context(
+    topic="algorithms",
+    level="advanced",
+    context="for a technical interview"
+)
+print("Context-aware guidance:", result["llm_enhanced_questions"])
+
+# Enhanced generator with tests and docs
+generator = LLMPoweredCodeGenerator(llm_client=llm)
+result = generator.generate_with_tests(
+    specification="Quicksort implementation",
+    language="python",
+    include_docs=True,
+    include_error_handling=True
+)
+print("Production-ready code with tests:", result["code"])
 ```
 
 ### Multi-Agent Workflow

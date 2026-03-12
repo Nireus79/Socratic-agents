@@ -30,6 +30,18 @@ from .agents.user_manager import UserManager
 # Data models
 from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
 
+# LLM-enhanced agent wrappers
+from .llm_agents import (
+    LLMPoweredCodeGenerator,
+    LLMPoweredCodeValidator,
+    LLMPoweredCounselor,
+    LLMPoweredProjectManager,
+    LLMPoweredQualityController,
+    LLMPoweredKnowledgeManager,
+    LLMPoweredContextAnalyzer,
+    LLMAgentError,
+)
+
 __all__ = [
     # Base class
     "BaseAgent",
@@ -57,4 +69,13 @@ __all__ = [
     "AgentSkill",
     "SkillApplicationResult",
     "SkillRecommendation",
+    # LLM-enhanced agent wrappers
+    "LLMPoweredCounselor",
+    "LLMPoweredCodeGenerator",
+    "LLMPoweredCodeValidator",
+    "LLMPoweredProjectManager",
+    "LLMPoweredQualityController",
+    "LLMPoweredKnowledgeManager",
+    "LLMPoweredContextAnalyzer",
+    "LLMAgentError",
 ]
