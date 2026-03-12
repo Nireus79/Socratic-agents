@@ -1,4 +1,3 @@
-
 import pytest
 
 from socratic_agents.agents.quality_controller import QualityController

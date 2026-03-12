@@ -2,7 +2,7 @@
 
 import logging
 import statistics
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from collections import defaultdict
 
@@ -22,7 +22,7 @@ class EffectivenessTrendAnalyzer:
         if not (0.0 <= effectiveness <= 1.0):
             raise ValueError("effectiveness must be between 0.0 and 1.0")
 
-        ts = timestamp or datetime.now(UTC).isoformat()
+        ts = timestamp or datetime.now(timezone.utc).isoformat()
 
         data_point = {"effectiveness": effectiveness, "timestamp": ts}
         self._effectiveness_data[skill_id].append(data_point)
