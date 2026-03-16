@@ -349,6 +349,16 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
 
 MIT License - See [LICENSE](LICENSE) for details.
 
+## Support Development
+
+If you find this package useful, consider supporting development:
+
+- [Become a Sponsor](https://github.com/sponsors/Nireus79) - Get early access to new features
+- [Star on GitHub](https://github.com/Nireus79/Socratic-agents) - Shows your appreciation
+- [Report Issues](https://github.com/Nireus79/Socratic-agents/issues) - Help improve the package
+
+Your support helps fund development of the entire Socratic ecosystem.
+
 ## Support
 
 - GitHub Issues: https://github.com/Nireus79/Socratic-agents/issues
