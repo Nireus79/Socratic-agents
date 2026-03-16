@@ -8,8 +8,6 @@ from .agents.base import BaseAgent
 from .agents.code_generator import CodeGenerator
 from .agents.code_validation_agent import CodeValidator
 from .agents.conflict_detector import AgentConflictDetector
-# Backward compatibility
-ConflictDetector = AgentConflictDetector
 from .agents.context_analyzer import ContextAnalyzer
 from .agents.document_context_analyzer import DocumentContextAnalyzer
 from .agents.document_processor import DocumentProcessor
@@ -43,6 +41,9 @@ from .llm_agents import (
 
 # Data models
 from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
+
+# Backward compatibility alias
+ConflictDetector = AgentConflictDetector
 
 __all__ = [
     # Base class

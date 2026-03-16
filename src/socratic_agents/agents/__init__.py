@@ -4,8 +4,6 @@ from .base import BaseAgent
 from .code_generator import CodeGenerator
 from .code_validation_agent import CodeValidator
 from .conflict_detector import AgentConflictDetector
-# Backward compatibility alias
-ConflictDetector = AgentConflictDetector
 from .context_analyzer import ContextAnalyzer
 from .document_context_analyzer import DocumentContextAnalyzer
 from .document_processor import DocumentProcessor
@@ -22,6 +20,9 @@ from .skill_generator_agent import SkillGeneratorAgent
 from .socratic_counselor import SocraticCounselor
 from .system_monitor import SystemMonitor
 from .user_manager import UserManager
+
+# Backward compatibility alias
+ConflictDetector = AgentConflictDetector
 
 __all__ = [
     "BaseAgent",
