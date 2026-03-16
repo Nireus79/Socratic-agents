@@ -1,7 +1,7 @@
 """Skill Version Manager for Phase 6: Skill Versioning & Compatibility."""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..models.skill_models import AgentSkill, SkillVersion
@@ -70,7 +70,7 @@ class SkillVersionManager:
                 skill_id=skill_id,
                 version=version,
                 skill=skill,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
                 created_by=created_by,
                 changelog=changelog,
             )
@@ -87,7 +87,7 @@ class SkillVersionManager:
                     "action": "register",
                     "skill_id": skill_id,
                     "version": version,
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                     "created_by": created_by,
                 }
             )
@@ -207,7 +207,7 @@ class SkillVersionManager:
                 "skill_id": skill_id,
                 "from_version": from_version,
                 "to_version": to_version,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         )
 
@@ -267,7 +267,7 @@ class SkillVersionManager:
                 "skill_id": skill_id,
                 "version": version,
                 "reason": reason,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         )
 

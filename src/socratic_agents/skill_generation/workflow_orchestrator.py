@@ -3,7 +3,7 @@
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from .workflow_skill import WorkflowSkill, WorkflowStep
@@ -21,7 +21,7 @@ class WorkflowStepResult:
     error: Optional[str] = None
     execution_time: float = 0.0
     retry_count: int = 0
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 @dataclass
