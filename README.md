@@ -6,6 +6,16 @@ Production-grade multi-agent orchestration system with 19 specialized agents for
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PyPI Status](https://img.shields.io/badge/PyPI-Coming%20Soon-blue.svg)](https://pypi.org/)
 
+## Why Socratic Agents?
+
+Building specialized agents takes months. Socratic Agents gives you 19 production-ready agents:
+
+- **Pre-built Agents** - 19 specialized agents covering learning, code generation, analysis, coordination, and more
+- **Adaptive Skill Generation** - Automatically generate and optimize skills based on maturity and learning patterns
+- **Framework Integration** - Works seamlessly with Openclaw and LangChain for easy deployment
+- **Multi-Provider Support** - Built on Socrates Nexus for Claude, GPT-4, Gemini, and other models
+- **Production Ready** - Full async support, comprehensive testing, type hints, and error handling
+
 ## Overview
 
 Socratic Agents provides a comprehensive agent orchestration framework with 19 pre-built agents designed to handle complex AI workflows. Each agent specializes in a specific capability (code generation, analysis, learning, coordination, skill generation, etc.) and can work independently or be orchestrated together.
