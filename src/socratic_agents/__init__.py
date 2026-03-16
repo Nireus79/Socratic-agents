@@ -7,7 +7,9 @@ __author__ = "Socratic Agents Contributors"
 from .agents.base import BaseAgent
 from .agents.code_generator import CodeGenerator
 from .agents.code_validation_agent import CodeValidator
-from .agents.conflict_detector import ConflictDetector
+from .agents.conflict_detector import AgentConflictDetector
+# Backward compatibility
+ConflictDetector = AgentConflictDetector
 from .agents.context_analyzer import ContextAnalyzer
 from .agents.document_context_analyzer import DocumentContextAnalyzer
 from .agents.document_processor import DocumentProcessor
@@ -60,7 +62,8 @@ __all__ = [
     "GithubSyncHandler",
     "SystemMonitor",
     "UserManager",
-    "ConflictDetector",
+    "AgentConflictDetector",
+    "ConflictDetector",  # Backward compatibility alias
     "KnowledgeAnalysis",
     "DocumentContextAnalyzer",
     "NoteManager",

@@ -3,7 +3,9 @@
 from .base import BaseAgent
 from .code_generator import CodeGenerator
 from .code_validation_agent import CodeValidator
-from .conflict_detector import ConflictDetector
+from .conflict_detector import AgentConflictDetector
+# Backward compatibility alias
+ConflictDetector = AgentConflictDetector
 from .context_analyzer import ContextAnalyzer
 from .document_context_analyzer import DocumentContextAnalyzer
 from .document_processor import DocumentProcessor
@@ -37,7 +39,8 @@ __all__ = [
     "SkillGeneratorAgent",
     "SystemMonitor",
     "UserManager",
-    "ConflictDetector",
+    "AgentConflictDetector",
+    "ConflictDetector",  # Backward compatibility alias
     "KnowledgeAnalysis",
     "DocumentContextAnalyzer",
     "NoteManager",

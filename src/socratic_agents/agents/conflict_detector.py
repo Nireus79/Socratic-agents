@@ -5,12 +5,12 @@ from typing import Any, Dict, List, Optional
 from .base import BaseAgent
 
 
-class ConflictDetector(BaseAgent):
+class AgentConflictDetector(BaseAgent):
     """Agent that detects and helps resolve conflicts."""
 
     def __init__(self, llm_client: Optional[Any] = None):
         """Initialize the Conflict Detector."""
-        super().__init__(name="ConflictDetector", llm_client=llm_client)
+        super().__init__(name="AgentConflictDetector", llm_client=llm_client)
         self.conflicts: List[Dict[str, Any]] = []
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
