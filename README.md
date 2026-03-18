@@ -324,6 +324,12 @@ agent = initialize_agent(
 - Context passing between agents
 - Error handling and recovery
 
+## Documentation
+
+- **[Skill Generator Agent Overview](docs/SKILL_GENERATOR_OVERVIEW.md)** - Complete guide to the adaptive skill generation system with integration architecture, implementation phases, and design principles
+- **[Skill Generator Analysis](docs/SKILL_GENERATOR_ANALYSIS.md)** - Technical feasibility analysis and implementation options
+- **[Skill Generator Standalone Design](docs/SKILL_GENERATOR_STANDALONE_ANALYSIS.md)** - Standalone vs. integrated design patterns and reusability architecture
+
 ## Testing
 
 ```bash
