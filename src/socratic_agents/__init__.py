@@ -3,30 +3,43 @@
 __version__ = "0.1.1"
 __author__ = "Socratic Agents Contributors"
 
+
 # Error classes for GitHub sync and integration
 class ConflictResolutionError(Exception):
     """Raised when merge conflict cannot be resolved"""
+
     pass
+
 
 class TokenExpiredError(Exception):
     """Raised when GitHub authentication token has expired"""
+
     pass
+
 
 class PermissionDeniedError(Exception):
     """Raised when user lacks repository access"""
+
     pass
+
 
 class RepositoryNotFoundError(Exception):
     """Raised when repository no longer exists or is inaccessible"""
+
     pass
+
 
 class NetworkSyncFailedError(Exception):
     """Raised when sync fails after all retry attempts"""
+
     pass
+
 
 class FileSizeExceededError(Exception):
     """Raised when file size exceeds GitHub limits"""
+
     pass
+
 
 # Core base class
 from .agents.base import BaseAgent
@@ -70,10 +83,12 @@ from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
 # Backward compatibility alias
 ConflictDetector = AgentConflictDetector
 
+
 # Factory functions
 def create_github_sync_handler(db=None):
     """Factory function to create GitHub sync handler"""
     return GithubSyncHandler(db=db)
+
 
 __all__ = [
     # Base class
