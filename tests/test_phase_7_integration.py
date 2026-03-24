@@ -291,9 +291,7 @@ class TestWorkflowManager:
         integration = SocratesIntegration(db)
         manager = WorkflowManager(orchestrator, integration)
 
-        workflow_id = manager.start_discovery_workflow(
-            "user123", "proj456", "A test project"
-        )
+        workflow_id = manager.start_discovery_workflow("user123", "proj456", "A test project")
 
         # Execute first step
         success = manager.execute_workflow_step(workflow_id)
@@ -318,9 +316,7 @@ class TestWorkflowManager:
         integration = SocratesIntegration(db)
         manager = WorkflowManager(orchestrator, integration)
 
-        workflow_id = manager.start_discovery_workflow(
-            "user123", "proj456", "A test project"
-        )
+        workflow_id = manager.start_discovery_workflow("user123", "proj456", "A test project")
 
         # Execute all steps
         for _ in range(2):
@@ -368,9 +364,7 @@ class TestEndToEndUserJourney:
         assert recs["current_phase"] == "discovery"
 
         # Start discovery workflow
-        wf_id = manager.start_discovery_workflow(
-            user_id, "proj1", "A project to build"
-        )
+        wf_id = manager.start_discovery_workflow(user_id, "proj1", "A project to build")
         assert wf_id is not None
 
         # Execute workflow steps
@@ -506,9 +500,7 @@ class TestEndToEndUserJourney:
         project_id = "full_project"
 
         # Discovery phase
-        disc_wf = manager.start_discovery_workflow(
-            user_id, project_id, "Build a calculator"
-        )
+        disc_wf = manager.start_discovery_workflow(user_id, project_id, "Build a calculator")
         manager.execute_workflow_step(disc_wf)
         manager.complete_workflow(disc_wf)
 
@@ -563,33 +555,42 @@ class TestSystemCoordination:
         integration = SocratesIntegration(db)
 
         # User 1: Discovery phase (0-25% overall)
-        integration.update_user_maturity("user1", {
-            "discovery": 0.1,
-            "analysis": 0.0,
-            "design": 0.0,
-            "implementation": 0.0,
-        })
+        integration.update_user_maturity(
+            "user1",
+            {
+                "discovery": 0.1,
+                "analysis": 0.0,
+                "design": 0.0,
+                "implementation": 0.0,
+            },
+        )
         phase1 = integration.get_user_phase("user1")
         assert phase1 == "discovery"
 
         # User 2: Analysis phase (25-50% overall)
         # (0.5 + 0.2) / 2 = 0.35 (analysis)
-        integration.update_user_maturity("user2", {
-            "discovery": 0.5,
-            "analysis": 0.2,
-            "design": 0.0,
-            "implementation": 0.0,
-        })
+        integration.update_user_maturity(
+            "user2",
+            {
+                "discovery": 0.5,
+                "analysis": 0.2,
+                "design": 0.0,
+                "implementation": 0.0,
+            },
+        )
         phase2 = integration.get_user_phase("user2")
         assert phase2 == "analysis"
 
         # User 3: Implementation phase (75-100% overall)
-        integration.update_user_maturity("user3", {
-            "discovery": 1.0,
-            "analysis": 1.0,
-            "design": 1.0,
-            "implementation": 0.5,
-        })
+        integration.update_user_maturity(
+            "user3",
+            {
+                "discovery": 1.0,
+                "analysis": 1.0,
+                "design": 1.0,
+                "implementation": 0.5,
+            },
+        )
         phase3 = integration.get_user_phase("user3")
         assert phase3 == "implementation"
 

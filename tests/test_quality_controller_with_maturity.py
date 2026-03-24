@@ -38,9 +38,7 @@ class TestQualityControllerIntegration:
         estimated_phase = result["phase"]
 
         # Calculate using MaturityCalculator directly
-        avg_score = sum(result["category_scores"].values()) / len(
-            result["category_scores"]
-        )
+        avg_score = sum(result["category_scores"].values()) / len(result["category_scores"])
         calculator_phase = MaturityCalculator.estimate_current_phase(avg_score)
 
         # Should match
@@ -57,9 +55,7 @@ class TestQualityControllerIntegration:
         weak_categories = result["weak_categories"]
 
         # Manually identify weak categories (< 0.6)
-        expected_weak = [
-            cat for cat, score in category_scores.items() if score < 0.6
-        ]
+        expected_weak = [cat for cat, score in category_scores.items() if score < 0.6]
 
         assert set(weak_categories) == set(expected_weak)
 
@@ -140,14 +136,14 @@ def test_calculate_sum():
         3. Weak categories identified for improvement
         """
         # Step 1: Analyze code with QualityController
-        code = '''
+        code = """
 def process_data(data):
     result = []
     for item in data:
         # TODO: Add validation
         result.append(item * 2)
     return result
-'''
+"""
 
         detection = self.qc.detect_weak_areas(code)
 

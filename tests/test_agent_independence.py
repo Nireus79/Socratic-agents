@@ -260,12 +260,14 @@ class TestAgentComposition:
         learning = LearningAgent()
 
         # LearningAgent has process method
-        result = learning.process({
-            "action": "track",
-            "user_id": "test_user",
-            "interaction_type": "skill_application",
-            "metadata": {"effectiveness": 0.8},
-        })
+        result = learning.process(
+            {
+                "action": "track",
+                "user_id": "test_user",
+                "interaction_type": "skill_application",
+                "metadata": {"effectiveness": 0.8},
+            }
+        )
 
         assert result is not None
 

@@ -22,6 +22,7 @@ from .skill_applier import SkillApplier
 
 class CoordinationEvent(Enum):
     """Events emitted during coordination."""
+
     WORKFLOW_STARTED = "workflow_started"
     PHASE_GATING_CHECK = "phase_gating_check"
     PHASE_GATE_PASSED = "phase_gate_passed"
@@ -36,24 +37,25 @@ class CoordinationEvent(Enum):
 
 # Maturity thresholds for workflow gating
 MATURITY_PHASE_THRESHOLDS = {
-    "discovery": (0.0, 0.25),      # 0-25%
-    "analysis": (0.25, 0.50),       # 25-50%
-    "design": (0.50, 0.75),         # 50-75%
+    "discovery": (0.0, 0.25),  # 0-25%
+    "analysis": (0.25, 0.50),  # 25-50%
+    "design": (0.50, 0.75),  # 50-75%
     "implementation": (0.75, 1.0),  # 75-100%
 }
 
 # Quality thresholds for agent gating
 QUALITY_GATE_THRESHOLDS = {
-    "discovery": 0.0,           # No bar - focus on understanding problem
-    "analysis": 0.2,            # Very low bar - requirement gathering
-    "design": 0.4,              # Moderate bar - architecture matters
-    "implementation": 0.6,      # High bar - code quality critical
+    "discovery": 0.0,  # No bar - focus on understanding problem
+    "analysis": 0.2,  # Very low bar - requirement gathering
+    "design": 0.4,  # Moderate bar - architecture matters
+    "implementation": 0.6,  # High bar - code quality critical
 }
 
 
 @dataclass
 class AgentRequest:
     """Structured request to execute an agent."""
+
     agent_name: str
     action: str
     data: Dict[str, Any]
@@ -64,6 +66,7 @@ class AgentRequest:
 @dataclass
 class AgentResponse:
     """Response from agent execution."""
+
     status: str  # "success", "error", "gated"
     agent: str
     action: str
@@ -167,9 +170,7 @@ class PureOrchestrator:
 
         # Estimate phase if not provided
         if current_phase is None:
-            current_phase = MaturityCalculator.estimate_current_phase(
-                current_maturity or 0.5
-            )
+            current_phase = MaturityCalculator.estimate_current_phase(current_maturity or 0.5)
 
         # Check gating
         can_execute, gating_reason = self.can_execute_request(
@@ -321,9 +322,7 @@ class PureOrchestrator:
     # WORKFLOW COMPOSITION
     # =========================================================================
 
-    def start_workflow(
-        self, workflow_id: str, initial_data: Dict[str, Any]
-    ) -> str:
+    def start_workflow(self, workflow_id: str, initial_data: Dict[str, Any]) -> str:
         """
         Start a new multi-agent workflow.
 
@@ -343,9 +342,7 @@ class PureOrchestrator:
 
         return workflow_id
 
-    def execute_workflow_step(
-        self, workflow_id: str, request: AgentRequest
-    ) -> AgentResponse:
+    def execute_workflow_step(self, workflow_id: str, request: AgentRequest) -> AgentResponse:
         """
         Execute a step in a multi-agent workflow.
 
@@ -463,8 +460,8 @@ class PureOrchestrator:
             "quality_controller": ["analysis", "design", "implementation"],
             "code_validator": ["design", "implementation"],
             "knowledge_manager": all_phases,  # Always available
-            "learning_agent": all_phases,     # Always available
-            "skill_generator": all_phases,    # Always available
+            "learning_agent": all_phases,  # Always available
+            "skill_generator": all_phases,  # Always available
         }
 
         return phase_specific.get(agent_name, all_phases)

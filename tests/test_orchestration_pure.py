@@ -600,9 +600,7 @@ class TestNoInfrastructureDependencies:
 
         # Mock maturity functions
         def get_maturity(user_id, phase):
-            return {"discovery": 0.2, "analysis": 0.4, "design": 0.6, "implementation": 0.8}[
-                phase
-            ]
+            return {"discovery": 0.2, "analysis": 0.4, "design": 0.6, "implementation": 0.8}[phase]
 
         def get_effectiveness(agent_name):
             return 0.75

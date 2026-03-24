@@ -15,6 +15,7 @@ from socrates_maturity import MaturityCalculator
 
 class IntegrationMode(Enum):
     """Integration modes for orchestrator."""
+
     PURE = "pure"  # Use PureOrchestrator only
     HYBRID = "hybrid"  # Use PureOrchestrator with gating
     LEGACY = "legacy"  # Use existing orchestrator (no gating)
@@ -104,9 +105,7 @@ class OrchestratorAdapter:
 
         # Handle gated response
         if response.gated:
-            self.logger.warning(
-                f"Request gated: {agent_name}.{action} - {response.gating_reason}"
-            )
+            self.logger.warning(f"Request gated: {agent_name}.{action} - {response.gating_reason}")
             return {
                 "status": "gated",
                 "agent": agent_name,
@@ -182,9 +181,7 @@ class OrchestratorAdapter:
 
         return success
 
-    def get_agent_availability(
-        self, current_phase: str, current_maturity: float
-    ) -> Dict[str, Any]:
+    def get_agent_availability(self, current_phase: str, current_maturity: float) -> Dict[str, Any]:
         """
         Get which agents are available for the current state.
 
@@ -196,9 +193,7 @@ class OrchestratorAdapter:
             Dict with available agents and gating reasons for unavailable ones
         """
         available = self.pure_orchestrator.get_available_agents_for_phase(current_phase)
-        quality_threshold = self.pure_orchestrator.get_required_quality_for_phase(
-            current_phase
-        )
+        quality_threshold = self.pure_orchestrator.get_required_quality_for_phase(current_phase)
 
         return {
             "phase": current_phase,
@@ -236,9 +231,7 @@ class OrchestratorAdapter:
                 "error": str(e),
             }
 
-    def _get_maturity(
-        self, user_id: Optional[str], phase: str
-    ) -> float:
+    def _get_maturity(self, user_id: Optional[str], phase: str) -> float:
         """Get maturity for a user/phase."""
         if user_id and user_id in self._maturity_cache:
             return self._maturity_cache[user_id].get(phase, 0.5)
@@ -350,9 +343,7 @@ class MaturityAwareOrchestrator:
             "total_requests": self._request_count,
             "gated_requests": self._gated_count,
             "pass_rate": (
-                1.0 - (self._gated_count / self._request_count)
-                if self._request_count > 0
-                else 1.0
+                1.0 - (self._gated_count / self._request_count) if self._request_count > 0 else 1.0
             ),
             "skills_applied": len(self._applied_skills),
         }

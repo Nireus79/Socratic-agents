@@ -70,9 +70,7 @@ class SocratesIntegration:
             # Try to get from cache first
             if user_id in self._user_maturity_cache:
                 if phase is None:
-                    return self._calculate_overall_maturity(
-                        self._user_maturity_cache[user_id]
-                    )
+                    return self._calculate_overall_maturity(self._user_maturity_cache[user_id])
                 return self._user_maturity_cache[user_id].get(phase, 0.5)
 
             # Get from database if available
@@ -148,9 +146,7 @@ class SocratesIntegration:
 
             # Log to learning agent if available
             # This would integrate with socratic-learning
-            self.logger.info(
-                f"Recorded {agent_name}.{action} effectiveness={effectiveness:.2f}"
-            )
+            self.logger.info(f"Recorded {agent_name}.{action} effectiveness={effectiveness:.2f}")
 
             return True
 
