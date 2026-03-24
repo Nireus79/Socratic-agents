@@ -151,7 +151,10 @@ class PureOrchestrator:
         return True, None
 
     def execute_request(
-        self, request: AgentRequest, current_maturity: float = None, current_phase: str = None
+        self,
+        request: AgentRequest,
+        current_maturity: Optional[float] = None,
+        current_phase: Optional[str] = None,
     ) -> AgentResponse:
         """
         Execute agent request with maturity-driven gating.

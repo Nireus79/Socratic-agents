@@ -7,7 +7,7 @@ Bridges pure coordination logic with infrastructure-aware request handling.
 
 import logging
 from enum import Enum
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from socrates_maturity import MaturityCalculator
 
@@ -288,7 +288,7 @@ class MaturityAwareOrchestrator:
         # Tracking
         self._request_count = 0
         self._gated_count = 0
-        self._applied_skills = []
+        self._applied_skills: List[Dict[str, Any]] = []
 
     def process_request(
         self,
