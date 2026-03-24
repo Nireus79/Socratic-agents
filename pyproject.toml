@@ -40,7 +40,7 @@ dependencies = [
 
 [project.optional-dependencies]
 # Core maturity system (currently local, will be PyPI after publication)
-maturity = ["socrates-maturity>=0.1.0"]
+maturity = ["socratic-maturity>=0.1.0"]
 
 # Framework integrations
 openclaw = []
@@ -49,7 +49,7 @@ nexus = ["socrates-nexus>=0.3.0"]
 
 # All features
 all = [
-    "socrates-maturity>=0.1.0",
+    "socratic-maturity>=0.1.0",
     "langchain>=0.1.0",
     "socrates-nexus>=0.3.0",
 ]
