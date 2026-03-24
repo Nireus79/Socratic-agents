@@ -5,12 +5,13 @@ Adapts PureOrchestrator to work with the existing Socrates orchestrator.
 Bridges pure coordination logic with infrastructure-aware request handling.
 """
 
-from typing import Any, Dict, Optional, Callable
-from enum import Enum
 import logging
+from enum import Enum
+from typing import Any, Callable, Dict, Optional
 
-from .orchestrator import PureOrchestrator, AgentRequest, CoordinationEvent
 from socrates_maturity import MaturityCalculator
+
+from .orchestrator import AgentRequest, PureOrchestrator
 
 
 class IntegrationMode(Enum):

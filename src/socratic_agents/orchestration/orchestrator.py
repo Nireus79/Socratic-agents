@@ -11,12 +11,13 @@ Key responsibilities:
 5. Emit coordination events
 """
 
-from typing import Dict, List, Any, Optional, Callable
+import logging
 from dataclasses import dataclass
 from enum import Enum
-import logging
+from typing import Any, Callable, Dict, List, Optional
 
 from socrates_maturity import MaturityCalculator
+
 from .skill_applier import SkillApplier
 
 

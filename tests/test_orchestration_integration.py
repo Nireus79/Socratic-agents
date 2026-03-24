@@ -11,14 +11,14 @@ Tests:
 5. Full end-to-end workflows
 """
 
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
 
 from src.socratic_agents.orchestration import (
-    PureOrchestrator,
-    OrchestratorAdapter,
-    MaturityAwareOrchestrator,
     IntegrationMode,
+    MaturityAwareOrchestrator,
+    OrchestratorAdapter,
+    PureOrchestrator,
 )
 
 
@@ -323,7 +323,7 @@ class TestMaturityAwareOrchestrator:
 
         wrapper = MaturityAwareOrchestrator(existing, pure)
 
-        response = wrapper.process_request(
+        wrapper.process_request(
             "any_agent",
             {"action": "test"},
             enforce_gating=False,  # Skip gating
@@ -379,7 +379,7 @@ class TestMaturityAwareOrchestrator:
         )
 
         # Should still work with default maturity
-        response = wrapper.process_request(
+        wrapper.process_request(
             "test_agent",
             {"action": "test"},
             enforce_gating=True,

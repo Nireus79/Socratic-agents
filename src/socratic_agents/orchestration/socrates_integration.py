@@ -9,12 +9,13 @@ This module provides methods that can be added to or wrapped around the
 existing AgentOrchestrator to enable Phase 5-6 functionality.
 """
 
-from typing import Any, Dict, Optional, Callable
 import logging
+from typing import Any, Dict, Optional
 
-from .orchestrator import PureOrchestrator, AgentRequest
-from .integration import MaturityAwareOrchestrator, OrchestratorAdapter
 from socrates_maturity import MaturityCalculator
+
+from .integration import MaturityAwareOrchestrator
+from .orchestrator import PureOrchestrator
 
 
 class SocratesIntegration:

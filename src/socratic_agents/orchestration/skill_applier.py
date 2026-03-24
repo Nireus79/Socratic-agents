@@ -5,8 +5,8 @@ Skills from SkillGenerator are applied to target agents to improve their
 behavior in specific areas.
 """
 
-from typing import Any
 import logging
+from typing import Any
 
 
 class SkillApplier:

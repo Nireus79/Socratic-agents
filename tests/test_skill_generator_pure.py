@@ -5,10 +5,10 @@ Demonstrates the complete integration chain:
   MaturityCalculator → QualityController → SkillGenerator
 """
 
-import pytest
 
-from src.socratic_agents.skill_generator import SkillGenerator, AgentSkill
 from socrates_maturity import MaturityCalculator
+
+from src.socratic_agents.skill_generator import AgentSkill, SkillGenerator
 
 
 class TestSkillGenerator:

@@ -4,10 +4,10 @@ Tests for QualityController integration with MaturityCalculator.
 Demonstrates how Phase 1 (socrates-maturity) enables Phase 2 (QualityController).
 """
 
-import pytest
+
+from socrates_maturity import MaturityCalculator
 
 from src.socratic_agents.agents.quality_controller import QualityController
-from socrates_maturity import MaturityCalculator
 
 
 class TestQualityControllerIntegration:

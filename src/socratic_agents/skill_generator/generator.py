@@ -6,8 +6,8 @@ maturity and learning data, then produces targeted skills for agents to use.
 No side effects, no dependencies beyond standard library.
 """
 
-from typing import Any, Dict, List, Optional
 import uuid
+from typing import Any, Dict, List, Optional
 
 
 class AgentSkill:
@@ -70,7 +70,7 @@ class SkillRecommendation:
             "skill": self.skill.to_dict(),
             "priority": self.priority,
             "reason": self.reason,
-            "expected_impact": expected_impact,
+            "expected_impact": self.expected_impact,
         }
 
 

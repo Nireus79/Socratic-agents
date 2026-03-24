@@ -10,15 +10,13 @@ Verifies that orchestration:
 6. Has no dependencies on infrastructure
 """
 
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 from src.socratic_agents.orchestration import (
-    PureOrchestrator,
-    CoordinationEvent,
     AgentRequest,
-    AgentResponse,
-    QUALITY_GATE_THRESHOLDS,
+    CoordinationEvent,
+    PureOrchestrator,
 )
 
 

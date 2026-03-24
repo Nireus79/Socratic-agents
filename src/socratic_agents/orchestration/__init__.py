@@ -13,20 +13,20 @@ Key components:
 - WorkflowManager: Manages complete multi-agent workflows (Phase 7)
 """
 
+from .integration import (
+    IntegrationMode,
+    MaturityAwareOrchestrator,
+    OrchestratorAdapter,
+)
 from .orchestrator import (
-    PureOrchestrator,
-    CoordinationEvent,
-    AgentRequest,
-    AgentResponse,
     MATURITY_PHASE_THRESHOLDS,
     QUALITY_GATE_THRESHOLDS,
+    AgentRequest,
+    AgentResponse,
+    CoordinationEvent,
+    PureOrchestrator,
 )
 from .skill_applier import SkillApplier
-from .integration import (
-    OrchestratorAdapter,
-    MaturityAwareOrchestrator,
-    IntegrationMode,
-)
 from .socrates_integration import (
     SocratesIntegration,
     WorkflowManager,

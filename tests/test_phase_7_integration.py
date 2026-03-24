@@ -10,13 +10,14 @@ Tests end-to-end integration of:
 6. Full system coordination
 """
 
+from typing import Any
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
-from typing import Any, Dict
 
 from src.socratic_agents.orchestration import (
-    PureOrchestrator,
     MaturityAwareOrchestrator,
+    PureOrchestrator,
 )
 from src.socratic_agents.orchestration.socrates_integration import (
     SocratesIntegration,
@@ -429,7 +430,6 @@ class TestEndToEndUserJourney:
         user_id = "user_progression"
 
         # Start at discovery (0-25% overall maturity)
-        maturity = integration.get_user_maturity(user_id)
         phase = integration.get_user_phase(user_id)
         assert phase == "discovery"
 
@@ -538,19 +538,6 @@ class TestSystemCoordination:
 
     def test_multiple_users_coordination(self):
         """Test coordination with multiple users at different phases."""
-        existing = MockExistingOrchestrator()
-        agents = {
-            "socratic_counselor": MockAgent("SocraticCounselor"),
-            "code_generator": MockAgent("CodeGenerator"),
-            "quality_controller": MockAgent("QualityController"),
-        }
-        pure = PureOrchestrator(
-            agents=agents,
-            get_maturity=lambda u, p: 0.5,
-            get_learning_effectiveness=lambda a: 0.7,
-        )
-        orchestrator = MaturityAwareOrchestrator(existing, pure)
-
         db = MockDatabase()
         integration = SocratesIntegration(db)
 

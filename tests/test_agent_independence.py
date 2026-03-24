@@ -193,9 +193,9 @@ class TestAgentInterface:
 
     def test_process_method_exists(self):
         """All agents should have process() method."""
-        from src.socratic_agents.agents.socratic_counselor import SocraticCounselor
         from src.socratic_agents.agents.code_generator import CodeGenerator
         from src.socratic_agents.agents.quality_controller import QualityController
+        from src.socratic_agents.agents.socratic_counselor import SocraticCounselor
 
         agents = [SocraticCounselor(), CodeGenerator(), QualityController()]
 
@@ -231,9 +231,10 @@ class TestAgentComposition:
 
     def test_qc_with_skill_generator(self):
         """QualityController and SkillGenerator can work together."""
+        from socrates_maturity import MaturityCalculator
+
         from src.socratic_agents.agents.quality_controller import QualityController
         from src.socratic_agents.skill_generator import SkillGenerator
-        from socrates_maturity import MaturityCalculator
 
         # QC analyzes code
         qc = QualityController()
