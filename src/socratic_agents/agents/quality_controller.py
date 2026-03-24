@@ -1,6 +1,12 @@
-"""Quality Controller Agent - Quality assurance and testing."""
+"""Quality Controller Agent - Quality assurance and testing.
+
+This agent uses the MaturityCalculator from socrates-maturity to estimate
+project phase and identify weak areas that need skill-based improvement.
+"""
 
 from typing import Any, Dict, List, Optional
+
+from socrates_maturity import MaturityCalculator
 
 from .base import BaseAgent
 
@@ -202,16 +208,15 @@ class QualityController(BaseAgent):
         return max(0.0, min(1.0, score))
 
     def _estimate_maturity_phase(self, code: str, category_scores: Dict[str, float]) -> str:
-        """Estimate current maturity phase based on code."""
+        """
+        Estimate current maturity phase based on code.
+
+        Uses MaturityCalculator from socrates-maturity to estimate phase
+        from average category score.
+        """
         avg_score = sum(category_scores.values()) / len(category_scores)
-        if avg_score < 0.4:
-            return "discovery"
-        elif avg_score < 0.6:
-            return "analysis"
-        elif avg_score < 0.8:
-            return "design"
-        else:
-            return "implementation"
+        # Use MaturityCalculator for phase estimation
+        return MaturityCalculator.estimate_current_phase(avg_score)
 
     def _estimate_completion(self, code: str) -> float:
         """Estimate completion percentage based on code length."""
