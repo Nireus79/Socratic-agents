@@ -1,12 +1,16 @@
 """
-Phase 5: Pure Orchestration Layer
+Pure Orchestration + Integration + System Integration (Phases 5-7)
 
 Coordinates agents with maturity-driven workflow gating and feedback loops.
 
 Key components:
-- PureOrchestrator: Core coordination logic
+- PureOrchestrator: Core coordination logic (Phase 5)
 - SkillApplier: Applies skills to agents
 - CoordinationEvent: Events emitted during coordination
+- OrchestratorAdapter: Adapts pure orchestrator to Socrates infrastructure (Phase 6)
+- MaturityAwareOrchestrator: Wraps existing orchestrator with maturity awareness (Phase 6)
+- SocratesIntegration: Integration helpers for main Socrates system (Phase 7)
+- WorkflowManager: Manages complete multi-agent workflows (Phase 7)
 """
 
 from .orchestrator import (
@@ -18,6 +22,15 @@ from .orchestrator import (
     QUALITY_GATE_THRESHOLDS,
 )
 from .skill_applier import SkillApplier
+from .integration import (
+    OrchestratorAdapter,
+    MaturityAwareOrchestrator,
+    IntegrationMode,
+)
+from .socrates_integration import (
+    SocratesIntegration,
+    WorkflowManager,
+)
 
 __all__ = [
     "PureOrchestrator",
@@ -27,4 +40,9 @@ __all__ = [
     "SkillApplier",
     "MATURITY_PHASE_THRESHOLDS",
     "QUALITY_GATE_THRESHOLDS",
+    "OrchestratorAdapter",
+    "MaturityAwareOrchestrator",
+    "IntegrationMode",
+    "SocratesIntegration",
+    "WorkflowManager",
 ]
