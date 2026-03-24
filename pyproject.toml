@@ -36,20 +36,18 @@ requires-python = ">=3.9"
 dependencies = [
     "pydantic>=2.0.0",
     "loguru>=0.7.0",
+    "socratic-maturity>=0.1.0",
 ]
 
 [project.optional-dependencies]
-# Core maturity system (currently local, will be PyPI after publication)
-maturity = ["socratic-maturity>=0.1.0"]
 
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
 nexus = ["socrates-nexus>=0.3.0"]
 
-# All features
+# All features (maturity is now a core dependency)
 all = [
-    "socratic-maturity>=0.1.0",
     "langchain>=0.1.0",
     "socrates-nexus>=0.3.0",
 ]
