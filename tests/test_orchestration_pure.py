@@ -10,7 +10,6 @@ Verifies that orchestration:
 6. Has no dependencies on infrastructure
 """
 
-
 import pytest
 
 from src.socratic_agents.orchestration import (

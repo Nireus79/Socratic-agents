@@ -5,7 +5,6 @@ Demonstrates the complete integration chain:
   MaturityCalculator → QualityController → SkillGenerator
 """
 
-
 from socrates_maturity import MaturityCalculator
 
 from src.socratic_agents.skill_generator import AgentSkill, SkillGenerator
