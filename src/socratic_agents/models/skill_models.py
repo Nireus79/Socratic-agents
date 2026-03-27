@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..utils.serialization import ensure_iso_datetime
+
 
 @dataclass
 class AgentSkill:
@@ -128,8 +130,8 @@ class AgentSkill:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "AgentSkill":
         """Create AgentSkill from dictionary."""
-        if isinstance(data.get("generated_at"), str):
-            data["generated_at"] = datetime.fromisoformat(data["generated_at"])
+        # Parse datetime string to datetime object
+        data = ensure_iso_datetime(data, "generated_at")
         return cls(**data)
 
 
