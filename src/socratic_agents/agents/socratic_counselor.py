@@ -60,7 +60,7 @@ Return only the questions, one per line."""
 
                 response = self.llm_client.generate_response(prompt)
                 if response:
-                    questions = [q.strip() for q in response.split('\n') if q.strip()]
+                    questions = [q.strip() for q in response.split("\n") if q.strip()]
                     if questions:
                         return questions
             except Exception as e:
