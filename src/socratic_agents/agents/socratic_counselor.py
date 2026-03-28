@@ -50,7 +50,23 @@ class SocraticCounselor(BaseAgent):
         return self.process({"topic": topic, "level": level})
 
     def _generate_guiding_questions(self, topic: str, level: str) -> list:
-        """Generate Socratic questions for a topic."""
+        """Generate Socratic questions for a topic using LLM if available."""
+        # If an LLM client is available, use it to generate dynamic questions
+        if self.llm_client:
+            try:
+                prompt = f"""Generate 3 Socratic questions to guide learning about "{topic}" at the {level} level.
+Focus on asking questions that help the learner discover answers themselves rather than providing direct information.
+Return only the questions, one per line."""
+
+                response = self.llm_client.generate_response(prompt)
+                if response:
+                    questions = [q.strip() for q in response.split('\n') if q.strip()]
+                    if questions:
+                        return questions
+            except Exception as e:
+                self.logger.warning(f"Failed to generate questions using LLM: {e}")
+
+        # Fallback to static questions if LLM is unavailable or fails
         questions = {
             "beginner": [
                 f"What do you already know about {topic}?",
