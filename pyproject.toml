@@ -44,12 +44,12 @@ dependencies = [
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
-nexus = ["socrates-nexus>=0.3.0"]
+nexus = ["socrates-nexus>=0.3.1"]
 
 # All features (maturity is now a core dependency)
 all = [
     "langchain>=0.1.0",
-    "socrates-nexus>=0.3.0",
+    "socrates-nexus>=0.3.1",
 ]
 
 # Development
