@@ -25,8 +25,8 @@ class TestAsyncBasicFunctionality:
             {"action": "guide", "topic": "testing", "level": "beginner"}
         )
 
-        assert "questions" in result
-        assert isinstance(result["questions"], list)
+        assert "question" in result
+        assert isinstance(result["question"], str)
 
     @pytest.mark.asyncio
     async def test_parallel_agents(self):
@@ -40,7 +40,7 @@ class TestAsyncBasicFunctionality:
         )
 
         assert len(results) == 2
-        assert "questions" in results[0]
+        assert "question" in results[0]
         assert "code" in results[1]
 
 

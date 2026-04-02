@@ -50,7 +50,7 @@ class TestOpenclawIntegration:
         result = skill.guide("Python functions", level="beginner")
 
         assert result["status"] == "success"
-        assert "questions" in result
+        assert "question" in result
 
     @pytest.mark.integration
     def test_generate_code_through_skill(self):

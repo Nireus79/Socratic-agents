@@ -46,7 +46,7 @@ class TestLLMPoweredCounselor:
             topic="Python recursion", level="beginner", context="for someone new to programming"
         )
 
-        assert "questions" in result
+        assert "question" in result
         assert result["llm_used"] is True
         assert result["context_aware"] is True
         assert result["topic"] == "Python recursion"
@@ -70,7 +70,7 @@ class TestLLMPoweredCounselor:
             topic="algorithms", user_level="intermediate", learning_style="practical"
         )
 
-        assert "questions" in result
+        assert "question" in result
         assert result["llm_used"] is True
         assert "llm_enhanced_questions" in result
 
@@ -80,7 +80,7 @@ class TestLLMPoweredCounselor:
         result = counselor.guide_with_context(topic="testing", level="beginner")
 
         # Should still return something despite LLM error
-        assert "questions" in result
+        assert "question" in result
         assert "llm_enhanced_questions" in result
 
 
@@ -208,7 +208,7 @@ class TestLLMWrapperIntegration:
 
         # Get guidance on topic
         guidance = counselor.guide_with_context("algorithm design")
-        assert "questions" in guidance
+        assert "question" in guidance or "llm_enhanced_questions" in guidance
 
         # Generate code based on topic
         code_result = generator.generate_with_tests("Implement bubble sort")

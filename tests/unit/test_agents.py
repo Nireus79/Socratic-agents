@@ -42,8 +42,8 @@ class TestSocraticCounselor:
 
         assert result["status"] == "success"
         assert result["topic"] == "recursion"
-        assert "questions" in result
-        assert len(result["questions"]) > 0
+        assert "question" in result
+        assert result["question"]  # Check that question is not empty
 
     @pytest.mark.unit
     def test_guide_learning_different_levels(self):
@@ -53,7 +53,7 @@ class TestSocraticCounselor:
         for level in ["beginner", "intermediate", "advanced"]:
             result = counselor.guide("Python", level=level)
             assert result["level"] == level
-            assert len(result["questions"]) > 0
+            assert result["question"]  # Check that question is not empty
 
     @pytest.mark.unit
     def test_guide_learning_without_topic(self):
