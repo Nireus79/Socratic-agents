@@ -23,7 +23,7 @@ Socratic Agents provides a comprehensive agent orchestration framework with 19 p
 ### The 19 Agents
 
 **Core Agents**:
-1. **Socratic Counselor** - Guided learning and interactive problem-solving
+1. **Socratic Counselor** - Guided learning with KB-aware questioning and context intelligence
 2. **Code Generator** - Intelligent code generation and completion
 3. **Code Validator** - Validation and testing of generated code
 4. **Knowledge Manager** - Knowledge base management and RAG integration
@@ -167,7 +167,6 @@ llm = LLMClient(provider="anthropic", model="claude-sonnet")
 # Agents now use LLM for enhanced responses
 counselor = SocraticCounselor(llm_client=llm)
 result = counselor.process({
-    "action": "guide",
     "topic": "machine learning gradient descent",
     "level": "intermediate"
 })
@@ -183,6 +182,53 @@ print("Generated code:", code_result["code"])
 ```
 
 See `examples/02_with_nexus.py` for full example.
+
+### Knowledge Base-Aware Socratic Counselor
+
+Generate context-specific questions grounded in project documentation and knowledge gaps:
+
+```python
+from socratic_agents import SocraticCounselor
+from socrates_nexus import LLMClient
+
+llm = LLMClient(provider="anthropic", model="claude-sonnet")
+counselor = SocraticCounselor(llm_client=llm)
+
+# Generate KB-aware question using project context
+result = counselor.process({
+    "topic": "user authentication system",
+    "phase": "design",
+    "level": "intermediate",
+    "knowledge_base": {
+        "chunks": [
+            {"content": "The system uses JWT tokens for stateless authentication"},
+            {"content": "OAuth2 integration with GitHub and Google providers"},
+            {"content": "Password hashing uses bcrypt with 12 rounds"}
+        ],
+        "gaps": [
+            {"topic": "session management", "severity": "high"},
+            {"topic": "token refresh strategy", "severity": "medium"}
+        ],
+        "coverage": 65
+    },
+    "document_understanding": {
+        "key_topics": ["authentication", "security", "tokens"],
+        "alignment_score": 0.8
+    },
+    "context": "User just completed requirement analysis for the auth system",
+    "recently_asked": [
+        "What authentication methods should we support?",
+        "How do we handle password security?"
+    ]
+})
+
+print("Question:", result["question"])
+print("KB Coverage:", result["kb_coverage"])
+```
+
+The counselor will generate a question like: "Given that we're using JWT tokens with OAuth2 providers, how should we handle session management and token refresh in a stateless architecture?" instead of generic questions.
+
+See `examples/03_kb_aware_counselor.py` for full example.
 
 ### LLM-Powered Agent Wrappers
 

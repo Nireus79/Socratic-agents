@@ -1,6 +1,6 @@
 """Socratic Agents - Multi-agent orchestration system for AI workflows."""
 
-__version__ = "0.1.3"
+__version__ = "0.2.4"  # Enhanced with KB-aware Socratic Counselor
 __author__ = "Socratic Agents Contributors"
 
 # Core base class

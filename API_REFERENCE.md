@@ -677,8 +677,110 @@ for agent_name, result in results["results"].items():
 
 ---
 
+## SocraticCounselor Agent API
+
+**Module**: `socratic_agents.agents.SocraticCounselor`
+
+Knowledge base-aware agent for generating context-specific Socratic questions.
+
+### Constructor
+
+```python
+SocraticCounselor(llm_client: Optional[Any] = None, batch_size: int = 1)
+```
+
+**Parameters**:
+- `llm_client`: Optional LLM client for intelligent question generation
+- `batch_size`: Number of questions per request (default: 1)
+
+### Methods
+
+#### `process(request: Dict[str, Any]) -> Dict[str, Any]`
+
+Generate Socratic questions with optional knowledge base context.
+
+**Request Parameters**:
+- `topic` (str, required): The learning topic
+- `level` (str, optional): Learning level ("beginner", "intermediate", "advanced"; default: "beginner")
+- `phase` (str, optional): Project phase ("discovery", "analysis", "design", "implementation")
+- `batch_size` (int, optional): Number of questions to generate
+- `knowledge_base` (dict, optional): KB context with:
+  - `chunks` (list): Document chunks retrieved via vector search
+  - `gaps` (list): Identified knowledge gaps
+  - `coverage` (float): KB coverage percentage (0-100)
+- `document_understanding` (dict, optional): Document analysis data
+- `context` (str, optional): Conversation context summary
+- `recently_asked` (list, optional): Previously asked questions to avoid repetition
+- `conversation_history` (list, optional): Full conversation history
+
+**Returns**:
+```python
+{
+    "status": "success",
+    "agent": "SocraticCounselor",
+    "topic": str,
+    "level": str,
+    "phase": str,
+    "question": str,          # Generated question
+    "kb_coverage": float      # KB coverage percentage
+}
+```
+
+**Example**:
+```python
+from socratic_agents import SocraticCounselor
+from socrates_nexus import LLMClient
+
+llm = LLMClient(provider="anthropic", model="claude-sonnet")
+counselor = SocraticCounselor(llm_client=llm)
+
+# Basic usage (generic question)
+result = counselor.process({
+    "topic": "REST API design",
+    "level": "intermediate"
+})
+print(result["question"])
+# Output: "How would you structure endpoints for a scalable REST API?"
+
+# KB-aware usage (context-specific question)
+result = counselor.process({
+    "topic": "REST API design",
+    "phase": "design",
+    "level": "intermediate",
+    "knowledge_base": {
+        "chunks": [
+            {"content": "Uses GraphQL for flexible queries"},
+            {"content": "Implements HATEOAS for discoverability"}
+        ],
+        "gaps": [
+            {"topic": "error handling strategy", "severity": "high"}
+        ],
+        "coverage": 70
+    },
+    "context": "Team discussed API versioning strategy"
+})
+print(result["question"])
+# Output: "Given that we're using GraphQL with HATEOAS, how should we handle
+# errors and validation in a way that's discoverable to clients?"
+```
+
+#### `guide(topic: str, level: str = "beginner", batch_size: Optional[int] = None, phase: Optional[str] = None, kb_context: Optional[Dict] = None) -> Dict[str, Any]`
+
+Convenience method for generating questions.
+
+**Parameters**:
+- `topic`: The topic to learn about
+- `level`: Learning level (default: "beginner")
+- `batch_size`: Number of questions (optional)
+- `phase`: Project phase (optional)
+- `kb_context`: Knowledge base context (optional)
+
+**Returns**: Same as `process()`
+
+---
+
 ## API Version
 
-Current version: **7.0.0**
+Current version: **8.0.0**
 
-Covers all phases of modularization (Phases 1-7).
+Enhanced with KB-aware Socratic questioning (v8.0.0).

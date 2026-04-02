@@ -4,6 +4,65 @@ All notable changes to the Socrates Skill Generation System are documented in th
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-04-02
+
+### Added - Knowledge Base-Aware Socratic Questioning
+
+#### Enhanced SocraticCounselor Agent
+- **Knowledge Base Context Support**: SocraticCounselor now accepts and leverages:
+  - KB chunks from vector search for document grounding
+  - Identified knowledge gaps to prioritize question focus
+  - KB coverage metrics to inform questioning strategy
+  - Document understanding analysis for context awareness
+  - Conversation history and previous questions to avoid repetition
+  - Project phase information for phase-specific questioning
+
+- **Context-Aware Question Generation**:
+  - Questions now grounded in specific project documents and context
+  - Phase-aware questions (discovery, analysis, design, implementation)
+  - Gap-driven questions that address identified knowledge needs
+  - LLM-powered KB-aware prompts for intelligent context integration
+  - Fallback to phase-specific templates when KB unavailable
+
+- **Enhanced Request Format**:
+  ```python
+  {
+      "topic": str,
+      "level": str,
+      "phase": str,                    # NEW
+      "knowledge_base": {...},         # NEW - chunks, gaps, coverage
+      "document_understanding": {...}, # NEW
+      "context": str,                  # NEW
+      "recently_asked": [...],         # NEW
+      "conversation_history": [...]    # NEW
+  }
+  ```
+
+- **Improved Response Format**:
+  - Returns single question as primary response
+  - Includes KB coverage percentage in response
+  - Better structured output for integration
+
+#### Documentation Updates
+- Removed non-production phase completion documents (PHASE_5-9_COMPLETION.md)
+- Updated README with KB-aware usage examples
+- Enhanced API reference with complete SocraticCounselor documentation
+- Added knowledge base integration guide in quick start section
+
+### Changed
+- SocraticCounselor now prioritizes KB context over generic templates
+- Improved prompt engineering for LLM-based question generation
+- Better phase-specific fallback questions with multi-level detail
+- API version bumped to 8.0.0
+
+### Technical Details
+- Added `_generate_kb_aware_question()` method for KB-informed generation
+- Added `_generate_llm_question()` method for LLM-based fallback
+- Added `_get_fallback_question()` method with phase-specific templates
+- Improved error handling and logging for KB context processing
+
+---
+
 ## [Phase 6.0.0] - 2026-03-11
 
 ### Added - Skill Versioning & Compatibility Management
