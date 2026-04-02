@@ -77,9 +77,7 @@ class SocraticCounselor(BaseAgent):
 
         return self.process({"topic": topic, "level": level, "batch_size": batch_size})
 
-    def _generate_guiding_questions(
-        self, topic: str, level: str, batch_size: int = 1
-    ) -> list[str]:
+    def _generate_guiding_questions(self, topic: str, level: str, batch_size: int = 1) -> list[str]:
         """
         Generate Socratic questions for a topic using LLM if available.
 
