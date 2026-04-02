@@ -4,7 +4,7 @@ All notable changes to the Socrates Skill Generation System are documented in th
 
 ## [Unreleased]
 
-## [8.0.0] - 2026-04-02
+## [0.2.5] - 2026-04-02
 
 ### Added - Knowledge Base-Aware Socratic Questioning
 
