@@ -57,7 +57,6 @@ class SocraticCounselor(BaseAgent):
         """
         topic = request.get("topic", "")
         level = request.get("level", "beginner")
-        batch_size = request.get("batch_size", self.batch_size)
         phase = request.get("phase", "discovery")
         kb_context = request.get("knowledge_base", {})
         doc_understanding = request.get("document_understanding", {})
@@ -217,7 +216,6 @@ class SocraticCounselor(BaseAgent):
             # Build KB context for the prompt
             chunks = kb_context.get("chunks", [])
             gaps = kb_context.get("gaps", [])
-            coverage = kb_context.get("coverage", 0)
 
             # Get snippets from chunks for context
             chunk_snippets = []
@@ -276,7 +274,7 @@ Generate ONE question only. Return only the question text, nothing else."""
 
             # Add recently asked avoidance if available
             if recently_asked:
-                prompt += f"\n\nDo NOT ask these previously asked questions:\n" + "\n".join(
+                prompt += "\n\nDo NOT ask these previously asked questions:\n" + "\n".join(
                     [f"- {q}" for q in recently_asked[:5]]
                 )
 
@@ -316,7 +314,7 @@ Focus on asking questions that help the learner discover answers themselves.
 Return only the question text, nothing else."""
 
             if recently_asked:
-                prompt += f"\n\nDo NOT ask:\n" + "\n".join([f"- {q}" for q in recently_asked[:3]])
+                prompt += "\n\nDo NOT ask:\n" + "\n".join([f"- {q}" for q in recently_asked[:3]])
 
             response = self.llm_client.generate_response(prompt)
             if response:
