@@ -308,6 +308,9 @@ Generate ONE question only. Return only the question text, nothing else."""
         """
         recently_asked = recently_asked or []
 
+        if not self.llm_client:
+            return self._get_fallback_question(topic, level, phase)
+
         try:
             prompt = f"""Generate ONE Socratic question about "{topic}" at the {level} level for the {phase} phase.
 Focus on asking questions that help the learner discover answers themselves.
