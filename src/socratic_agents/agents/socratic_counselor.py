@@ -229,9 +229,11 @@ class SocraticCounselor(BaseAgent):
                         chunk_snippets.append(str(chunk)[:200])
 
             # Build the enhanced prompt
-            chunks_context = "\n".join(
-                [f"- {s}" for s in chunk_snippets]
-            ) if chunk_snippets else "No document context available"
+            chunks_context = (
+                "\n".join([f"- {s}" for s in chunk_snippets])
+                if chunk_snippets
+                else "No document context available"
+            )
 
             gaps_context = ""
             if gaps:
@@ -281,7 +283,9 @@ Generate ONE question only. Return only the question text, nothing else."""
             response = self.llm_client.generate_response(prompt)
             if response:
                 question = response.strip()
-                if question and not any(q.strip().lower() == question.lower() for q in recently_asked):
+                if question and not any(
+                    q.strip().lower() == question.lower() for q in recently_asked
+                ):
                     return question
 
         except Exception as e:
