@@ -698,54 +698,136 @@ Return ONLY the JSON."""
 
     def _handle_conflict_detection(self, request: Dict) -> Dict:
         """
-        Detect conflicts in extracted insights.
+        Detect conflicts in extracted insights using socratic-conflict library.
 
         Analyzes insights for contradictions or inconsistencies with existing
-        project context. Returns list of identified conflicts.
+        project context using full conflict detection capabilities.
+
+        Supported detection modes:
+        - LLM-based: Uses LLM to analyze insights for contradictions
+        - socratic-conflict: Full multi-agent conflict detection with severity assessment
+        - Fallback: Simple contradiction detection
 
         Args:
             request: Dictionary with:
                 - 'project': ProjectContext object (optional)
                 - 'insights': Extracted insights dictionary
+                - 'response': User response (optional)
 
         Returns:
             Dictionary with:
             - 'status': 'success'
             - 'conflicts_found': List of conflict dictionaries
             - 'has_conflicts': Boolean flag
+            - 'conflict_count': Number of conflicts
+            - 'severity_levels': Count by severity
         """
+        from .conflict_detector import AgentConflictDetector
+
         project = request.get("project")
         insights = request.get("insights", {})
+        response = request.get("response", "")
 
         conflicts_found = []
 
-        # Use LLM for smart conflict detection
-        if self.llm_client and project:
+        # Initialize conflict detector with LLM client
+        conflict_detector = AgentConflictDetector(llm_client=self.llm_client)
+
+        # Strategy 1: Try socratic-conflict library if available
+        if conflict_detector.use_full_detection:
             try:
-                conflict_prompt = f"""Analyze these insights for conflicts:
+                # Prepare agent states for full conflict detection
+                agent_states = {
+                    "project_state": {
+                        "goal": getattr(project, "description", ""),
+                        "phase": getattr(project, "phase", "discovery"),
+                        "requirements": getattr(project, "requirements", []),
+                    },
+                    "user_response": {"content": response} if response else {},
+                    "insights": insights,
+                }
 
-Existing context: {getattr(project, 'description', 'N/A')}
+                detection_result = conflict_detector.detect_from_agent_states(agent_states)
+                if detection_result["status"] == "success":
+                    conflicts_found = detection_result.get("conflicts", [])
+                    self.logger.debug(
+                        f"Full detection: found {len(conflicts_found)} conflicts"
+                    )
 
-New insights: {str(insights)}
+            except Exception as e:
+                self.logger.debug(f"Full conflict detection error: {e}")
 
-List any contradictions or inconsistencies.
-Return JSON with 'conflicts' list and 'severity' per conflict."""
+        # Strategy 2: Fallback to LLM-based analysis if no conflicts found
+        if not conflicts_found and self.llm_client and project:
+            try:
+                conflict_prompt = f"""Analyze these insights for contradictions:
 
-                response = self.llm_client.generate_response(conflict_prompt)
-                if response:
+Project Context: {getattr(project, 'description', 'N/A')}
+Current Phase: {getattr(project, 'phase', 'discovery')}
+
+User Response: {response}
+
+Extracted Insights: {str(insights)}
+
+Identify any contradictions, conflicts, or inconsistencies.
+Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity'"""
+
+                response_text = self.llm_client.generate_response(conflict_prompt)
+                if response_text:
                     try:
-                        conflict_data = json.loads(response)
+                        conflict_data = json.loads(response_text)
                         conflicts_found = conflict_data.get("conflicts", [])
-                    except:
+                        self.logger.debug(
+                            f"LLM detection: found {len(conflicts_found)} conflicts"
+                        )
+                    except json.JSONDecodeError:
                         pass
 
             except Exception as e:
-                self.logger.debug(f"Conflict detection error: {e}")
+                self.logger.debug(f"LLM conflict detection error: {e}")
+
+        # Strategy 3: Simple text-based conflict detection as last resort
+        if not conflicts_found and response and insights:
+            try:
+                response_lower = response.lower()
+                insight_str = str(insights).lower()
+
+                # Check for simple contradictions
+                contradiction_keywords = [
+                    ("but", "however"),
+                    ("conflict", "contradiction"),
+                    ("disagree", "different"),
+                    ("not", "never"),
+                ]
+
+                for keyword_pair in contradiction_keywords:
+                    if keyword_pair[0] in response_lower and keyword_pair[1] in insight_str:
+                        conflicts_found.append(
+                            {
+                                "type": "contradiction",
+                                "description": "Potential contradiction detected in user response",
+                                "severity": "low",
+                            }
+                        )
+                        break
+
+            except Exception as e:
+                self.logger.debug(f"Simple conflict detection error: {e}")
+
+        # Calculate severity summary
+        severity_summary = {
+            "high": sum(1 for c in conflicts_found if c.get("severity") == "high"),
+            "medium": sum(1 for c in conflicts_found if c.get("severity") == "medium"),
+            "low": sum(1 for c in conflicts_found if c.get("severity") == "low"),
+        }
 
         return {
             "status": "success",
             "conflicts_found": conflicts_found,
             "has_conflicts": len(conflicts_found) > 0,
+            "conflict_count": len(conflicts_found),
+            "severity_levels": severity_summary,
+            "detection_mode": "full" if conflict_detector.use_full_detection else "fallback",
         }
 
     def _update_project_maturity(self, project: Any, insights: Dict) -> None:
