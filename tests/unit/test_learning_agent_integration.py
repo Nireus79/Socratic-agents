@@ -279,10 +279,12 @@ class TestProcessMethod:
         """Test process with record action."""
         agent = LearningAgent()
 
-        result = agent.process({
-            "action": "record",
-            "interaction": {"type": "question", "success": True},
-        })
+        result = agent.process(
+            {
+                "action": "record",
+                "interaction": {"type": "question", "success": True},
+            }
+        )
 
         assert result["status"] == "success"
 
@@ -298,10 +300,12 @@ class TestProcessMethod:
         """Test process with metrics action."""
         agent = LearningAgent()
 
-        result = agent.process({
-            "action": "metrics",
-            "user_id": "user_123",
-        })
+        result = agent.process(
+            {
+                "action": "metrics",
+                "user_id": "user_123",
+            }
+        )
 
         assert result["status"] == "success" or result["status"] == "error"
 
@@ -309,10 +313,12 @@ class TestProcessMethod:
         """Test process with recommend action."""
         agent = LearningAgent()
 
-        result = agent.process({
-            "action": "recommend",
-            "user_id": "user_123",
-        })
+        result = agent.process(
+            {
+                "action": "recommend",
+                "user_id": "user_123",
+            }
+        )
 
         assert result["status"] == "success" or result["status"] == "error"
 
@@ -320,11 +326,13 @@ class TestProcessMethod:
         """Test process with assess_maturity action."""
         agent = LearningAgent()
 
-        result = agent.process({
-            "action": "assess_maturity",
-            "phase": "discovery",
-            "phase_specs": [],
-        })
+        result = agent.process(
+            {
+                "action": "assess_maturity",
+                "phase": "discovery",
+                "phase_specs": [],
+            }
+        )
 
         assert result["status"] == "success" or result["status"] == "error"
 
@@ -366,12 +374,14 @@ class TestLearningIntegration:
 
         # Record interactions
         for i in range(5):
-            agent.record_interaction({
-                "type": "question",
-                "topic": "Python",
-                "success": i % 2 == 0,
-                "quality_score": 0.7 + (i * 0.05),
-            })
+            agent.record_interaction(
+                {
+                    "type": "question",
+                    "topic": "Python",
+                    "success": i % 2 == 0,
+                    "quality_score": 0.7 + (i * 0.05),
+                }
+            )
 
         # Calculate metrics
         metrics = agent.calculate_learning_metrics("user_123")

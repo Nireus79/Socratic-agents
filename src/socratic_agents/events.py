@@ -82,7 +82,6 @@ class EventType(Enum):
     EFFECTIVENESS_CALCULATED = "effectiveness_calculated"
     USER_INTERACTION = "user_interaction"
     QUESTION_ANSWERED = "question_answered"
-    KNOWLEDGE_UPDATED = "knowledge_updated"
     LEARNING_GOAL_ACHIEVED = "learning_goal_achieved"
 
     # ==================== CONFLICT RESOLUTION EVENTS (8) ====================

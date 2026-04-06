@@ -265,9 +265,7 @@ class ProjectFileLoader:
     ) -> List[tuple]:
         """Rank files by path."""
         return [
-            (f, priority)
-            for f in files
-            if any(path in f.get("file_path", "") for path in paths)
+            (f, priority) for f in files if any(path in f.get("file_path", "") for path in paths)
         ]
 
     def _rank_by_extension(
@@ -280,9 +278,7 @@ class ProjectFileLoader:
             if any(f.get("file_path", "").endswith(ext) for ext in extensions)
         ]
 
-    def _sample_strategy(
-        self, files: List[Dict[str, Any]], max_files: int
-    ) -> List[Dict[str, Any]]:
+    def _sample_strategy(self, files: List[Dict[str, Any]], max_files: int) -> List[Dict[str, Any]]:
         """
         Sample strategy: Random sampling with important files always included.
 
@@ -307,7 +303,9 @@ class ProjectFileLoader:
 
         return important[:max_files]
 
-    def _filter_duplicates(self, files: List[Dict[str, Any]], project_id: str) -> List[Dict[str, Any]]:
+    def _filter_duplicates(
+        self, files: List[Dict[str, Any]], project_id: str
+    ) -> List[Dict[str, Any]]:
         """
         Filter out files that are already loaded in knowledge base.
 

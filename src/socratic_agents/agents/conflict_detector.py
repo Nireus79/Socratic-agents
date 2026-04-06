@@ -11,6 +11,7 @@ from .base import BaseAgent
 try:
     from socratic_conflict import ConflictDetector as SocraticConflictDetector
     from socratic_conflict import ConflictResolver
+
     SOCRATIC_CONFLICT_AVAILABLE = True
 except ImportError:
     SOCRATIC_CONFLICT_AVAILABLE = False
@@ -161,12 +162,14 @@ class AgentConflictDetector(BaseAgent):
             for i, item in enumerate(items[:-1]):
                 for j, other in enumerate(items[i + 1 :]):
                     if str(item) == str(other):
-                        conflicts.append({
-                            "id": f"conflict_{len(conflicts)}",
-                            "type": "duplicate",
-                            "items": [i, j + i + 1],
-                            "severity": "medium",
-                        })
+                        conflicts.append(
+                            {
+                                "id": f"conflict_{len(conflicts)}",
+                                "type": "duplicate",
+                                "items": [i, j + i + 1],
+                                "severity": "medium",
+                            }
+                        )
 
         self.conflicts.extend(conflicts)
 
@@ -224,7 +227,9 @@ class AgentConflictDetector(BaseAgent):
         try:
             # Use socratic-conflict resolver
             agent_metadata = {}  # Can be populated with agent info if needed
-            resolution = self.resolver.resolve(conflict_to_resolve, agent_metadata, strategy if strategy != "auto" else None)
+            resolution = self.resolver.resolve(
+                conflict_to_resolve, agent_metadata, strategy if strategy != "auto" else None
+            )
 
             return {
                 "status": "success",

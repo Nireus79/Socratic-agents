@@ -213,7 +213,11 @@ class SocraticCounselor:
             return {"status": "error", "message": "Project context required"}
 
         # STEP 1: Check for existing unanswered question
-        if not force_refresh and hasattr(project, "pending_questions") and project.pending_questions:
+        if (
+            not force_refresh
+            and hasattr(project, "pending_questions")
+            and project.pending_questions
+        ):
             unanswered = [q for q in project.pending_questions if q.get("status") == "unanswered"]
             if unanswered:
                 self.logger.debug(f"Returning existing unanswered question for {user_id}")
@@ -243,8 +247,10 @@ class SocraticCounselor:
         phase_questions = []
         if hasattr(project, "conversation_history"):
             phase_questions = [
-                msg for msg in project.conversation_history
-                if msg.get("type") == "assistant" and msg.get("phase") == getattr(project, "phase", "discovery")
+                msg
+                for msg in project.conversation_history
+                if msg.get("type") == "assistant"
+                and msg.get("phase") == getattr(project, "phase", "discovery")
             ]
 
         # STEP 5: Generate question
@@ -266,27 +272,31 @@ class SocraticCounselor:
 
         # STEP 6: Store in conversation_history
         if hasattr(project, "conversation_history"):
-            project.conversation_history.append({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "type": "assistant",
-                "content": question,
-                "phase": getattr(project, "phase", "discovery"),
-                "question_number": len(phase_questions) + 1,
-            })
+            project.conversation_history.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "type": "assistant",
+                    "content": question,
+                    "phase": getattr(project, "phase", "discovery"),
+                    "question_number": len(phase_questions) + 1,
+                }
+            )
 
         # STEP 7: Store in pending_questions
         if not hasattr(project, "pending_questions"):
             project.pending_questions = []
 
-        project.pending_questions.append({
-            "id": f"q_{uuid.uuid4().hex[:8]}",
-            "question": question,
-            "phase": getattr(project, "phase", "discovery"),
-            "status": "unanswered",
-            "created_at": datetime.datetime.now().isoformat(),
-            "answer": None,
-            "answered_at": None,
-        })
+        project.pending_questions.append(
+            {
+                "id": f"q_{uuid.uuid4().hex[:8]}",
+                "question": question,
+                "phase": getattr(project, "phase", "discovery"),
+                "status": "unanswered",
+                "created_at": datetime.datetime.now().isoformat(),
+                "answer": None,
+                "answered_at": None,
+            }
+        )
 
         # STEP 8: Update user metrics
         if hasattr(user, "increment_question_usage"):
@@ -350,17 +360,21 @@ class SocraticCounselor:
 
         # STEP 1: Add to conversation_history
         if hasattr(project, "conversation_history"):
-            project.conversation_history.append({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "type": "user",
-                "content": user_response,
-                "phase": getattr(project, "phase", "discovery"),
-                "author": user_id,
-            })
+            project.conversation_history.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "type": "user",
+                    "content": user_response,
+                    "phase": getattr(project, "phase", "discovery"),
+                    "author": user_id,
+                }
+            )
             debug_log.append("response_added")
 
         # STEP 2: Extract insights
-        insights_result = self._extract_insights_only({"response": user_response, "project": project})
+        insights_result = self._extract_insights_only(
+            {"response": user_response, "project": project}
+        )
         insights_data = insights_result.get("insights", {})
         debug_log.append("insights_extracted")
 
@@ -375,9 +389,7 @@ class SocraticCounselor:
                     break
 
         # STEP 4: Conflict detection
-        conflicts = self._handle_conflict_detection(
-            {"project": project, "insights": insights_data}
-        )
+        conflicts = self._handle_conflict_detection({"project": project, "insights": insights_data})
         conflicts_found = conflicts.get("conflicts_found", [])
 
         if conflicts_found:
@@ -407,13 +419,19 @@ class SocraticCounselor:
             debug_log.append("phase_complete")
 
         # STEP 8: Generate NEXT question (CRITICAL!)
-        next_question_result = self._generate_question({
-            "project": project,
-            "user_id": user_id,
-            "force_refresh": True,
-            "knowledge_base": kb_context,
-        })
-        next_question = next_question_result.get("question") if next_question_result.get("status") == "success" else None
+        next_question_result = self._generate_question(
+            {
+                "project": project,
+                "user_id": user_id,
+                "force_refresh": True,
+                "knowledge_base": kb_context,
+            }
+        )
+        next_question = (
+            next_question_result.get("question")
+            if next_question_result.get("status") == "success"
+            else None
+        )
         debug_log.append("next_question_generated")
 
         # STEP 9: Save to database
@@ -541,7 +559,9 @@ class SocraticCounselor:
             chunk_snippets = []
             if chunks:
                 for chunk in chunks[:3]:
-                    content = chunk.get("content", str(chunk)) if isinstance(chunk, dict) else str(chunk)
+                    content = (
+                        chunk.get("content", str(chunk)) if isinstance(chunk, dict) else str(chunk)
+                    )
                     chunk_snippets.append(content[:200])
 
             chunks_context = (
@@ -553,7 +573,9 @@ class SocraticCounselor:
             # Build gaps context
             gaps_context = ""
             if gaps:
-                gap_list = [g.get("topic", str(g)) if isinstance(g, dict) else str(g) for g in gaps[:3]]
+                gap_list = [
+                    g.get("topic", str(g)) if isinstance(g, dict) else str(g) for g in gaps[:3]
+                ]
                 gaps_context = f"\nKnowledge gaps: {', '.join(gap_list)}"
 
             # Build prompt for LLM
@@ -693,7 +715,7 @@ Return ONLY the JSON."""
                 "raw_response": response,
                 "length": len(response),
                 "confidence": 0.5,
-            }
+            },
         }
 
     def _handle_conflict_detection(self, request: Dict) -> Dict:
@@ -750,9 +772,7 @@ Return ONLY the JSON."""
                 detection_result = conflict_detector.detect_from_agent_states(agent_states)
                 if detection_result["status"] == "success":
                     conflicts_found = detection_result.get("conflicts", [])
-                    self.logger.debug(
-                        f"Full detection: found {len(conflicts_found)} conflicts"
-                    )
+                    self.logger.debug(f"Full detection: found {len(conflicts_found)} conflicts")
 
             except Exception as e:
                 self.logger.debug(f"Full conflict detection error: {e}")
@@ -777,9 +797,7 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
                     try:
                         conflict_data = json.loads(response_text)
                         conflicts_found = conflict_data.get("conflicts", [])
-                        self.logger.debug(
-                            f"LLM detection: found {len(conflicts_found)} conflicts"
-                        )
+                        self.logger.debug(f"LLM detection: found {len(conflicts_found)} conflicts")
                     except json.JSONDecodeError:
                         pass
 
@@ -934,7 +952,9 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
 
         is_complete = self._check_phase_completion_internal(project)
         phase = getattr(project, "phase", "discovery")
-        maturity = project.maturity_scores.get(phase, 0) if hasattr(project, "maturity_scores") else 0
+        maturity = (
+            project.maturity_scores.get(phase, 0) if hasattr(project, "maturity_scores") else 0
+        )
 
         return {
             "status": "success",
@@ -1163,7 +1183,9 @@ Don't give the answer, guide the thinking process."""
 
         if hasattr(project, "pending_questions"):
             for q in project.pending_questions:
-                if q.get("status") == "answered" and (not question_id or q.get("id") == question_id):
+                if q.get("status") == "answered" and (
+                    not question_id or q.get("id") == question_id
+                ):
                     q["status"] = "unanswered"
                     q["answered_at"] = None
                     q["answer"] = None

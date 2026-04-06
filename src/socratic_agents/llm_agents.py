@@ -247,7 +247,9 @@ class LLMPoweredCodeGenerator:
             generated_code = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
             logger.error(f"Invalid LLM response format in generate_with_tests: {e}", exc_info=True)
-            generated_code = "# Error: LLM response format invalid - check LLM client compatibility\n"
+            generated_code = (
+                "# Error: LLM response format invalid - check LLM client compatibility\n"
+            )
         except Exception as e:
             logger.exception(f"Code generation failed in generate_with_tests: {e}")
             generated_code = "# Error: Code generation service unavailable - please try again\n"
@@ -288,7 +290,9 @@ class LLMPoweredCodeGenerator:
             response = self.llm.chat(prompt)
             response_text = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in generate_with_explanation: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in generate_with_explanation: {e}", exc_info=True
+            )
             response_text = "Error: LLM response format invalid"
         except Exception as e:
             logger.exception(f"Code generation with explanation failed: {e}")
@@ -369,7 +373,9 @@ class LLMPoweredCodeValidator:
             response = self.llm.chat(prompt)
             review = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in review_with_suggestions: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in review_with_suggestions: {e}", exc_info=True
+            )
             review = "[Review failed: LLM response format error]"
         except Exception as e:
             logger.exception(f"Code review failed in review_with_suggestions: {e}")
@@ -451,7 +457,9 @@ class LLMPoweredProjectManager:
             response = self.llm.chat(prompt)
             breakdown = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in intelligent_project_breakdown: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in intelligent_project_breakdown: {e}", exc_info=True
+            )
             breakdown = "[Project breakdown failed: LLM response format error]"
         except Exception as e:
             logger.exception(f"Project breakdown failed: {e}")
@@ -495,7 +503,9 @@ class LLMPoweredProjectManager:
             response = self.llm.chat(prompt)
             risk_analysis = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in analyze_project_risks: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in analyze_project_risks: {e}", exc_info=True
+            )
             risk_analysis = "[Risk analysis failed: LLM response format error]"
         except Exception as e:
             logger.exception(f"Risk analysis failed: {e}")
@@ -845,7 +855,9 @@ class LLMPoweredContextAnalyzer:
             response = self.llm.chat(prompt)
             analysis = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in deep_context_analysis: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in deep_context_analysis: {e}", exc_info=True
+            )
             analysis = "[Context analysis failed: LLM response format error]"
         except Exception as e:
             logger.exception(f"Context analysis failed: {e}")
@@ -944,7 +956,9 @@ class LLMPoweredContextAnalyzer:
             response = self.llm.chat(prompt)
             recommendations = response.content if hasattr(response, "content") else str(response)
         except (AttributeError, TypeError) as e:
-            logger.error(f"Invalid LLM response format in recommend_next_actions: {e}", exc_info=True)
+            logger.error(
+                f"Invalid LLM response format in recommend_next_actions: {e}", exc_info=True
+            )
             recommendations = "[Recommendation generation failed: LLM response format error]"
         except Exception as e:
             logger.exception(f"Recommendation generation failed: {e}")

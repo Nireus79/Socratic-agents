@@ -20,6 +20,7 @@ try:
     from socratic_learning.analytics.metrics_collector import MetricsCollector
     from socratic_learning.recommendations.engine import RecommendationEngine
     from socratic_learning.storage.sqlite_store import SQLiteLearningStore
+
     SOCRATIC_LEARNING_AVAILABLE = True
 except ImportError:
     SOCRATIC_LEARNING_AVAILABLE = False
@@ -389,9 +390,7 @@ class LearningAgent(BaseAgent):
             responses_quality = [
                 i.get("quality_score", 0.5) for i in self.interactions if i.get("response")
             ]
-            topic_interactions = [
-                i.get("topic", "general") for i in self.interactions
-            ]
+            topic_interactions = [i.get("topic", "general") for i in self.interactions]
 
             # Build profile using learning engine
             profile = self.learning_engine.build_user_profile(

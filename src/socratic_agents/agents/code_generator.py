@@ -156,8 +156,7 @@ class CodeGenerator(BaseAgent):
         """Generate explanation for generated code."""
         if self.llm_client:
             llm_prompt = (
-                f"Explain this {language} code in 2-3 sentences:\n\n{code}\n\n"
-                f"Context: {prompt}"
+                f"Explain this {language} code in 2-3 sentences:\n\n{code}\n\n" f"Context: {prompt}"
             )
             try:
                 response = self.llm_client.chat(llm_prompt)
@@ -225,7 +224,7 @@ if __name__ == "__main__":
 
     def _get_javascript_template(self, prompt: str) -> str:
         """Get JavaScript code template."""
-        return f'''/**
+        return f"""/**
  * {prompt}
  */
 
@@ -234,11 +233,11 @@ function main() {{
 }}
 
 main();
-'''
+"""
 
     def _get_typescript_template(self, prompt: str) -> str:
         """Get TypeScript code template."""
-        return f'''/**
+        return f"""/**
  * {prompt}
  */
 
@@ -247,11 +246,11 @@ function main(): void {{
 }}
 
 main();
-'''
+"""
 
     def _get_java_template(self, prompt: str) -> str:
         """Get Java code template."""
-        return f'''/**
+        return f"""/**
  * {prompt}
  */
 public class Main {{
@@ -259,10 +258,10 @@ public class Main {{
         System.out.println("Implement: {prompt}");
     }}
 }}
-'''
+"""
 
     def _get_generic_template(self, prompt: str) -> str:
         """Get generic code template."""
-        return f'''# {prompt}
+        return f"""# {prompt}
 # TODO: Implement {prompt}
-'''
+"""
