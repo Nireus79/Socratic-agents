@@ -19,6 +19,7 @@ from .agents.multi_llm_agent import MultiLlmAgent
 from .agents.note_manager import NoteManager
 from .agents.project_manager import ProjectManager
 from .agents.quality_controller import QualityController
+from .agents.project_file_loader import ProjectFileLoader
 from .agents.question_queue_agent import QuestionQueueAgent
 from .agents.skill_generator_agent import SkillGeneratorAgent
 
@@ -114,6 +115,7 @@ __all__ = [
     "LearningAgent",
     "MultiLlmAgent",
     "ProjectManager",
+    "ProjectFileLoader",
     "QualityController",
     "SkillGeneratorAgent",
     "ContextAnalyzer",
