@@ -23,7 +23,7 @@ Socratic Agents provides a comprehensive agent orchestration framework with 19 p
 ### The 19 Agents
 
 **Core Agents**:
-1. **Socratic Counselor** - Guided learning with KB-aware questioning and context intelligence
+1. **Socratic Counselor** - Complete Socratic dialogue orchestration engine with full question generation, answer processing, insight extraction, conflict detection, maturity tracking, and automatic next question generation. Provides complete dialogue flow: Q -> A -> Next Q
 2. **Code Generator** - Intelligent code generation and completion
 3. **Code Validator** - Validation and testing of generated code
 4. **Knowledge Manager** - Knowledge base management and RAG integration

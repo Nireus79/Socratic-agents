@@ -2,7 +2,126 @@
 
 All notable changes to the Socrates Skill Generation System are documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2026-04-06
+
+### Phase 0a Complete: Complete Orchestration Engine
+
+This release transforms SocraticCounselor from a question-generation-only component into a **complete Socratic dialogue orchestration engine**. This completes Phase 0a of the modularization remediation and prepares for integration in Phase 1.
+
+#### Added - Complete Dialogue Orchestration
+
+**Full Question Generation Orchestration (_generate_question)**:
+- Check for existing unanswered questions (prevent double generation)
+- Get/create user with auto-creation for local/CLI users
+- Validate subscription limits (free: 5/day, pro: 100/day, enterprise: unlimited)
+- Gather KB context from vector DB (with caching per phase)
+- Generate questions (dynamic with KB or static fallback)
+- Store in BOTH conversation_history AND pending_questions (unified tracking)
+- Increment user metrics and save to database
+- Return question with orchestration results
+
+**Full Answer Processing Orchestration (_process_response)**:
+- Add response to conversation_history with metadata
+- Extract insights from user response using LLM
+- Mark question answered (CRITICALLY before conflict detection)
+- Detect conflicts in specifications (with early return if found)
+- Update project maturity based on insights
+- Track question effectiveness for learning analytics
+- Check phase completion status
+- **GENERATE NEXT QUESTION** (critical for dialogue continuity)
+- Save project to database
+- Return insights, next_question, phase status, conflicts if any
+
+**Supporting Orchestration Methods**:
+- `_extract_insights_only()` - Extract insights from responses
+- `_handle_conflict_detection()` - Detect and report conflicts
+- `_update_project_maturity()` - Update phase maturity scores
+- `_track_question_effectiveness()` - Log learning effectiveness
+- `_check_phase_completion_internal()` - Check if phase is complete (70% maturity)
+- `_advance_phase()` - Move to next phase
+- `_generate_hint()` - Generate helpful hints
+- Question generation variants: `_generate_dynamic_question()`, `_generate_static_question()`, `_generate_kb_aware_question()`
+
+**User Management**:
+- Auto-create users for local/CLI usage (pro tier by default)
+- Subscription tier checking (free, pro, enterprise)
+- Question usage tracking
+- User metrics persistence
+
+**State Management**:
+- Dual storage: conversation_history (full log) + pending_questions (tracking)
+- Question status tracking: unanswered -> answered
+- Timestamp and metadata for all interactions
+- Phase-aware conversation history
+
+**Database Integration Points**:
+- Optional database client for persistence
+- Saves project after every critical operation
+- Saves user after metric updates
+- Loads user for subscription checking
+
+#### Removed
+- Placeholder/stub implementations of orchestration methods
+- Incomplete answer processing code
+- Orphaned imports and unused code
+
+#### Changed
+- **BREAKING**: SocraticCounselor now requires orchestration-aware clients
+- **BREAKING**: process() method now supports action routing (generate_question, process_response, etc)
+- **BREAKING**: API responses now match orchestration structure
+- Version bumped to 1.0.0 (major rewrite, production ready)
+
+#### Fixed
+- **Critical**: Next question now properly generated after answer processing
+- **Critical**: Question state properly tracked (prevents repetition)
+- **Critical**: Answer processing returns next question in response
+- **Critical**: Database persistence working for all state changes
+- **Critical**: Conversation flow: Q -> A -> Q -> A works end-to-end
+
+#### Testing
+- Added comprehensive unit tests (19 test cases, 100% pass rate)
+- Test coverage for:
+  - Question generation with existing question return
+  - New question generation when no unanswered exist
+  - Storage in both conversation_history and pending_questions
+  - User auto-creation
+  - Response processing and marking answered
+  - Next question generation
+  - Full dialogue flow (Q->A->Q->A)
+  - Subscription validation by tier
+  - Phase-appropriate questions
+  - Insight extraction
+  - Conflict detection
+
+### Migration Guide
+
+If you were using v0.2.x with question generation only:
+
+```python
+# Old (v0.2.x):
+counselor = SocraticCounselor(llm_client=llm)
+result = counselor.process({"topic": "Python", "level": "intermediate"})
+question = result["question"]
+
+# New (v1.0.0) - Full orchestration:
+counselor = SocraticCounselor(llm_client=llm, database=db)
+
+# Generate question with orchestration
+q_result = counselor._generate_question({
+    "project": project,
+    "user_id": "user123",
+})
+question = q_result["question"]
+
+# Process answer with next question generation
+a_result = counselor._process_response({
+    "project": project,
+    "user_id": "user123",
+    "response": "User's answer",
+})
+next_question = a_result["next_question"]
+insights = a_result["insights"]
+```
 
 ## [0.2.5] - 2026-04-02
 
