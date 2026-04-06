@@ -45,6 +45,16 @@ from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
 # Event system (93 comprehensive event types)
 from .events import EventType, EventBus, EVENT_CATEGORIES
 
+# Function calling support
+from .function_calling import (
+    FunctionRegistry,
+    FunctionCallExecutor,
+    FunctionSchema,
+    FunctionCall,
+    ParameterSchema,
+    ParameterType,
+)
+
 
 # Error classes for GitHub sync and integration
 class ConflictResolutionError(Exception):
@@ -143,4 +153,11 @@ __all__ = [
     "EventType",
     "EventBus",
     "EVENT_CATEGORIES",
+    # Function calling support
+    "FunctionRegistry",
+    "FunctionCallExecutor",
+    "FunctionSchema",
+    "FunctionCall",
+    "ParameterSchema",
+    "ParameterType",
 ]
