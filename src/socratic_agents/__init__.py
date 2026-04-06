@@ -42,6 +42,9 @@ from .llm_agents import (
 # Data models
 from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
 
+# Event system (93 comprehensive event types)
+from .events import EventType, EventBus, EVENT_CATEGORIES
+
 
 # Error classes for GitHub sync and integration
 class ConflictResolutionError(Exception):
@@ -136,4 +139,8 @@ __all__ = [
     "FileSizeExceededError",
     # Factory functions
     "create_github_sync_handler",
+    # Event system (93 event types)
+    "EventType",
+    "EventBus",
+    "EVENT_CATEGORIES",
 ]
