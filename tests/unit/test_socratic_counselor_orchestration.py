@@ -268,7 +268,6 @@ class TestFullDialogueFlow:
             }
         )
         assert q1_result["status"] == "success"
-        q1_text = q1_result["question"]
 
         # Turn 1: Answer first question
         a1_result = counselor._process_response(
