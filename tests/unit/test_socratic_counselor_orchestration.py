@@ -1,7 +1,9 @@
 """Unit tests for SocraticCounselor orchestration methods."""
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+
 from src.socratic_agents.agents.socratic_counselor import SocraticCounselor
 
 
@@ -82,7 +84,7 @@ class TestGenerateQuestion:
 
         assert result["status"] == "success"
         assert result["question"] == "Existing question?"
-        assert result["existing"] == True
+        assert result["existing"]
 
     def test_generate_question_creates_new_when_none_unanswered(self):
         """Test that new question is generated when no unanswered questions exist."""
@@ -169,7 +171,7 @@ class TestProcessResponse:
             }
         ]
 
-        result = counselor._process_response(
+        counselor._process_response(
             {
                 "project": project,
                 "user_id": "test_user",
@@ -197,7 +199,7 @@ class TestProcessResponse:
             }
         ]
 
-        result = counselor._process_response(
+        counselor._process_response(
             {
                 "project": project,
                 "user_id": "test_user",
@@ -221,7 +223,7 @@ class TestProcessResponse:
             }
         ]
 
-        result = counselor._process_response(
+        counselor._process_response(
             {
                 "project": project,
                 "user_id": "test_user",
@@ -240,7 +242,7 @@ class TestProcessResponse:
         """Test that project and response are both required."""
         counselor = SocraticCounselor()
 
-        result = counselor._process_response(
+        counselor._process_response(
             {
                 "user_id": "test_user",
                 # Missing project and response
@@ -266,7 +268,7 @@ class TestFullDialogueFlow:
             }
         )
         assert q1_result["status"] == "success"
-        q1_text = q1_result["question"]
+        q1_result["question"]
 
         # Turn 1: Answer first question
         a1_result = counselor._process_response(
@@ -278,7 +280,7 @@ class TestFullDialogueFlow:
         )
         assert a1_result["status"] == "success"
         assert "next_question" in a1_result
-        q2_text = a1_result["next_question"]
+        a1_result["next_question"]
 
         # Verify conversation has 3 messages (Q1, A1, Q2) because next question is generated
         assert len(project.conversation_history) == 3
@@ -293,7 +295,7 @@ class TestFullDialogueFlow:
         )
         assert a2_result["status"] == "success"
         assert "next_question" in a2_result
-        q3_text = a2_result["next_question"]
+        a2_result["next_question"]
 
         # Verify conversation grew (each turn generates next Q)
         assert len(project.conversation_history) == 5  # Q1, A1, Q2, A2, Q3
@@ -313,7 +315,7 @@ class TestFullDialogueFlow:
                 "user_id": "user_1",
             }
         )
-        q1_text = q1_result["question"]
+        q1_result["question"]
 
         # Try to generate again without answering (should return existing)
         q2_result = counselor._generate_question(
@@ -324,7 +326,7 @@ class TestFullDialogueFlow:
         )
 
         # Should return existing question
-        assert q2_result.get("existing") == True
+        assert q2_result.get("existing")
         assert q2_result["question"] == q1_text
 
 
@@ -368,7 +370,7 @@ class TestSubscriptionValidation:
 
         can_ask, error = counselor._check_subscription_limit(user)
 
-        assert can_ask == True
+        assert can_ask
         assert error is None
 
     def test_subscription_free_tier_limited(self):
@@ -379,7 +381,7 @@ class TestSubscriptionValidation:
 
         can_ask, error = counselor._check_subscription_limit(user)
 
-        assert can_ask == False
+        assert not can_ask
         assert "limit" in error.lower()
 
 

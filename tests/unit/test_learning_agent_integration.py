@@ -1,7 +1,8 @@
 """Integration tests for LearningAgent with socratic-learning library."""
 
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 from src.socratic_agents.agents.learning_agent import LearningAgent
 

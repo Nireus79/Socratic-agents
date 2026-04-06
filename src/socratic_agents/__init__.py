@@ -17,9 +17,9 @@ from .agents.knowledge_manager import KnowledgeManager
 from .agents.learning_agent import LearningAgent
 from .agents.multi_llm_agent import MultiLlmAgent
 from .agents.note_manager import NoteManager
+from .agents.project_file_loader import ProjectFileLoader
 from .agents.project_manager import ProjectManager
 from .agents.quality_controller import QualityController
-from .agents.project_file_loader import ProjectFileLoader
 from .agents.question_queue_agent import QuestionQueueAgent
 from .agents.skill_generator_agent import SkillGeneratorAgent
 
@@ -27,6 +27,19 @@ from .agents.skill_generator_agent import SkillGeneratorAgent
 from .agents.socratic_counselor import SocraticCounselor
 from .agents.system_monitor import SystemMonitor
 from .agents.user_manager import UserManager
+
+# Event system (93 comprehensive event types)
+from .events import EVENT_CATEGORIES, EventBus, EventType
+
+# Function calling support
+from .function_calling import (
+    FunctionCall,
+    FunctionCallExecutor,
+    FunctionRegistry,
+    FunctionSchema,
+    ParameterSchema,
+    ParameterType,
+)
 
 # LLM-enhanced agent wrappers
 from .llm_agents import (
@@ -42,19 +55,6 @@ from .llm_agents import (
 
 # Data models
 from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
-
-# Event system (93 comprehensive event types)
-from .events import EventType, EventBus, EVENT_CATEGORIES
-
-# Function calling support
-from .function_calling import (
-    FunctionRegistry,
-    FunctionCallExecutor,
-    FunctionSchema,
-    FunctionCall,
-    ParameterSchema,
-    ParameterType,
-)
 
 
 # Error classes for GitHub sync and integration

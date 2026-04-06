@@ -8,16 +8,16 @@ Integrates with socratic-learning library to provide:
 - Interaction logging and tracking
 """
 
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
 from .base import BaseAgent
 
 try:
-    from socratic_learning.analytics.learning_engine import LearningEngine, UserProfile
+    from socratic_learning.analytics.learning_engine import LearningEngine
     from socratic_learning.analytics.maturity_calculator import MaturityCalculator
-    from socratic_learning.analytics.pattern_detector import PatternDetector
     from socratic_learning.analytics.metrics_collector import MetricsCollector
+    from socratic_learning.analytics.pattern_detector import PatternDetector
     from socratic_learning.recommendations.engine import RecommendationEngine
     from socratic_learning.storage.sqlite_store import SQLiteLearningStore
 

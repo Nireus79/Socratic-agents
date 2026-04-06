@@ -19,9 +19,9 @@ Now adapted as a standalone module for use in modular Socrates architecture.
 """
 
 import datetime
+import json
 import logging
 import uuid
-import json
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -628,23 +628,23 @@ Return ONLY the question text, nothing else."""
         fallback_questions = {
             "discovery": [
                 f"What is the main purpose of {topic}?",
-                f"Who are the primary users?",
-                f"What problem does this solve?",
+                "Who are the primary users?",
+                "What problem does this solve?",
             ],
             "analysis": [
-                f"What are the main requirements?",
-                f"What constraints apply?",
-                f"How will this be measured?",
+                "What are the main requirements?",
+                "What constraints apply?",
+                "How will this be measured?",
             ],
             "design": [
-                f"How would you structure this?",
-                f"What components are needed?",
-                f"What architecture would fit?",
+                "How would you structure this?",
+                "What components are needed?",
+                "What architecture would fit?",
             ],
             "implementation": [
-                f"What's the first step?",
-                f"What tools would you use?",
-                f"How would you test this?",
+                "What's the first step?",
+                "What tools would you use?",
+                "How would you test this?",
             ],
         }
 
@@ -671,7 +671,6 @@ Return ONLY the question text, nothing else."""
             - 'insights': Extracted insights dictionary
         """
         response = request.get("response", "")
-        project = request.get("project")
 
         if not response:
             return {"status": "error", "message": "Response required", "insights": {}}
@@ -699,7 +698,7 @@ Return ONLY the JSON."""
                 if isinstance(insights_text, str):
                     try:
                         insights = json.loads(insights_text)
-                    except:
+                    except (ValueError, TypeError):
                         insights = {"raw_response": insights_text}
                 else:
                     insights = insights_text or {}
@@ -1120,7 +1119,6 @@ Provide a clear explanation suitable for learning."""
         Returns:
             Dictionary with guidance
         """
-        project = request.get("project")
         question = request.get("question", "")
 
         if self.llm_client:
@@ -1211,7 +1209,6 @@ Don't give the answer, guide the thinking process."""
         Returns:
             Dictionary with list of suggestion approaches
         """
-        project = request.get("project")
         question = request.get("question", "")
 
         suggestions = []

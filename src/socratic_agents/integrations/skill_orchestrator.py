@@ -3,13 +3,13 @@ import uuid
 from typing import Any, Dict
 
 from ..agents.learning_agent import LearningAgent
-
-logger = logging.getLogger(__name__)
 from ..agents.quality_controller import QualityController
 from ..agents.skill_generator_agent import SkillGeneratorAgent
 from ..models.skill_models import AgentSkill
 from ..skill_generation.compatibility_checker import CompatibilityChecker
 from ..skill_generation.skill_version_manager import SkillVersionManager
+
+logger = logging.getLogger(__name__)
 
 
 class SkillOrchestrator:

@@ -1,7 +1,8 @@
 """Integration tests for AgentConflictDetector with socratic-conflict library."""
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 from src.socratic_agents.agents.conflict_detector import AgentConflictDetector
 

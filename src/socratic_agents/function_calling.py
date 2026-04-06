@@ -1,11 +1,10 @@
 """Function calling support for LLM agents."""
 
 import inspect
-import json
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Type, get_type_hints
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -287,13 +286,13 @@ class FunctionRegistry:
         if annotation == inspect.Parameter.empty or annotation is None:
             return ParameterType.STRING
 
-        if annotation == str:
+        if annotation is str:
             return ParameterType.STRING
-        elif annotation == int:
+        elif annotation is int:
             return ParameterType.INTEGER
         elif annotation in (float, int):
             return ParameterType.NUMBER
-        elif annotation == bool:
+        elif annotation is bool:
             return ParameterType.BOOLEAN
         elif annotation in (list, List):
             return ParameterType.ARRAY
@@ -302,9 +301,9 @@ class FunctionRegistry:
         else:
             # Check for generic types like List[str], Dict[str, Any]
             origin = getattr(annotation, "__origin__", None)
-            if origin == list:
+            if origin is list:
                 return ParameterType.ARRAY
-            elif origin == dict:
+            elif origin is dict:
                 return ParameterType.OBJECT
 
         return ParameterType.STRING
