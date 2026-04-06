@@ -171,7 +171,7 @@ class TestProcessResponse:
             }
         ]
 
-        counselor._process_response(
+        result = counselor._process_response(
             {
                 "project": project,
                 "user_id": "test_user",
@@ -223,7 +223,7 @@ class TestProcessResponse:
             }
         ]
 
-        counselor._process_response(
+        result = counselor._process_response(
             {
                 "project": project,
                 "user_id": "test_user",
@@ -268,7 +268,7 @@ class TestFullDialogueFlow:
             }
         )
         assert q1_result["status"] == "success"
-        q1_result["question"]
+        q1_text = q1_result["question"]
 
         # Turn 1: Answer first question
         a1_result = counselor._process_response(
@@ -280,7 +280,7 @@ class TestFullDialogueFlow:
         )
         assert a1_result["status"] == "success"
         assert "next_question" in a1_result
-        a1_result["next_question"]
+        q2_text = a1_result["next_question"]
 
         # Verify conversation has 3 messages (Q1, A1, Q2) because next question is generated
         assert len(project.conversation_history) == 3
@@ -295,7 +295,7 @@ class TestFullDialogueFlow:
         )
         assert a2_result["status"] == "success"
         assert "next_question" in a2_result
-        a2_result["next_question"]
+        q3_text = a2_result["next_question"]
 
         # Verify conversation grew (each turn generates next Q)
         assert len(project.conversation_history) == 5  # Q1, A1, Q2, A2, Q3
