@@ -1,32 +1,107 @@
-"""Learning Agent - Continuous learning and performance improvement."""
+"""Learning Agent - Continuous learning and performance improvement.
+
+Integrates with socratic-learning library to provide:
+- Learning analytics and pattern detection
+- User profile building and metrics
+- Phase maturity assessment
+- Personalization and recommendations
+- Interaction logging and tracking
+"""
 
 from typing import Any, Dict, List, Optional
+import logging
 
 from .base import BaseAgent
+
+try:
+    from socratic_learning.analytics.learning_engine import LearningEngine, UserProfile
+    from socratic_learning.analytics.maturity_calculator import MaturityCalculator
+    from socratic_learning.analytics.pattern_detector import PatternDetector
+    from socratic_learning.analytics.metrics_collector import MetricsCollector
+    from socratic_learning.recommendations.engine import RecommendationEngine
+    from socratic_learning.storage.sqlite_store import SQLiteLearningStore
+    SOCRATIC_LEARNING_AVAILABLE = True
+except ImportError:
+    SOCRATIC_LEARNING_AVAILABLE = False
+
+
+logger = logging.getLogger(__name__)
 
 
 class LearningAgent(BaseAgent):
     """Agent that learns from interactions and improves over time."""
 
-    def __init__(self, llm_client: Optional[Any] = None):
-        """Initialize the Learning Agent."""
+    def __init__(
+        self,
+        llm_client: Optional[Any] = None,
+        database_path: str = ":memory:",
+    ):
+        """
+        Initialize the Learning Agent.
+
+        Args:
+            llm_client: Optional LLM client for enhanced analytics
+            database_path: Path to SQLite database for persistence
+        """
         super().__init__(name="LearningAgent", llm_client=llm_client)
         self.interactions: List[Dict[str, Any]] = []
         self.patterns: List[str] = []
-        # Phase 2: Skill integration fields
+
+        # Initialize socratic-learning components if available
+        self.use_full_learning = SOCRATIC_LEARNING_AVAILABLE
+        if self.use_full_learning:
+            try:
+                self.store = SQLiteLearningStore(database_path)
+                self.learning_engine = LearningEngine(logger_instance=logger)
+                self.maturity_calculator = MaturityCalculator()
+                self.metrics_collector = MetricsCollector(store=self.store)
+                self.recommendation_engine = RecommendationEngine()
+                self.pattern_detector = PatternDetector(self.store)
+                logger.debug("Full socratic-learning components initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize learning components: {e}")
+                self.use_full_learning = False
+
+        # Skill integration fields
         self.skill_effectiveness_history: Dict[str, List[float]] = {}
         self.user_profile = self._initialize_user_profile()
         self.personalization_rules = self._initialize_personalization_rules()
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process learning requests."""
+        """
+        Process learning requests.
+
+        Supported actions:
+        - record: Record an interaction
+        - analyze: Analyze patterns
+        - suggest: Suggest improvements
+        - metrics: Calculate learning metrics
+        - assess_maturity: Assess phase maturity
+        - patterns: Detect learning patterns
+        - recommend: Generate recommendations
+        - personalize_skills: Personalize skills
+        - track_feedback: Track skill feedback
+        - get_profile: Get user profile
+        """
         action = request.get("action", "record")
+
         if action == "record":
             return self.record_interaction(request.get("interaction"))  # type: ignore[arg-type]
         elif action == "analyze":
             return self.analyze_patterns()
         elif action == "suggest":
             return self.suggest_improvements()
+        elif action == "metrics":
+            return self.calculate_learning_metrics(request.get("user_id", "user"))  # type: ignore[arg-type]
+        elif action == "assess_maturity":
+            return self.assess_phase_maturity(
+                request.get("phase", "discovery"),  # type: ignore[arg-type]
+                request.get("phase_specs", []),  # type: ignore[arg-type]
+            )
+        elif action == "patterns":
+            return self.detect_learning_patterns(request.get("agent_name"))  # type: ignore[arg-type]
+        elif action == "recommend":
+            return self.generate_recommendations(request.get("user_id", "user"))  # type: ignore[arg-type]
         elif action == "personalize_skills":
             return self.personalize_skills(
                 request.get("skills", []),  # type: ignore[arg-type]
@@ -278,3 +353,259 @@ class LearningAgent(BaseAgent):
             )
 
         self.user_profile["total_skills_applied"] += 1
+
+    # ===== Full Learning Analytics Methods =====
+
+    def calculate_learning_metrics(self, user_id: str) -> Dict[str, Any]:
+        """
+        Calculate comprehensive learning metrics for a user.
+
+        Uses socratic-learning to compute engagement, velocity, and experience level.
+
+        Args:
+            user_id: ID of the user
+
+        Returns:
+            Dictionary with learning metrics
+        """
+        if not self.use_full_learning:
+            # Fallback: basic metrics
+            return {
+                "status": "success",
+                "mode": "basic",
+                "engagement_score": self.user_profile.get("engagement_score", 0.5),
+                "learning_velocity": self.user_profile.get("learning_velocity", "medium"),
+                "experience_level": self._estimate_experience_level(),
+                "interactions_count": len(self.interactions),
+            }
+
+        try:
+            # Extract metrics from interactions
+            questions_asked = [
+                {"times_asked": 1, "times_answered_well": 1 if i.get("success", False) else 0}
+                for i in self.interactions
+                if i.get("type") == "question"
+            ]
+            responses_quality = [
+                i.get("quality_score", 0.5) for i in self.interactions if i.get("response")
+            ]
+            topic_interactions = [
+                i.get("topic", "general") for i in self.interactions
+            ]
+
+            # Build profile using learning engine
+            profile = self.learning_engine.build_user_profile(
+                user_id=user_id,
+                questions_asked=questions_asked,
+                responses_quality=responses_quality,
+                topic_interactions=topic_interactions,
+                projects_completed=0,
+            )
+
+            # Calculate metrics
+            metrics = self.learning_engine.calculate_learning_metrics(profile)
+            metrics["status"] = "success"
+            metrics["mode"] = "full"
+            metrics["total_interactions"] = len(self.interactions)
+
+            return metrics
+
+        except Exception as e:
+            logger.warning(f"Failed to calculate full learning metrics: {e}")
+            return {
+                "status": "error",
+                "message": f"Metrics calculation failed: {str(e)}",
+            }
+
+    def assess_phase_maturity(
+        self,
+        phase: str,
+        phase_specs: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """
+        Assess maturity of a project phase.
+
+        Uses socratic-learning's MaturityCalculator for confidence-weighted assessment.
+
+        Args:
+            phase: Phase name (discovery, analysis, design, implementation)
+            phase_specs: List of specifications with categories and values
+
+        Returns:
+            Maturity assessment with readiness status
+        """
+        if not self.use_full_learning:
+            # Fallback: basic maturity
+            return {
+                "status": "success",
+                "phase": phase,
+                "maturity_percentage": 50.0,
+                "is_ready": False,
+                "mode": "basic",
+            }
+
+        try:
+            maturity = self.maturity_calculator.calculate_phase_maturity(
+                phase_specs=phase_specs,
+                phase=phase,
+            )
+            maturity["status"] = "success"
+            maturity["mode"] = "full"
+            return maturity
+
+        except Exception as e:
+            logger.warning(f"Failed to assess phase maturity: {e}")
+            return {
+                "status": "error",
+                "message": f"Maturity assessment failed: {str(e)}",
+            }
+
+    def detect_learning_patterns(self, agent_name: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Detect patterns in agent interactions.
+
+        Identifies error patterns, success patterns, and performance anomalies.
+
+        Args:
+            agent_name: Optional agent name to filter patterns
+
+        Returns:
+            Dictionary with detected patterns
+        """
+        if not self.use_full_learning:
+            # Fallback: basic patterns
+            return {
+                "status": "success",
+                "patterns": self.patterns,
+                "pattern_count": len(self.patterns),
+                "mode": "basic",
+            }
+
+        try:
+            # Detect different pattern types
+            error_patterns = self.pattern_detector.detect_error_patterns(agent_name)
+            success_patterns = self.pattern_detector.detect_success_patterns(agent_name)
+            perf_patterns = self.pattern_detector.detect_performance_patterns(agent_name)
+
+            all_patterns = error_patterns + success_patterns + perf_patterns
+
+            patterns_data = [
+                {
+                    "type": p.pattern_type,
+                    "name": p.name,
+                    "description": p.description,
+                    "confidence": p.confidence,
+                    "occurrence_count": p.occurrence_count,
+                }
+                for p in all_patterns
+            ]
+
+            return {
+                "status": "success",
+                "patterns": patterns_data,
+                "pattern_count": len(patterns_data),
+                "error_patterns": len(error_patterns),
+                "success_patterns": len(success_patterns),
+                "performance_patterns": len(perf_patterns),
+                "mode": "full",
+            }
+
+        except Exception as e:
+            logger.warning(f"Failed to detect patterns: {e}")
+            return {
+                "status": "error",
+                "message": f"Pattern detection failed: {str(e)}",
+            }
+
+    def generate_recommendations(self, user_id: str) -> Dict[str, Any]:
+        """
+        Generate personalized learning recommendations.
+
+        Uses socratic-learning to generate skills and learning suggestions.
+
+        Args:
+            user_id: User ID to generate recommendations for
+
+        Returns:
+            Dictionary with recommendations
+        """
+        if not self.use_full_learning:
+            # Fallback: basic suggestions
+            return {
+                "status": "success",
+                "recommendations": self._get_basic_recommendations(),
+                "mode": "basic",
+            }
+
+        try:
+            # Get learning hints from engine
+            profile = self._build_learning_profile(user_id)
+            metrics = self.learning_engine.calculate_learning_metrics(profile)
+            hints = self.learning_engine.get_personalization_hints(profile, metrics)
+
+            return {
+                "status": "success",
+                "recommendations": hints,
+                "recommendation_count": len(hints),
+                "based_on_metrics": metrics,
+                "mode": "full",
+            }
+
+        except Exception as e:
+            logger.warning(f"Failed to generate recommendations: {e}")
+            return {
+                "status": "error",
+                "message": f"Recommendation generation failed: {str(e)}",
+            }
+
+    def _estimate_experience_level(self) -> str:
+        """Estimate user experience level based on interaction count."""
+        interaction_count = len(self.interactions)
+        if interaction_count < 10:
+            return "beginner"
+        elif interaction_count < 50:
+            return "intermediate"
+        else:
+            return "advanced"
+
+    def _get_basic_recommendations(self) -> List[str]:
+        """Get basic learning recommendations."""
+        level = self._estimate_experience_level()
+        if level == "beginner":
+            return [
+                "Focus on fundamental concepts",
+                "Practice basic examples",
+                "Build confidence with simple tasks",
+            ]
+        elif level == "intermediate":
+            return [
+                "Explore advanced patterns",
+                "Apply knowledge to complex problems",
+                "Mentor beginners",
+            ]
+        else:
+            return [
+                "Pursue specialized knowledge",
+                "Share expertise with team",
+                "Explore emerging techniques",
+            ]
+
+    def _build_learning_profile(self, user_id: str) -> Any:
+        """Build learning profile from interactions."""
+        questions_asked = [
+            {"times_asked": 1, "times_answered_well": 1 if i.get("success") else 0}
+            for i in self.interactions
+            if i.get("type") == "question"
+        ]
+        responses_quality = [
+            i.get("quality_score", 0.5) for i in self.interactions if i.get("response")
+        ]
+        topics = [i.get("topic", "general") for i in self.interactions]
+
+        return self.learning_engine.build_user_profile(
+            user_id=user_id,
+            questions_asked=questions_asked,
+            responses_quality=responses_quality,
+            topic_interactions=topics,
+            projects_completed=0,
+        )
