@@ -15,6 +15,7 @@ Usage:
     result = counselor.guide_with_context("machine learning", context="for beginners")
 """
 
+import logging
 from typing import Any, Dict, List, Optional
 
 from .agents import (
@@ -26,6 +27,8 @@ from .agents import (
     QualityController,
     SocraticCounselor,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class LLMAgentError(Exception):
@@ -114,8 +117,12 @@ class LLMPoweredCounselor:
         try:
             response = self.llm.chat(prompt)
             llm_questions = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in guide_with_context: {e}", exc_info=True)
+            llm_questions = "[LLM response format error - check LLM client compatibility]"
         except Exception as e:
-            llm_questions = f"[LLM generation failed: {e}]"
+            logger.exception(f"LLM chat failed in guide_with_context: {e}")
+            llm_questions = "[LLM service unavailable - please try again later]"
 
         # Get basic questions from agent
         basic_result = self.agent.process({"action": "guide", "topic": topic, "level": level})
@@ -238,8 +245,12 @@ class LLMPoweredCodeGenerator:
         try:
             response = self.llm.chat(prompt)
             generated_code = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in generate_with_tests: {e}", exc_info=True)
+            generated_code = "# Error: LLM response format invalid - check LLM client compatibility\n"
         except Exception as e:
-            generated_code = f"# Error generating code: {e}"
+            logger.exception(f"Code generation failed in generate_with_tests: {e}")
+            generated_code = "# Error: Code generation service unavailable - please try again\n"
 
         return {
             "code": generated_code,
@@ -276,8 +287,12 @@ class LLMPoweredCodeGenerator:
         try:
             response = self.llm.chat(prompt)
             response_text = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in generate_with_explanation: {e}", exc_info=True)
+            response_text = "Error: LLM response format invalid"
         except Exception as e:
-            response_text = f"Error: {e}"
+            logger.exception(f"Code generation with explanation failed: {e}")
+            response_text = "Error: Service unavailable"
 
         # Try to split code from explanation
         parts = response_text.split("\n\n")
@@ -353,8 +368,12 @@ class LLMPoweredCodeValidator:
         try:
             response = self.llm.chat(prompt)
             review = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in review_with_suggestions: {e}", exc_info=True)
+            review = "[Review failed: LLM response format error]"
         except Exception as e:
-            review = f"Review failed: {e}"
+            logger.exception(f"Code review failed in review_with_suggestions: {e}")
+            review = "[Review failed: Service temporarily unavailable]"
 
         # Get basic validation
         basic_result = self.agent.process({"code": code, "language": language})
@@ -431,8 +450,12 @@ class LLMPoweredProjectManager:
         try:
             response = self.llm.chat(prompt)
             breakdown = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in intelligent_project_breakdown: {e}", exc_info=True)
+            breakdown = "[Project breakdown failed: LLM response format error]"
         except Exception as e:
-            breakdown = f"[Project breakdown failed: {e}]"
+            logger.exception(f"Project breakdown failed: {e}")
+            breakdown = "[Project breakdown failed: Service unavailable]"
 
         return {
             "project_description": project_description,
@@ -471,8 +494,12 @@ class LLMPoweredProjectManager:
         try:
             response = self.llm.chat(prompt)
             risk_analysis = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in analyze_project_risks: {e}", exc_info=True)
+            risk_analysis = "[Risk analysis failed: LLM response format error]"
         except Exception as e:
-            risk_analysis = f"[Risk analysis failed: {e}]"
+            logger.exception(f"Risk analysis failed: {e}")
+            risk_analysis = "[Risk analysis failed: Service unavailable]"
 
         return {
             "project_id": project_id,
@@ -547,8 +574,12 @@ class LLMPoweredQualityController:
         try:
             response = self.llm.chat(prompt)
             review = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in deep_code_review: {e}", exc_info=True)
+            review = "[Review failed: LLM response format error]"
         except Exception as e:
-            review = f"[Review failed: {e}]"
+            logger.exception(f"Deep code review failed: {e}")
+            review = "[Review failed: Service unavailable]"
 
         basic_result = self.agent.process({"action": "detect_weak_areas", "code": code})
 
@@ -583,8 +614,12 @@ class LLMPoweredQualityController:
         try:
             response = self.llm.chat(prompt)
             suggestions = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in suggest_refactoring: {e}", exc_info=True)
+            suggestions = "[Refactoring analysis failed: LLM response format error]"
         except Exception as e:
-            suggestions = f"[Refactoring analysis failed: {e}]"
+            logger.exception(f"Refactoring analysis failed: {e}")
+            suggestions = "[Refactoring analysis failed: Service unavailable]"
 
         return {
             "code": code,
@@ -670,8 +705,12 @@ class LLMPoweredKnowledgeManager:
         try:
             response = self.llm.chat(prompt)
             semantic_ranking = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in semantic_search: {e}", exc_info=True)
+            semantic_ranking = "[Semantic search failed: LLM response format error]"
         except Exception as e:
-            semantic_ranking = f"[Semantic search failed: {e}]"
+            logger.exception(f"Semantic search failed: {e}")
+            semantic_ranking = "[Semantic search failed: Service unavailable]"
 
         return {
             "query": query,
@@ -722,8 +761,12 @@ class LLMPoweredKnowledgeManager:
         try:
             response = self.llm.chat(prompt)
             answer = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in answer_question: {e}", exc_info=True)
+            answer = "[Question answering failed: LLM response format error]"
         except Exception as e:
-            answer = f"[Question answering failed: {e}]"
+            logger.exception(f"Question answering failed: {e}")
+            answer = "[Question answering failed: Service unavailable]"
 
         return {
             "question": question,
@@ -801,8 +844,12 @@ class LLMPoweredContextAnalyzer:
         try:
             response = self.llm.chat(prompt)
             analysis = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in deep_context_analysis: {e}", exc_info=True)
+            analysis = "[Context analysis failed: LLM response format error]"
         except Exception as e:
-            analysis = f"[Context analysis failed: {e}]"
+            logger.exception(f"Context analysis failed: {e}")
+            analysis = "[Context analysis failed: Service unavailable]"
 
         basic_result = self.agent.process({"action": "analyze", "content": content})
 
@@ -847,8 +894,12 @@ class LLMPoweredContextAnalyzer:
         try:
             response = self.llm.chat(prompt)
             intent_analysis = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in detect_intent: {e}", exc_info=True)
+            intent_analysis = "[Intent detection failed: LLM response format error]"
         except Exception as e:
-            intent_analysis = f"[Intent detection failed: {e}]"
+            logger.exception(f"Intent detection failed: {e}")
+            intent_analysis = "[Intent detection failed: Service unavailable]"
 
         return {
             "content": content,
@@ -892,8 +943,12 @@ class LLMPoweredContextAnalyzer:
         try:
             response = self.llm.chat(prompt)
             recommendations = response.content if hasattr(response, "content") else str(response)
+        except (AttributeError, TypeError) as e:
+            logger.error(f"Invalid LLM response format in recommend_next_actions: {e}", exc_info=True)
+            recommendations = "[Recommendation generation failed: LLM response format error]"
         except Exception as e:
-            recommendations = f"[Recommendation generation failed: {e}]"
+            logger.exception(f"Recommendation generation failed: {e}")
+            recommendations = "[Recommendation generation failed: Service unavailable]"
 
         return {
             "context": current_context,

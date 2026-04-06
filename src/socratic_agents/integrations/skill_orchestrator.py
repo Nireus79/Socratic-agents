@@ -1,7 +1,10 @@
+import logging
 import uuid
 from typing import Any, Dict
 
 from ..agents.learning_agent import LearningAgent
+
+logger = logging.getLogger(__name__)
 from ..agents.quality_controller import QualityController
 from ..agents.skill_generator_agent import SkillGeneratorAgent
 from ..models.skill_models import AgentSkill
@@ -144,10 +147,17 @@ class SkillOrchestrator:
 
             compat_warnings = compat_result.warnings
 
-        except Exception:
+        except (ValueError, KeyError, AttributeError) as e:
             # Backward compatibility: if skill dict is minimal/legacy format,
             # proceed without version management
-            pass
+            logger.debug(f"Skill format compatibility fallback for skill {skill_id}: {e}")
+            skill_obj = None
+            compat_warnings = []
+        except Exception as e:
+            # Log unexpected errors but continue with legacy format
+            logger.warning(f"Unexpected error processing skill {skill_id}: {e}", exc_info=True)
+            skill_obj = None
+            compat_warnings = []
 
         tracking_id = str(uuid.uuid4())
         self.applied_skills[skill_id] = {
