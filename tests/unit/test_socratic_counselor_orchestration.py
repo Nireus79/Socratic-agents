@@ -242,7 +242,7 @@ class TestProcessResponse:
         """Test that project and response are both required."""
         counselor = SocraticCounselor()
 
-        counselor._process_response(
+        result = counselor._process_response(
             {
                 "user_id": "test_user",
                 # Missing project and response
@@ -280,7 +280,6 @@ class TestFullDialogueFlow:
         )
         assert a1_result["status"] == "success"
         assert "next_question" in a1_result
-        q2_text = a1_result["next_question"]
 
         # Verify conversation has 3 messages (Q1, A1, Q2) because next question is generated
         assert len(project.conversation_history) == 3
@@ -295,7 +294,6 @@ class TestFullDialogueFlow:
         )
         assert a2_result["status"] == "success"
         assert "next_question" in a2_result
-        q3_text = a2_result["next_question"]
 
         # Verify conversation grew (each turn generates next Q)
         assert len(project.conversation_history) == 5  # Q1, A1, Q2, A2, Q3
@@ -315,7 +313,7 @@ class TestFullDialogueFlow:
                 "user_id": "user_1",
             }
         )
-        q1_result["question"]
+        q1_text = q1_result["question"]
 
         # Try to generate again without answering (should return existing)
         q2_result = counselor._generate_question(
