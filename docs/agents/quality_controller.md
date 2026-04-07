@@ -1,43 +1,67 @@
 # QualityController Agent
 
-**Quality assurance, testing, and maturity assessment for projects.**
+**Quality assurance, workflow optimization, and maturity assessment for projects.**
 
 ## Overview
 
-The QualityController agent manages quality assurance operations, analyzes code quality, identifies weak areas that need improvement, integrates with the maturity assessment system, and generates targeted skills to address quality gaps. It bridges quality metrics with skill-based improvement recommendations.
+The QualityController agent is the quality and workflow gatekeeper for the Socratic system. It:
+
+1. **Analyzes code quality** through pattern detection
+2. **Identifies weak areas** for skill-based improvement
+3. **Estimates maturity phases** using the MaturityCalculator
+4. **Manages workflow approval** to prevent greedy optimization
+5. **Enumerates execution paths** and recommends optimal routes
+6. **Calculates cost/risk/quality metrics** for workflow comparison
+7. **Requires human approval** before execution proceeds
+
+The agent prevents "greedy" optimization by requiring deliberate human approval of major workflow decisions, ensuring minimum total cost across all steps rather than just easiest first steps.
 
 ## Key Capabilities
 
 ### 1. **Code Quality Analysis**
-- Detects code smells and anti-patterns
-- Identifies weak areas requiring improvement
-- Calculates quality scores (0-100)
-- Tracks quality metrics over time
+- Checks for code length and structure
+- Detects TODO/FIXME comments
+- Assesses code patterns (classes, functions, imports)
+- Returns quality score (0-100)
 
-### 2. **Maturity Assessment**
-- Determines project phase (discovery, analysis, design, implementation)
-- Calculates phase completion percentage
-- Identifies readiness for next phase
-- Recommends phase-specific improvements
+### 2. **Category Assessment**
+- Code Quality - Evaluates code structure and patterns
+- Testing Coverage - Checks for test and assert statements
+- Documentation - Looks for docstrings and comments
+- Architecture - Assesses class and function organization
+- Performance - Identifies loops and import patterns
 
-### 3. **Issue Detection**
-- Code complexity analysis
-- Test coverage assessment
-- Performance bottlenecks
-- Security vulnerabilities
-- Documentation gaps
+### 3. **Maturity Phase Estimation**
+- Uses MaturityCalculator from socrates-maturity library
+- Estimates current project phase based on code metrics
+- Calculates completion percentage
+- Identifies weak categories (score < 0.6)
 
-### 4. **Skill Generation**
-- Generates skills to fix identified issues
-- Recommends learning resources
-- Tracks skill application
-- Measures skill effectiveness
+### 4. **Skill Application**
+- Applies skills from SkillGeneratorAgent
+- Tracks applied skills for future reference
+- Sets quality focus area from skills
+- Logs skill application history
 
-### 5. **Testing Framework**
-- Test generation and validation
-- Coverage tracking
-- Test execution orchestration
-- Reports and metrics
+### 5. **Workflow Approval System**
+- Enumerates multiple execution paths
+- Calculates cost, risk, and quality metrics
+- Recommends optimal path (minimum total cost)
+- Requests human approval before proceeding
+- **Prevents greedy optimization** - doesn't take easiest first step
+- Tracks approved and rejected workflows
+
+### 6. **Workflow Metrics Calculation**
+- **Cost Metrics** - Token consumption and USD equivalents
+- **Risk Metrics** - Risk score, incompleteness risk, complexity risk
+- **Quality Metrics** - Coverage quality, complexity quality
+- **ROI Calculation** - Maturity gain per token
+
+### 7. **Testing & Reporting**
+- Runs stored test suites
+- Generates quality reports
+- Tracks quality scores over time
+- Reports on test execution
 
 ## Usage
 
@@ -54,63 +78,99 @@ result = controller.process({
 })
 
 print(f"Quality Score: {result['quality_score']}")
-print(f"Issues Found: {len(result['issues'])}")
-for issue in result['issues']:
-    print(f"  - {issue['severity']}: {issue['description']}")
+print(f"Issues: {result['issues']}")
 ```
 
-### Intermediate: Analyze Weak Areas
+### Intermediate: Detect Weak Areas
 
 ```python
 result = controller.process({
     "action": "detect_weak_areas",
-    "code": python_code,
-    "language": "python"
+    "code": python_code
 })
 
-print(f"Weak Areas: {result['weak_areas']}")
-print(f"Quality Score: {result['quality_score']}")
-
-# Get recommendations
-recommendations = result.get('recommendations', [])
-for rec in recommendations:
-    print(f"  - {rec['category']}: {rec['description']}")
+print(f"Current Phase: {result['phase']}")
+print(f"Category Scores: {result['category_scores']}")
+print(f"Weak Categories: {result['weak_categories']}")
+print(f"Completion: {result['completion_percent']}%")
 ```
 
-### Advanced: Full Quality Pipeline
+### Advanced: Apply Skills and Report
 
 ```python
-# 1. Detect issues
+# 1. Check quality
 quality_result = controller.process({
-    "action": "detect_weak_areas",
-    "code": code,
-    "language": "python"
+    "action": "check",
+    "code": code
 })
 
-weak_areas = quality_result['weak_areas']
+weak_areas = quality_result['issues']
 
-# 2. Generate skills to fix issues
+# 2. Get skills from SkillGeneratorAgent
 from socratic_agents import SkillGeneratorAgent
 skill_gen = SkillGeneratorAgent()
 
-skills = []
-for weak_area in weak_areas:
-    skill = skill_gen.process({
-        "action": "generate",
-        "maturity_data": {
-            "weak_categories": [weak_area]
-        }
-    })
-    skills.append(skill)
-
-# 3. Track improvement
-improvement = controller.process({
-    "action": "track_improvement",
-    "skills_applied": [s["skill_id"] for s in skills],
-    "before_score": quality_result['quality_score']
+skills = skill_gen.process({
+    "action": "generate",
+    "maturity_data": {
+        "weak_categories": ["testing_coverage", "documentation"]
+    }
 })
 
-print(f"Improvement: {improvement['improvement_percentage']}%")
+# 3. Apply skills to quality controller
+application = controller.process({
+    "action": "apply_skills",
+    "skills": skills.get("skills", [])
+})
+
+# 4. Generate report
+report = controller.process({
+    "action": "report"
+})
+
+print(f"Quality Score: {report['overall_score']}")
+print(f"Tests Run: {report['tests_run']}")
+```
+
+### Workflow Approval System: Request and Approve
+
+```python
+controller = QualityController()
+
+# 1. Request approval for multiple workflow paths
+approval_result = controller.process({
+    "action": "approve_workflow",
+    "workflows": [
+        {
+            "steps": ["SocraticCounselor", "CodeGenerator", "CodeValidator"],
+            "estimated_maturity_gain": 30,
+            "missing_categories": 1
+        },
+        {
+            "steps": ["SocraticCounselor", "CodeValidator", "CodeGenerator"],
+            "estimated_maturity_gain": 25,
+            "missing_categories": 2
+        }
+    ]
+})
+
+print(f"Workflow ID: {approval_result['workflow_id']}")
+print(f"Recommended path: {approval_result['approval_request']['recommended_path_id']}")
+print(f"Paths analyzed: {approval_result['paths_analyzed']}")
+
+# 2. Check pending approvals
+pending = controller.process({
+    "action": "get_pending_approvals"
+})
+
+# 3. Submit approval decision
+approval = controller.process({
+    "action": "submit_approval",
+    "workflow_id": approval_result['workflow_id'],
+    "approved": True
+})
+
+print(f"Approval status: {approval['message']}")
 ```
 
 ## Request Format
@@ -121,14 +181,7 @@ Perform basic quality check on code.
 ```python
 request = {
     "action": "check",
-    "code": code_string,                         # Required
-    "language": "python",                        # Optional
-    "checks": [                                  # Optional
-        "style",
-        "complexity",
-        "coverage",
-        "security"
-    ]
+    "code": code_string                          # Required
 }
 ```
 
@@ -136,32 +189,22 @@ request = {
 ```python
 {
     "status": "success",
-    "quality_score": 75,                         # 0-100
+    "agent": "QualityController",
+    "quality_score": 80,                         # 0-100
     "issues": [
-        {
-            "type": "missing_docstring",
-            "severity": "medium",
-            "location": "line 42",
-            "description": "Function lacks documentation"
-        }
-    ],
-    "metrics": {
-        "complexity": 8,
-        "test_coverage": 85,
-        "duplicated_lines": 12
-    }
+        "Code is too short",
+        "Contains TODO comments"
+    ]
 }
 ```
 
 ### action: `detect_weak_areas`
-Identify areas needing improvement.
+Analyze code and identify weak categories.
 
 ```python
 request = {
     "action": "detect_weak_areas",
-    "code": code_string,                         # Required
-    "language": "python",                        # Optional
-    "threshold": 70                              # Optional: score threshold
+    "code": code_string                          # Required
 }
 ```
 
@@ -169,20 +212,19 @@ request = {
 ```python
 {
     "status": "success",
-    "quality_score": 65,
-    "weak_areas": [
-        "documentation",
-        "test_coverage",
-        "code_complexity"
+    "agent": "QualityController",
+    "phase": "discovery",                        # Estimated maturity phase
+    "category_scores": {
+        "code_quality": 0.8,
+        "testing_coverage": 0.6,
+        "documentation": 0.5,
+        "architecture": 0.7,
+        "performance": 0.7
+    },
+    "weak_categories": [                         # Categories with score < 0.6
+        "documentation"
     ],
-    "issues": [...],
-    "recommendations": [
-        {
-            "category": "documentation",
-            "description": "Add docstrings to functions",
-            "priority": "high"
-        }
-    ]
+    "completion_percent": 35.0
 }
 ```
 
@@ -273,6 +315,109 @@ request = {
 }
 ```
 
+### action: `approve_workflow`
+Request approval for workflow paths by analyzing metrics and recommending optimal route.
+
+```python
+request = {
+    "action": "approve_workflow",
+    "workflows": [                                    # Required
+        {
+            "steps": ["agent1", "agent2", "agent3"],
+            "estimated_maturity_gain": 30,
+            "missing_categories": 1
+        },
+        {
+            "steps": ["agent1", "agent3", "agent2"],
+            "estimated_maturity_gain": 25,
+            "missing_categories": 2
+        }
+    ]
+}
+```
+
+**Returns:**
+```python
+{
+    "status": "pending_approval",
+    "agent": "QualityController",
+    "workflow_id": "workflow_a1b2c3d4",
+    "paths_analyzed": 2,
+    "approval_request": {
+        "id": "workflow_a1b2c3d4",
+        "status": "pending",
+        "paths": [
+            {
+                "path_id": "path_0",
+                "path": ["agent1", "agent2", "agent3"],
+                "metrics": {
+                    "token_cost": 1500,
+                    "usd_cost": 0.003,
+                    "total_cost": 1500,
+                    "risk_score": 0.367,
+                    "quality_score": 87.5,
+                    "roi": 0.02,
+                    "step_count": 3
+                }
+            }
+        ],
+        "recommended_path_id": "path_0",
+        "recommendation_reason": "Lowest total cost: 1500 tokens"
+    }
+}
+```
+
+### action: `submit_approval`
+Submit user approval or rejection for a pending workflow.
+
+```python
+request = {
+    "action": "submit_approval",
+    "workflow_id": "workflow_a1b2c3d4",    # Required
+    "approved": true                        # Required: true to approve, false to reject
+}
+```
+
+**Returns:**
+```python
+{
+    "status": "success",
+    "agent": "QualityController",
+    "workflow_id": "workflow_a1b2c3d4",
+    "approved": true,
+    "message": "Workflow approved. Using recommended path: path_0"
+}
+```
+
+### action: `get_pending_approvals`
+Get all pending workflow approvals.
+
+```python
+request = {
+    "action": "get_pending_approvals"
+}
+```
+
+**Returns:**
+```python
+{
+    "status": "success",
+    "agent": "QualityController",
+    "pending_count": 2,
+    "approved_count": 5,
+    "rejected_count": 1,
+    "pending_approvals": [
+        {
+            "id": "workflow_a1b2c3d4",
+            "status": "pending",
+            "paths": [...],
+            "recommended_path_id": "path_0",
+            "recommendation_reason": "Lowest total cost: 1500 tokens"
+        }
+    ]
+}
+```
+
 ## Configuration
 
 ### Initialization
@@ -341,9 +486,66 @@ controller = QualityController(llm_client=llm)
 - `insecure_deserialize` - Unsafe deserialization
 - `weak_crypto` - Weak cryptography
 
+## Workflow Metrics
+
+### Cost Metrics
+- **token_cost** - Estimated token consumption for the workflow
+- **usd_cost** - Approximate USD cost at ~$0.002 per 1k tokens
+- **total_cost** - Overall cost metric used for optimization
+
+### Risk Metrics
+- **risk_score** - Overall risk (0.0-1.0)
+- **incompleteness_risk** - Risk from missing categories
+- **complexity_risk** - Risk from workflow complexity
+
+### Quality Metrics
+- **quality_score** - Estimated quality (0-100)
+- **roi** - Return on investment (maturity gain per token)
+- **step_count** - Number of steps in workflow
+
 ## Best Practices
 
-### 1. **Regular Quality Checks**
+### 1. **Use Workflow Approval for Critical Paths**
+```python
+# Always request approval for important workflow decisions
+approval = controller.process({
+    "action": "approve_workflow",
+    "workflows": candidate_workflows
+})
+
+# Wait for human decision before proceeding
+if approval["status"] == "pending_approval":
+    # Present options to user
+    # User decides and submits approval
+    pass
+```
+
+### 2. **Prevent Greedy Optimization**
+```python
+# DON'T: Just take the first successful path
+# risk of greedy approach
+
+# DO: Compare all paths and let QualityController recommend
+approval = controller.process({
+    "action": "approve_workflow",
+    "workflows": [path1, path2, path3]  # All options
+})
+
+# QualityController analyzes all and recommends minimum-cost path
+recommended = approval["approval_request"]["recommended_path_id"]
+```
+
+### 3. **Monitor Approval Decisions**
+```python
+# Track what's been approved vs rejected
+pending = controller.process({"action": "get_pending_approvals"})
+
+print(f"Pending: {pending['pending_count']}")
+print(f"Approved: {pending['approved_count']}")
+print(f"Rejected: {pending['rejected_count']}")
+```
+
+### 4. **Regular Quality Checks**
 ```python
 # Schedule periodic quality assessments
 import schedule
@@ -490,6 +692,63 @@ new_quality = controller.process({
 })
 ```
 
+### With Workflow Approval System
+
+```python
+from socratic_agents import QualityController
+
+controller = QualityController()
+
+# 1. Define possible workflows for reaching goals
+workflows = [
+    {
+        "steps": ["SocraticCounselor", "CodeGenerator", "CodeValidator"],
+        "estimated_maturity_gain": 35,
+        "missing_categories": 1
+    },
+    {
+        "steps": ["SocraticCounselor", "CodeValidator", "CodeGenerator"],
+        "estimated_maturity_gain": 30,
+        "missing_categories": 2
+    },
+    {
+        "steps": ["CodeGenerator", "SocraticCounselor", "CodeValidator"],
+        "estimated_maturity_gain": 25,
+        "missing_categories": 2
+    }
+]
+
+# 2. Request QualityController to analyze and recommend optimal path
+approval = controller.process({
+    "action": "approve_workflow",
+    "workflows": workflows
+})
+
+# 3. System analyzes all paths and recommends minimum-cost option
+print(f"Workflow ID: {approval['workflow_id']}")
+print(f"Recommended path: {approval['approval_request']['recommended_path_id']}")
+
+# 4. Show all options to user for review
+for path in approval['approval_request']['paths']:
+    metrics = path['metrics']
+    print(f"\n{path['path_id']}: {' -> '.join(path['path'])}")
+    print(f"  Cost: {metrics['token_cost']} tokens (${metrics['usd_cost']})")
+    print(f"  Risk: {metrics['risk_score']} (quality: {metrics['quality_score']})")
+
+# 5. User reviews and approves/rejects
+user_approval = controller.process({
+    "action": "submit_approval",
+    "workflow_id": approval['workflow_id'],
+    "approved": True
+})
+
+if user_approval["approved"]:
+    print(f"✓ {user_approval['message']}")
+    # Proceed with approved workflow
+else:
+    print("✗ Workflow rejected - try different approach")
+```
+
 ## Common Patterns
 
 ### Pattern 1: Quality Gate
@@ -551,6 +810,37 @@ def is_ready_for_next_phase(code, current_phase):
     return maturity["ready_for_next_phase"], maturity["blockers"]
 ```
 
+### Pattern 4: Prevent Greedy Optimization
+
+```python
+def approve_optimal_workflow(candidate_workflows):
+    """
+    Compare all workflow options and get approval for optimal (min cost) path.
+
+    Prevents greedy algorithm pattern where easiest first step is always taken.
+    Instead analyzes all paths and approves minimum-cost complete path.
+    """
+    controller = QualityController()
+
+    # Request analysis of all candidate paths
+    approval = controller.process({
+        "action": "approve_workflow",
+        "workflows": candidate_workflows
+    })
+
+    # QualityController recommends minimum-cost path
+    recommended = approval['approval_request']['recommended_path_id']
+
+    # Get user approval before proceeding
+    result = controller.process({
+        "action": "submit_approval",
+        "workflow_id": approval['workflow_id'],
+        "approved": True
+    })
+
+    return result['approved'], recommended
+```
+
 ## Performance Characteristics
 
 | Operation | Time | Notes |
@@ -581,8 +871,32 @@ def is_ready_for_next_phase(code, current_phase):
 - May need multiple iterations
 - Review specific issues being addressed
 
+## Implementation Notes
+
+### Current Implementation (Phase 1-2)
+The current implementation includes:
+- ✅ Code quality analysis (pattern-based)
+- ✅ Weak area detection (5-category assessment)
+- ✅ Maturity phase estimation
+- ✅ Skill application tracking
+
+### Workflow Approval System (Phase 3)
+The workflow approval system is now implemented and includes:
+- ✅ Path enumeration and metric calculation
+- ✅ Cost, risk, and quality analysis
+- ✅ Optimal path recommendation (minimum cost)
+- ✅ Human approval gate (prevents greedy algorithms)
+- ✅ Workflow tracking (approved/rejected/pending)
+
+### Future Enhancement Plans
+Planned improvements for future versions:
+- Integration with real token cost APIs
+- Advanced path finding algorithms
+- Machine learning-based ROI prediction
+- Workflow history analytics
+
 ---
 
-**Related Agents:** SkillGeneratorAgent, CodeGenerator, CodeValidator
+**Related Agents:** SkillGeneratorAgent, CodeGenerator, CodeValidator, SocraticCounselor
 
 **Next:** [LearningAgent](./learning_agent.md)

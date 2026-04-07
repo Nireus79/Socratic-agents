@@ -1,10 +1,14 @@
-"""Quality Controller Agent - Quality assurance and testing.
+"""Quality Controller Agent - Quality assurance, workflow approval, and optimization.
 
-This agent uses the MaturityCalculator from socrates-maturity to estimate
-project phase and identify weak areas that need skill-based improvement.
+This agent:
+1. Uses MaturityCalculator from socrates-maturity to estimate project phase
+2. Identifies weak areas that need skill-based improvement
+3. Manages workflow approval system to prevent greedy optimization
+4. Enumerates execution paths and recommends optimal routes based on cost/risk/quality metrics
 """
 
 from typing import Any, Dict, List, Optional
+import uuid
 
 from socrates_maturity import MaturityCalculator
 
@@ -23,6 +27,10 @@ class QualityController(BaseAgent):
         self.quality_focus_area: Optional[str] = None
         self.generated_skills: List[Dict[str, Any]] = []
         self.skill_application_log: List[Dict[str, Any]] = []
+        # Phase 3: Workflow approval system
+        self.pending_approvals: Dict[str, Dict[str, Any]] = {}
+        self.approved_workflows: Dict[str, Dict[str, Any]] = {}
+        self.rejected_workflows: Dict[str, Dict[str, Any]] = {}
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process quality control requests."""
@@ -37,6 +45,12 @@ class QualityController(BaseAgent):
             return self.detect_weak_areas(request.get("code"))  # type: ignore[arg-type]
         elif action == "apply_skills":
             return self.apply_skills(request.get("skills", []))
+        elif action == "approve_workflow":
+            return self._request_workflow_approval(request.get("workflows", []))
+        elif action == "submit_approval":
+            return self._submit_approval(request.get("workflow_id"), request.get("approved", False))
+        elif action == "get_pending_approvals":
+            return self._get_pending_approvals()
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
@@ -158,6 +172,153 @@ class QualityController(BaseAgent):
             "skills_applied": len(applied_skills),
             "applied_skills": applied_skills,
             "focus_area": self.quality_focus_area,
+        }
+
+    def _request_workflow_approval(self, workflows: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Request approval for workflow paths by analyzing cost and risk metrics.
+
+        Enumerates possible execution paths, calculates metrics (cost, risk, quality),
+        recommends optimal path, and requests human approval before proceeding.
+        Prevents greedy optimization by requiring deliberate approval.
+
+        Args:
+            workflows: List of workflow path dictionaries to analyze
+
+        Returns:
+            Approval request with metrics for each path and recommendation
+        """
+        if not workflows:
+            return {"status": "error", "agent": self.name, "message": "Workflows required"}
+
+        workflow_id = f"workflow_{uuid.uuid4().hex[:8]}"
+        analyzed_paths = []
+
+        for idx, workflow in enumerate(workflows):
+            metrics = self._calculate_workflow_metrics(workflow)
+            analyzed_paths.append(
+                {
+                    "path_id": f"path_{idx}",
+                    "path": workflow.get("steps", []),
+                    "metrics": metrics,
+                }
+            )
+
+        # Recommend optimal path (lowest total cost)
+        recommended_path = min(analyzed_paths, key=lambda p: p["metrics"]["total_cost"])
+
+        approval_request = {
+            "id": workflow_id,
+            "status": "pending",
+            "paths": analyzed_paths,
+            "recommended_path_id": recommended_path["path_id"],
+            "recommendation_reason": f"Lowest total cost: {recommended_path['metrics']['total_cost']} tokens",
+        }
+
+        self.pending_approvals[workflow_id] = approval_request
+
+        return {
+            "status": "pending_approval",
+            "agent": self.name,
+            "workflow_id": workflow_id,
+            "paths_analyzed": len(analyzed_paths),
+            "approval_request": approval_request,
+        }
+
+    def _calculate_workflow_metrics(self, workflow: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Calculate cost, risk, and quality metrics for a workflow path.
+
+        Args:
+            workflow: Workflow with steps and configurations
+
+        Returns:
+            Dictionary with cost, risk, quality, and ROI metrics
+        """
+        steps = workflow.get("steps", [])
+        step_count = len(steps)
+
+        # Cost calculation: estimate tokens per step
+        token_cost = step_count * 500  # Base: ~500 tokens per agent step
+        usd_cost = token_cost / 1000 * 0.002  # Approximate cost per 1k tokens
+
+        # Risk calculation based on completeness
+        missing_categories = workflow.get("missing_categories", 0)
+        incompleteness_risk = min(1.0, missing_categories / 5.0)
+        complexity_risk = min(1.0, step_count / 10.0)
+        risk_score = (incompleteness_risk * 0.6) + (complexity_risk * 0.4)
+
+        # Quality calculation
+        coverage_quality = 1.0 - incompleteness_risk
+        complexity_quality = 1.0 - (complexity_risk * 0.5)
+        quality_score = max(0.0, min(100.0, (coverage_quality + complexity_quality) * 50))
+
+        # ROI: maturity gain per token
+        maturity_gain = workflow.get("estimated_maturity_gain", step_count * 10)
+        roi = maturity_gain / max(token_cost, 1)
+
+        return {
+            "token_cost": token_cost,
+            "usd_cost": round(usd_cost, 4),
+            "total_cost": token_cost,
+            "risk_score": round(risk_score, 3),
+            "incompleteness_risk": round(incompleteness_risk, 3),
+            "complexity_risk": round(complexity_risk, 3),
+            "quality_score": round(quality_score, 1),
+            "roi": round(roi, 3),
+            "step_count": step_count,
+        }
+
+    def _submit_approval(self, workflow_id: str, approved: bool) -> Dict[str, Any]:
+        """
+        Submit user approval or rejection for a pending workflow.
+
+        Args:
+            workflow_id: ID of the workflow to approve/reject
+            approved: True to approve, False to reject
+
+        Returns:
+            Status of approval submission
+        """
+        if workflow_id not in self.pending_approvals:
+            return {"status": "error", "agent": self.name, "message": f"Workflow {workflow_id} not found"}
+
+        request = self.pending_approvals.pop(workflow_id)
+        request["status"] = "approved" if approved else "rejected"
+
+        if approved:
+            self.approved_workflows[workflow_id] = request
+            return {
+                "status": "success",
+                "agent": self.name,
+                "workflow_id": workflow_id,
+                "approved": True,
+                "message": f"Workflow approved. Using recommended path: {request['recommended_path_id']}",
+            }
+        else:
+            self.rejected_workflows[workflow_id] = request
+            return {
+                "status": "success",
+                "agent": self.name,
+                "workflow_id": workflow_id,
+                "approved": False,
+                "message": "Workflow rejected. Please submit alternative workflow.",
+            }
+
+    def _get_pending_approvals(self) -> Dict[str, Any]:
+        """
+        Get all pending workflow approvals.
+
+        Returns:
+            List of pending approval requests
+        """
+        return {
+            "status": "success",
+            "agent": self.name,
+            "pending_count": len(self.pending_approvals),
+            "approved_count": len(self.approved_workflows),
+            "rejected_count": len(self.rejected_workflows),
+            "pending_approvals": list(self.pending_approvals.values()),
         }
 
     def _assess_code_quality(self, code: str) -> float:
