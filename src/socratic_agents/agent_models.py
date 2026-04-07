@@ -33,9 +33,11 @@ class AgentResponse(BaseModel):
     status: Literal["success", "error", "warning"] = Field(
         ..., description="Response status"
     )
-    message: Optional[str] = Field(None, description="Status message")
-    agent: Optional[str] = Field(None, description="Agent name")
-    timestamp: Optional[datetime] = Field(None, description="Response timestamp")
+    message: Optional[str] = Field(default=None, description="Status message")
+    agent: Optional[str] = Field(default=None, description="Agent name")
+    timestamp: Optional[datetime] = Field(
+        default_factory=datetime.utcnow, description="Response timestamp"
+    )
 
 
 # ============================================================================
@@ -398,25 +400,8 @@ class ContextAnalyzerAnalyzeResponse(AgentResponse):
 # ============================================================================
 
 
-class GenericAgentRequest(BaseModel):
-    """Generic request wrapper for agents using Dict[str, Any]."""
-
-    action: str = Field(..., description="Action to perform")
-    **{
-        k: (Optional[Any], None)
-        for k in [
-            "project",
-            "project_id",
-            "current_user",
-            "username",
-            "content",
-            "message",
-        ]
-    }
-
-
 class GenericAgentResponse(AgentResponse):
-    """Generic response wrapper."""
+    """Generic response wrapper for agents with dynamic data."""
 
     data: Optional[Dict[str, Any]] = Field(None, description="Response data")
 
@@ -473,6 +458,5 @@ __all__ = [
     "ContextAnalyzerAnalyzeRequest",
     "ContextAnalyzerAnalyzeResponse",
     # Generic
-    "GenericAgentRequest",
     "GenericAgentResponse",
 ]
