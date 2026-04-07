@@ -16,6 +16,10 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Set, Tuple, cast
 
 from .base import BaseAgent
+from ..agent_models import (
+    ContextAnalyzerAnalyzeRequest,
+    ContextAnalyzerAnalyzeResponse,
+)
 
 
 class ContextEntity:
@@ -88,35 +92,47 @@ class ContextAnalyzer(BaseAgent):
         self.context_relationships: Dict[str, Set[str]] = defaultdict(set)
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process context analysis requests."""
-        action = request.get("action", "analyze")
+        """Process context analysis requests with type validation."""
+        try:
+            # Parse and validate request using Pydantic model
+            req = ContextAnalyzerAnalyzeRequest(**request)
+            action = req.action
 
-        if action == "analyze":
-            return self.analyze_context(cast(str, request.get("content")), request.get("domain"))
-        elif action == "extract_entities":
-            return self.extract_entities(cast(str, request.get("content")))
-        elif action == "build_model":
-            return self.build_context_model(
-                cast(str, request.get("name")), cast(str, request.get("content")), request.get("domain")
-            )
-        elif action == "detect_relationships":
-            return self.detect_relationships(cast(str, request.get("content")))
-        elif action == "identify_domain":
-            return self.identify_domain(cast(str, request.get("content")))
-        elif action == "find_relevant_context":
-            return self.find_relevant_context(cast(str, request.get("query")), request.get("limit", 5))
-        elif action == "store":
-            return self.store_context(
-                cast(str, request.get("name")), cast(str, request.get("content")), request.get("metadata")
-            )
-        elif action == "retrieve":
-            return self.retrieve_context(cast(str, request.get("name")))
-        elif action == "list":
-            return self.list_contexts()
-        elif action == "get_hierarchy":
-            return self.get_context_hierarchy(request.get("context_name"))
-        else:
-            return {"status": "error", "message": f"Unknown action: {action}"}
+            if action == "analyze":
+                result = self.analyze_context(req.content or "", req.domain)
+            elif action == "extract_entities":
+                result = self.extract_entities(req.content or "")
+            elif action == "build_model":
+                result = self.build_context_model(req.name or "", req.content or "", req.domain)
+            elif action == "detect_relationships":
+                result = self.detect_relationships(req.content or "")
+            elif action == "identify_domain":
+                result = self.identify_domain(req.content or "")
+            elif action == "find_relevant_context":
+                result = self.find_relevant_context(req.query or "", req.limit)
+            elif action == "store":
+                result = self.store_context(req.name or "", req.content or "", req.metadata)
+            elif action == "retrieve":
+                result = self.retrieve_context(req.name or "")
+            elif action == "list":
+                result = self.list_contexts()
+            elif action == "get_hierarchy":
+                result = self.get_context_hierarchy(request.get("context_name"))
+            else:
+                return ContextAnalyzerAnalyzeResponse(
+                    status="error", message=f"Unknown action: {action}"
+                ).model_dump()
+
+            # Ensure result is a dict
+            if isinstance(result, ContextAnalyzerAnalyzeResponse):
+                return result.model_dump()
+            return result
+
+        except Exception as e:
+            self.logger.error(f"Error processing request: {e}")
+            return ContextAnalyzerAnalyzeResponse(
+                status="error", message=str(e)
+            ).model_dump()
 
     def analyze_context(self, content: str, domain: Optional[str] = None) -> Dict[str, Any]:
         """Analyze content and extract context."""
