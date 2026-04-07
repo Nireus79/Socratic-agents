@@ -157,7 +157,7 @@ class AgentConflictDetector(BaseAgent):
         if not items:
             return {"status": "error", "message": "Items required"}
 
-        conflicts = []
+        conflicts: list[Dict[str, Any]] = []
         if len(items) > 1:
             for i, item in enumerate(items[:-1]):
                 for j, other in enumerate(items[i + 1 :]):
@@ -226,7 +226,7 @@ class AgentConflictDetector(BaseAgent):
 
         try:
             # Use socratic-conflict resolver
-            agent_metadata = {}  # Can be populated with agent info if needed
+            agent_metadata: Dict[str, Any] = {}  # Can be populated with agent info if needed
             resolution = self.resolver.resolve(
                 conflict_to_resolve, agent_metadata, strategy if strategy != "auto" else None
             )

@@ -34,7 +34,7 @@ class ParameterSchema:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
-        schema = {
+        schema: Dict[str, Any] = {
             "name": self.name,
             "type": self.type.value,
             "description": self.description,

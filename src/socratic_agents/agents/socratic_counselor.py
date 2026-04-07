@@ -70,7 +70,7 @@ class SocraticCounselor:
         # Configuration
         self.use_dynamic_questions = True
         self.max_questions_per_phase = 5
-        self.phase_docs_cache = {}
+        self.phase_docs_cache: Dict[str, Any] = {}
 
         # Static questions for fallback
         self.static_questions = {
@@ -1150,7 +1150,7 @@ Don't give the answer, guide the thinking process."""
         """
         project = request.get("project")
 
-        if hasattr(project, "pending_questions") and project.pending_questions:
+        if project and hasattr(project, "pending_questions") and project.pending_questions:
             for q in reversed(project.pending_questions):
                 if q.get("status") == "unanswered":
                     q["status"] = "skipped"
@@ -1179,7 +1179,7 @@ Don't give the answer, guide the thinking process."""
         project = request.get("project")
         question_id = request.get("question_id")
 
-        if hasattr(project, "pending_questions"):
+        if project and hasattr(project, "pending_questions"):
             for q in project.pending_questions:
                 if q.get("status") == "answered" and (
                     not question_id or q.get("id") == question_id
