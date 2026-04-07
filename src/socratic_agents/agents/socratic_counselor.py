@@ -1026,22 +1026,35 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
 
     def _advance_phase(self, request: Dict) -> Dict:
         """
-        Advance project to next phase.
+        Advance project to next phase with QualityController workflow approval.
 
-        Moves project from current phase to next in sequence.
+        Moves project from current phase to next in sequence with workflow optimization.
         Phase sequence: discovery → analysis → design → implementation
+
+        Workflow:
+        1. Validate current phase and next phase
+        2. Build workflow definition for phase transition
+        3. Request optimization approval from QualityController
+        4. Return approval request to user (phase advances only after approval)
 
         Args:
             request: Dictionary with:
-                - 'project': ProjectContext object
+                - 'project': ProjectContext object (required)
+                - 'quality_controller': Optional QualityController instance for approval
+                - 'auto_approve': Boolean to auto-approve (default: False)
 
         Returns:
             Dictionary with:
-            - 'status': 'success' or 'error'
+            - 'status': 'pending_approval' or 'success' or 'error'
             - 'previous_phase': Name of previous phase
             - 'new_phase': Name of new phase
+            - 'approval_id': Approval request ID if pending approval
+            - 'approval_request': Full approval details if available
         """
         project = request.get("project")
+        quality_controller = request.get("quality_controller")
+        auto_approve = request.get("auto_approve", False)
+
         if not project:
             return {"status": "error", "message": "Project required"}
 
@@ -1052,16 +1065,82 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
             idx = phases.index(current)
             next_phase = phases[idx + 1] if idx + 1 < len(phases) else current
 
-            if hasattr(project, "phase"):
-                project.phase = next_phase
+            # If no next phase or same phase, just return success
+            if next_phase == current:
+                return {
+                    "status": "success",
+                    "message": "Already in final phase",
+                    "previous_phase": current,
+                    "new_phase": next_phase,
+                }
 
-            self.logger.info(f"Advanced from {current} to {next_phase}")
+            # Build workflow definition for phase transition
+            workflow_definition = self._build_phase_transition_workflow(
+                project, current, next_phase
+            )
 
-            if self.database:
-                self.database.save_project(project)
+            # If QualityController is available, request approval
+            if quality_controller:
+                approval = quality_controller.process(
+                    {
+                        "action": "optimize_workflow",
+                        "workflow_definition": workflow_definition,
+                    }
+                )
 
-            return {"status": "success", "previous_phase": current, "new_phase": next_phase}
+                # If approval is pending and not auto-approving, return approval request
+                if approval.get("status") == "pending_approval" and not auto_approve:
+                    self.logger.info(
+                        f"Phase advancement {current} → {next_phase} pending approval: {approval.get('approval_id')}"
+                    )
+                    return {
+                        "status": "pending_approval",
+                        "previous_phase": current,
+                        "new_phase": next_phase,
+                        "approval_id": approval.get("approval_id"),
+                        "approval_request": approval.get("approval_request"),
+                        "message": f"Phase advancement requires approval. Review the workflow optimization details.",
+                    }
+
+                # If auto-approve or approval succeeded, proceed with phase change
+                if approval.get("status") == "success" or auto_approve:
+                    if hasattr(project, "phase"):
+                        project.phase = next_phase
+
+                    self.logger.info(f"Advanced from {current} to {next_phase}")
+
+                    if self.database:
+                        self.database.save_project(project)
+
+                    return {
+                        "status": "success",
+                        "previous_phase": current,
+                        "new_phase": next_phase,
+                        "message": f"Phase advanced to {next_phase}",
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "message": f"Workflow optimization failed: {approval.get('message', 'Unknown error')}",
+                    }
+            else:
+                # No QualityController, proceed directly
+                if hasattr(project, "phase"):
+                    project.phase = next_phase
+
+                self.logger.info(f"Advanced from {current} to {next_phase}")
+
+                if self.database:
+                    self.database.save_project(project)
+
+                return {
+                    "status": "success",
+                    "previous_phase": current,
+                    "new_phase": next_phase,
+                }
+
         except Exception as e:
+            self.logger.error(f"Phase advancement failed: {e}")
             return {"status": "error", "message": str(e)}
 
     def _rollback_phase(self, request: Dict) -> Dict:
@@ -1292,6 +1371,65 @@ Format as a list of brief approaches."""
         return {"status": "success", "suggestions": suggestions}
 
     # ===== HELPER METHODS =====
+
+    def _build_phase_transition_workflow(
+        self, project: Any, current_phase: str, next_phase: str
+    ) -> Dict[str, Any]:
+        """
+        Build workflow definition for phase transition.
+
+        Creates a workflow definition representing the phase transition that can be
+        analyzed by QualityController for optimization and approval.
+
+        The workflow represents the learning objectives and coverage areas for the
+        current and next phases.
+
+        Args:
+            project: ProjectContext object
+            current_phase: Current phase name
+            next_phase: Next phase name
+
+        Returns:
+            Workflow definition with nodes, edges, start/end nodes, and categories
+        """
+        phase_categories = {
+            "discovery": ["goals", "audience", "requirements"],
+            "analysis": ["technical_requirements", "constraints", "dependencies"],
+            "design": ["architecture", "design_patterns", "data_structures"],
+            "implementation": ["coding", "testing", "integration"],
+        }
+
+        # Define nodes for current and next phases
+        nodes = {
+            "current_phase": {
+                "type": "question",
+                "phase": current_phase,
+                "covers_categories": phase_categories.get(current_phase, []),
+            },
+            "next_phase": {
+                "type": "question",
+                "phase": next_phase,
+                "covers_categories": phase_categories.get(next_phase, []),
+            },
+        }
+
+        # Single edge from current to next
+        edges = [
+            {
+                "id": f"e_{current_phase}_to_{next_phase}",
+                "source": "current_phase",
+                "target": "next_phase",
+            }
+        ]
+
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "start_nodes": ["current_phase"],
+            "end_nodes": ["next_phase"],
+            "project_name": getattr(project, "name", "unnamed"),
+            "project_phase": current_phase,
+        }
 
     def _create_default_user(self, user_id: str) -> Dict:
         """
