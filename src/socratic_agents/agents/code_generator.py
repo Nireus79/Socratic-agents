@@ -86,6 +86,7 @@ class CodeGenerator(BaseAgent):
             knowledge_store: Optional knowledge store for artifact persistence
         """
         super().__init__(name="CodeGenerator", llm_client=llm_client)
+        self.llm_client = llm_client
         self.knowledge_store = knowledge_store
         self.logger = logging.getLogger(f"{__name__}.CodeGenerator")
         self.generated_projects: Dict[str, GeneratedProject] = {}

@@ -49,6 +49,7 @@ class SkillGeneratorAgent(BaseAgent):
             skill_templates: Optional custom skill templates (uses defaults if None)
         """
         super().__init__(name="SkillGeneratorAgent", llm_client=llm_client)
+        self.llm_client = llm_client
         self.skill_templates = skill_templates or self._load_default_templates()
         self.generated_skills: Dict[str, AgentSkill] = {}
         self.skill_effectiveness: Dict[str, float] = {}
