@@ -13,7 +13,7 @@ This agent:
 import re
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, cast
 
 from .base import BaseAgent
 
@@ -92,25 +92,25 @@ class ContextAnalyzer(BaseAgent):
         action = request.get("action", "analyze")
 
         if action == "analyze":
-            return self.analyze_context(request.get("content"), request.get("domain"))
+            return self.analyze_context(cast(str, request.get("content")), request.get("domain"))
         elif action == "extract_entities":
-            return self.extract_entities(request.get("content"))
+            return self.extract_entities(cast(str, request.get("content")))
         elif action == "build_model":
             return self.build_context_model(
-                request.get("name"), request.get("content"), request.get("domain")
+                cast(str, request.get("name")), cast(str, request.get("content")), request.get("domain")
             )
         elif action == "detect_relationships":
-            return self.detect_relationships(request.get("content"))
+            return self.detect_relationships(cast(str, request.get("content")))
         elif action == "identify_domain":
-            return self.identify_domain(request.get("content"))
+            return self.identify_domain(cast(str, request.get("content")))
         elif action == "find_relevant_context":
-            return self.find_relevant_context(request.get("query"), request.get("limit", 5))
+            return self.find_relevant_context(cast(str, request.get("query")), request.get("limit", 5))
         elif action == "store":
             return self.store_context(
-                request.get("name"), request.get("content"), request.get("metadata")
+                cast(str, request.get("name")), cast(str, request.get("content")), request.get("metadata")
             )
         elif action == "retrieve":
-            return self.retrieve_context(request.get("name"))
+            return self.retrieve_context(cast(str, request.get("name")))
         elif action == "list":
             return self.list_contexts()
         elif action == "get_hierarchy":
@@ -353,7 +353,7 @@ class ContextAnalyzer(BaseAgent):
 
         # Extract code-like identifiers
         identifiers = re.findall(r"\b[a-z_][a-z0-9_]*\b", content)
-        for identifier in set(identifiers)[:5]:  # Limit to avoid noise
+        for identifier in list(set(identifiers))[:5]:  # Limit to avoid noise
             if len(identifier) > 2:
                 entities[identifier] = "concept"
 
@@ -398,8 +398,8 @@ class ContextAnalyzer(BaseAgent):
             score = sum(1 for kw in keywords if kw in content_lower)
             scores[domain] = score
 
-        best_domain = max(scores, key=scores.get)
-        return best_domain if scores[best_domain] > 0 else "general"
+        best_domain = max(scores, key=lambda d: scores[d]) if scores else "general"
+        return best_domain if scores.get(best_domain, 0) > 0 else "general"
 
     def _calculate_domain_confidence(self, content: str, domain: str) -> float:
         """Calculate confidence in domain identification."""

@@ -14,7 +14,7 @@ import logging
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from .base import BaseAgent
 
@@ -201,7 +201,7 @@ class CodeGenerator(BaseAgent):
                     content=json.dumps(
                         {
                             "type": project_type.value,
-                            "files": {path: f["content"] for path, f in project_structure.items()},
+                            "files": {path: cast(Dict[str, Any], f)["content"] for path, f in project_structure.items()},
                         },
                         indent=2,
                     ),
