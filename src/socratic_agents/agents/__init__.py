@@ -1,6 +1,12 @@
-"""Agent implementations for Socratic Agents."""
+"""Agent implementations for Socratic Agents.
 
-from .base import BaseAgent
+Imports unified Agent base class from socratic-core (hub-and-spoke architecture).
+"""
+
+from socratic_core import Agent
+
+# Backward compatibility alias
+BaseAgent = Agent
 from .code_generator import CodeGenerator
 from .code_validation_agent import CodeValidator
 from .conflict_detector import AgentConflictDetector
@@ -25,6 +31,7 @@ from .user_manager import UserManager
 ConflictDetector = AgentConflictDetector
 
 __all__ = [
+    "Agent",
     "BaseAgent",
     "SocraticCounselor",
     "CodeGenerator",
