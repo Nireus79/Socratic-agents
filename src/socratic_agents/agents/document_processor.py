@@ -15,6 +15,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from .base import BaseAgent
+
 
 class DocumentFormat(Enum):
     """Supported document formats."""
