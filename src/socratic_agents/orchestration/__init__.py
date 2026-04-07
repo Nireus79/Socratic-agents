@@ -13,6 +13,7 @@ Key components:
 - WorkflowManager: Manages complete multi-agent workflows (Phase 7)
 """
 
+from .agent_orchestrator import AgentOrchestrator
 from .integration import (
     IntegrationMode,
     MaturityAwareOrchestrator,
@@ -33,6 +34,7 @@ from .socrates_integration import (
 )
 
 __all__ = [
+    "AgentOrchestrator",
     "PureOrchestrator",
     "CoordinationEvent",
     "AgentRequest",

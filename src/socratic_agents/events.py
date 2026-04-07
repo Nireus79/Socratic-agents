@@ -94,11 +94,12 @@ class EventType(Enum):
     DECISION_MADE = "decision_made"
     RESOLUTION_APPROVED = "resolution_approved"
 
-    # ==================== KNOWLEDGE & CONTEXT EVENTS (10) ====================
+    # ==================== KNOWLEDGE & CONTEXT EVENTS (11) ====================
     KNOWLEDGE_INDEXED = "knowledge_indexed"
     KNOWLEDGE_RETRIEVED = "knowledge_retrieved"
     KNOWLEDGE_UPDATED = "knowledge_updated"
     KNOWLEDGE_DELETED = "knowledge_deleted"
+    KNOWLEDGE_SUGGESTION = "knowledge_suggestion"
     CONTEXT_ANALYZED = "context_analyzed"
     CONTEXT_ENRICHED = "context_enriched"
     DOCUMENT_PROCESSED = "document_processed"
@@ -150,6 +151,12 @@ class EventType(Enum):
     WORKFLOW_COORDINATION = "workflow_coordination"
     MULTI_AGENT_SYNC = "multi_agent_sync"
     ORCHESTRATION_COMPLETE = "orchestration_complete"
+
+    # ==================== LOGGING EVENTS (4) ====================
+    LOG_DEBUG = "log_debug"
+    LOG_INFO = "log_info"
+    LOG_WARNING = "log_warning"
+    LOG_ERROR = "log_error"
 
 
 # Event categories for filtering and processing
