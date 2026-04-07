@@ -152,6 +152,7 @@ class SocraticCounselor(BaseAgent):
             "skip_question": self._skip_question,
             "reopen_question": self._reopen_question,
             "generate_answer_suggestions": self._generate_answer_suggestions,
+            "guide": self._guide_handler,
         }
 
         handler = handlers.get(action)
@@ -176,24 +177,53 @@ class SocraticCounselor(BaseAgent):
             level: The learner's level (beginner, intermediate, advanced)
 
         Returns:
-            Dictionary with status and generated question
+            Dictionary with status, topic, level, and generated question
         """
+        result = self._guide_handler({"topic": topic, "level": level})
+        return result
+
+    def _guide_handler(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Internal handler for guide action that can be called via process().
+
+        Args:
+            request: Dictionary with 'topic' and optionally 'level'
+
+        Returns:
+            Dictionary with status, topic, level, and question
+        """
+        topic = request.get("topic")
+        level = request.get("level", "beginner")
+
+        if not topic:
+            return {"status": "error", "message": "Topic is required for guidance"}
+
         # Create a temporary project context for guidance
-        request = {
+        temp_project = type(
+            "obj",
+            (object,),
+            {
+                "name": f"guidance_{topic}",
+                "conversation_history": [],
+                "pending_questions": [],
+                "metadata": {"topic": topic, "level": level},
+            },
+        )()
+
+        generate_request = {
             "action": "generate_question",
-            "project": type(
-                "obj",
-                (object,),
-                {
-                    "name": f"guidance_{topic}",
-                    "conversation_history": [],
-                    "pending_questions": [],
-                    "metadata": {"topic": topic, "level": level},
-                },
-            )(),
+            "project": temp_project,
             "user_id": "guide_user",
         }
-        return self.process(request)
+
+        result = self._generate_question(generate_request)
+
+        # Add topic and level to the response
+        if result.get("status") == "success":
+            result["topic"] = topic
+            result["level"] = level
+
+        return result
 
     # ===== CRITICAL ORCHESTRATION METHODS =====
 
