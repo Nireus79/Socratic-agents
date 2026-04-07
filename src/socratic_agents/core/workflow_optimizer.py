@@ -1,7 +1,7 @@
 """WorkflowOptimizer - Orchestrates workflow optimization and path selection."""
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from .workflow_cost_calculator import WorkflowCostCalculator
 from .workflow_path_finder import WorkflowPath, WorkflowPathFinder

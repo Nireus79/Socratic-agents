@@ -9,8 +9,8 @@ This agent:
 6. Recommends optimal workflow paths based on cost/risk/quality metrics
 """
 
-from typing import Any, Dict, List, Optional
 import uuid
+from typing import Any, Dict, List, Optional
 
 from socrates_maturity import MaturityCalculator
 

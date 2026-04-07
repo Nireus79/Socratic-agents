@@ -1099,7 +1099,7 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
                         "new_phase": next_phase,
                         "approval_id": approval.get("approval_id"),
                         "approval_request": approval.get("approval_request"),
-                        "message": f"Phase advancement requires approval. Review the workflow optimization details.",
+                        "message": "Phase advancement requires approval. Review the workflow optimization details.",
                     }
 
                 # If auto-approve or approval succeeded, proceed with phase change

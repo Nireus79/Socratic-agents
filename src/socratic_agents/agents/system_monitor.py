@@ -11,7 +11,6 @@ This agent:
 8. Manages system thresholds and limits
 """
 
-from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -197,7 +196,7 @@ class SystemMonitor(BaseAgent):
             "agent": self.name,
             "metric": metric_name,
             "value": value,
-            "status": metric._get_status(),
+            "metric_status": metric._get_status(),
         }
 
     def get_metric(self, metric_name: str) -> Dict[str, Any]:

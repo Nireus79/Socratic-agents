@@ -349,23 +349,23 @@ class CodeGenerator(BaseAgent):
                 files["setup.py"] = self._generate_python_setup(project_name, description)
 
             elif project_type == ProjectType.REST_API:
-                files[f"src/app.py"] = self._generate_python_flask_app(project_name)
-                files[f"src/routes.py"] = self._generate_python_routes()
-                files[f"src/models.py"] = self._generate_python_models()
+                files["src/app.py"] = self._generate_python_flask_app(project_name)
+                files["src/routes.py"] = self._generate_python_routes()
+                files["src/models.py"] = self._generate_python_models()
                 files["requirements.txt"] = "flask\nflask-cors\npydantic\n" + "\n".join(
                     requirements
                 )
 
             elif project_type == ProjectType.MICROSERVICE:
-                files[f"src/service.py"] = self._generate_python_microservice(project_name)
-                files[f"src/config.py"] = self._generate_python_config()
+                files["src/service.py"] = self._generate_python_microservice(project_name)
+                files["src/config.py"] = self._generate_python_config()
                 files["docker/Dockerfile"] = self._generate_dockerfile("python")
                 files["docker-compose.yml"] = self._generate_docker_compose()
 
             elif project_type == ProjectType.DATA_PIPELINE:
-                files[f"src/pipeline.py"] = self._generate_python_pipeline(project_name)
-                files[f"src/extractors.py"] = self._generate_python_extractors()
-                files[f"src/transformers.py"] = self._generate_python_transformers()
+                files["src/pipeline.py"] = self._generate_python_pipeline(project_name)
+                files["src/extractors.py"] = self._generate_python_extractors()
+                files["src/transformers.py"] = self._generate_python_transformers()
                 files["requirements.txt"] = "pandas\npyspark\npolars\n" + "\n".join(requirements)
 
         elif language in ["javascript", "typescript"]:

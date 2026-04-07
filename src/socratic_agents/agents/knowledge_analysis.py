@@ -14,7 +14,7 @@ import asyncio
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from .base import BaseAgent
 

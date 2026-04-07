@@ -12,12 +12,9 @@ This agent:
 """
 
 import hashlib
-import json
-import re
-from collections import defaultdict
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from .base import BaseAgent
 
@@ -302,7 +299,7 @@ class GithubSyncHandler(BaseAgent):
         if branch_name == "main":
             return {"status": "error", "message": "Cannot delete main branch"}
 
-        deleted = self.branches.pop(branch_name)
+        self.branches.pop(branch_name)
 
         return {
             "status": "success",
@@ -368,7 +365,7 @@ class GithubSyncHandler(BaseAgent):
             "title": title,
             "source_branch": source_branch,
             "target_branch": target_branch,
-            "status": "draft",
+            "pr_status": "draft",
         }
 
     def update_pr_status(self, pr_id: str, status: str) -> Dict[str, Any]:
@@ -485,13 +482,6 @@ class GithubSyncHandler(BaseAgent):
             return {"status": "error", "message": "Event required"}
 
         payload = payload or {}
-
-        # Log webhook event
-        webhook_log = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "event": event,
-            "payload": payload,
-        }
 
         return {
             "status": "success",

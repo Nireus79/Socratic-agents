@@ -12,7 +12,7 @@ This agent:
 import ast
 import re
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 from .base import BaseAgent
 
@@ -337,7 +337,8 @@ class CodeValidator(BaseAgent):
         # Check for undefined variables (simple heuristic)
         defined = set(re.findall(r"^\s*(\w+)\s*=", code, re.MULTILINE))
         used = set(re.findall(r"\b([a-zA-Z_]\w*)\b", code))
-        undefined = used - defined - set(["if", "else", "for", "while", "def", "class"])
+        # Note: undefined variables calculation available but not used for validation currently
+        used - defined - set(["if", "else", "for", "while", "def", "class"])
 
         return issues
 
@@ -499,7 +500,7 @@ class CodeValidator(BaseAgent):
             "code_metrics": {
                 "lines": len(code.split("\n")),
                 "characters": len(code),
-                "blank_lines": len([l for l in code.split("\n") if not l.strip()]),
+                "blank_lines": len([line for line in code.split("\n") if not line.strip()]),
             },
             "issues_by_severity": {
                 "critical": [i.to_dict() for i in critical],
