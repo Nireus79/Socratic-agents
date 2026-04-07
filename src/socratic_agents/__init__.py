@@ -3,8 +3,8 @@
 __version__ = "0.3.0"  # Complete orchestration engine (Phase 0a complete, pre-integration)
 __author__ = "Socratic Agents Contributors"
 
-# Core base class (imported from socratic-core via hub-and-spoke architecture)
-from .agents.base import Agent, BaseAgent
+# Core base class
+from .agents.base import BaseAgent
 from .agents.code_generator import CodeGenerator
 from .agents.code_validation_agent import CodeValidator
 from .agents.conflict_detector import AgentConflictDetector
@@ -105,8 +105,7 @@ def create_github_sync_handler(db=None):
 
 
 __all__ = [
-    # Base class (from socratic-core)
-    "Agent",
+    # Base class
     "BaseAgent",
     # Agent implementations
     "SocraticCounselor",
