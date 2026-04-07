@@ -45,6 +45,7 @@ class LearningAgent(BaseAgent):
             database_path: Path to SQLite database for persistence
         """
         super().__init__(name="LearningAgent", llm_client=llm_client)
+        self.llm_client = llm_client
         self.interactions: List[Dict[str, Any]] = []
         self.patterns: List[str] = []
 

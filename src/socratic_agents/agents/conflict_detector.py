@@ -38,6 +38,7 @@ class AgentConflictDetector(BaseAgent):
             llm_client: Optional LLM client for enhanced conflict analysis
         """
         super().__init__(name="AgentConflictDetector", llm_client=llm_client)
+        self.llm_client = llm_client
         self.conflicts: List[Dict[str, Any]] = []
 
         # Initialize socratic-conflict components if available
