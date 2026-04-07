@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Dict, Optional
 
-from socratic_agents.events import EventBus, EventType
+from ..events import EventBus, EventType
 
 
 class AgentOrchestrator:

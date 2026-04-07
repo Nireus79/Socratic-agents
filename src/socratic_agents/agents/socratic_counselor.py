@@ -63,6 +63,7 @@ class SocraticCounselor(BaseAgent):
                        For compatibility, can be set to 3 for legacy behavior.
         """
         super().__init__(name="SocraticCounselor", llm_client=llm_client)
+        self.llm_client = llm_client
         self.database = database
         if logger:
             self.logger = logger

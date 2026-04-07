@@ -6,10 +6,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from socratic_agents.events import EventType
+from ..events import EventType
 
 if TYPE_CHECKING:
-    from socratic_agents.orchestration import AgentOrchestrator
+    from ..orchestration import AgentOrchestrator
 
 
 class Agent(ABC):
@@ -24,18 +24,41 @@ class Agent(ABC):
     - Structured error handling
     """
 
-    def __init__(self, name: str, orchestrator: "AgentOrchestrator"):
+    def __init__(
+        self,
+        name: str,
+        orchestrator: Optional["AgentOrchestrator"] = None,
+        llm_client: Optional[Any] = None,
+    ):
         """
         Initialize an agent.
 
         Args:
             name: Display name for the agent
-            orchestrator: Reference to the AgentOrchestrator for accessing other agents/services
+            orchestrator: Reference to the AgentOrchestrator for accessing other agents/services.
+                         If not provided, a mock orchestrator will be created.
+            llm_client: Optional LLM client (accepted for backward compatibility, not used by base class)
         """
         self.name = name
-        self.orchestrator = orchestrator
         self.logger = logging.getLogger(f"socratic_agents.{name}")
         self.created_at = datetime.utcnow()
+
+        # Create mock orchestrator if not provided
+        if orchestrator is None:
+            orchestrator = self._create_mock_orchestrator()
+        self.orchestrator = orchestrator
+
+    @staticmethod
+    def _create_mock_orchestrator() -> "AgentOrchestrator":
+        """Create a mock orchestrator for standalone agent usage."""
+        from ..events import EventBus
+
+        # Create a minimal orchestrator-like object
+        class MockOrchestrator:
+            def __init__(self):
+                self.event_emitter = EventBus()
+
+        return MockOrchestrator()  # type: ignore
 
     @abstractmethod
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
