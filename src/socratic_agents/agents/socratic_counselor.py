@@ -20,12 +20,13 @@ Now adapted as a standalone module for use in modular Socrates architecture.
 
 import datetime
 import json
-import logging
 import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
+from .base import BaseAgent
 
-class SocraticCounselor:
+
+class SocraticCounselor(BaseAgent):
     """
     Complete Socratic dialogue orchestration engine.
 
@@ -61,10 +62,10 @@ class SocraticCounselor:
             batch_size: Number of questions to generate per request (default: 1).
                        For compatibility, can be set to 3 for legacy behavior.
         """
-        self.name = "SocraticCounselor"
-        self.llm_client = llm_client
+        super().__init__(name="SocraticCounselor", llm_client=llm_client)
         self.database = database
-        self.logger = logger or logging.getLogger("socratic_counselor")
+        if logger:
+            self.logger = logger
         self.batch_size = max(1, batch_size)
 
         # Configuration
@@ -162,6 +163,37 @@ class SocraticCounselor:
         except Exception as e:
             self.logger.error(f"Error in {action}: {e}", exc_info=True)
             return {"status": "error", "message": str(e)}
+
+    def guide(self, topic: str, level: str = "beginner") -> Dict[str, Any]:
+        """
+        Generate a Socratic question to guide learning on a topic.
+
+        This is a convenience method that creates a temporary project context
+        and generates an initial question on the specified topic.
+
+        Args:
+            topic: The topic to guide learning on
+            level: The learner's level (beginner, intermediate, advanced)
+
+        Returns:
+            Dictionary with status and generated question
+        """
+        # Create a temporary project context for guidance
+        request = {
+            "action": "generate_question",
+            "project": type(
+                "obj",
+                (object,),
+                {
+                    "name": f"guidance_{topic}",
+                    "conversation_history": [],
+                    "pending_questions": [],
+                    "metadata": {"topic": topic, "level": level},
+                },
+            )(),
+            "user_id": "guide_user",
+        }
+        return self.process(request)
 
     # ===== CRITICAL ORCHESTRATION METHODS =====
 
