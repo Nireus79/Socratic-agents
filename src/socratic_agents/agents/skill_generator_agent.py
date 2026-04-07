@@ -3,16 +3,39 @@
 import uuid
 from typing import Any, Dict, List, Optional
 
-from ..models.skill_models import AgentSkill, SkillRecommendation
+from .base import BaseAgent
+
+try:
+    from ..models.skill_models import AgentSkill, SkillRecommendation
+    MODELS_AVAILABLE = True
+except ImportError:
+    MODELS_AVAILABLE = False
+    # Fallback classes
+    class AgentSkill:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class SkillRecommendation:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
 
-class SkillGeneratorAgent:
+class SkillGeneratorAgent(BaseAgent):
     """
     Generates adaptive skills for agents based on maturity and learning data.
 
     This agent takes maturity phase data and learning metrics, then generates
     targeted behavioral skills to improve agent performance in weak areas.
-    Pure data transformation: no agent dependencies, works standalone.
+
+    Features:
+    - Analyzes weak categories from maturity data
+    - Generates targeted skills for improvement
+    - Evaluates skill effectiveness with feedback
+    - Prioritizes skills by impact
+    - Pure data transformation with no external dependencies
+    - Works as standalone or integrated component
     """
 
     def __init__(self, llm_client: Optional[Any] = None, skill_templates: Optional[Dict] = None):
@@ -23,8 +46,7 @@ class SkillGeneratorAgent:
             llm_client: Optional LLMClient for future LLM-based skill generation
             skill_templates: Optional custom skill templates (uses defaults if None)
         """
-        self.name = "SkillGeneratorAgent"
-        self.llm_client = llm_client
+        super().__init__(name="SkillGeneratorAgent", llm_client=llm_client)
         self.skill_templates = skill_templates or self._load_default_templates()
         self.generated_skills: Dict[str, AgentSkill] = {}
         self.skill_effectiveness: Dict[str, float] = {}
