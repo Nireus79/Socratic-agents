@@ -10,6 +10,7 @@ This agent:
 7. Supports multi-level knowledge hierarchies
 """
 
+import asyncio
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -131,6 +132,59 @@ class KnowledgeAnalysis(BaseAgent):
             return self.get_analysis_summary()
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
+
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process knowledge analysis requests asynchronously."""
+        action = request.get("action", "analyze")
+
+        if action == "analyze":
+            return await self._analyze_knowledge_async(
+                request.get("knowledge"),
+                request.get("analysis_depth", "standard"),
+            )
+        elif action == "extract_patterns":
+            return await self._extract_patterns_async(request.get("knowledge"))
+        elif action == "generate_insights":
+            return await self._generate_insights_async(request.get("patterns"))
+        elif action == "detect_relationships":
+            return await self._detect_relationships_async(request.get("entities"))
+        elif action == "identify_gaps":
+            return await self._identify_knowledge_gaps_async(request.get("knowledge"))
+        elif action == "categorize":
+            return await self._categorize_knowledge_async(request.get("items"), request.get("categories"))
+        elif action == "list_patterns":
+            return await asyncio.to_thread(self.list_patterns)
+        elif action == "list_insights":
+            return await asyncio.to_thread(self.list_insights)
+        elif action == "get_summary":
+            return await asyncio.to_thread(self.get_analysis_summary)
+        else:
+            return {"status": "error", "message": f"Unknown action: {action}"}
+
+    # Async wrapper methods
+    async def _analyze_knowledge_async(self, knowledge: str, analysis_depth: str = "standard") -> Dict[str, Any]:
+        """Analyze knowledge asynchronously."""
+        return await asyncio.to_thread(self.analyze_knowledge, knowledge, analysis_depth)
+
+    async def _extract_patterns_async(self, knowledge: str) -> Dict[str, Any]:
+        """Extract patterns asynchronously."""
+        return await asyncio.to_thread(self.extract_patterns, knowledge)
+
+    async def _generate_insights_async(self, patterns: List[KnowledgePattern]) -> Dict[str, Any]:
+        """Generate insights asynchronously."""
+        return await asyncio.to_thread(self.generate_insights, patterns)
+
+    async def _detect_relationships_async(self, entities: List[str]) -> Dict[str, Any]:
+        """Detect relationships asynchronously."""
+        return await asyncio.to_thread(self.detect_relationships, entities)
+
+    async def _identify_knowledge_gaps_async(self, knowledge: str) -> Dict[str, Any]:
+        """Identify knowledge gaps asynchronously."""
+        return await asyncio.to_thread(self.identify_knowledge_gaps, knowledge)
+
+    async def _categorize_knowledge_async(self, items: List[str], categories: List[str]) -> Dict[str, Any]:
+        """Categorize knowledge asynchronously."""
+        return await asyncio.to_thread(self.categorize_knowledge, items, categories)
 
     def analyze_knowledge(self, knowledge: str, analysis_depth: str = "standard") -> Dict[str, Any]:
         """Comprehensive knowledge analysis."""

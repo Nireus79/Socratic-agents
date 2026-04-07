@@ -9,6 +9,7 @@ This agent:
 6. Supports semantic preprocessing and analysis
 """
 
+import asyncio
 import re
 import uuid
 from datetime import datetime
@@ -149,6 +150,64 @@ class DocumentProcessor(BaseAgent):
 
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
+
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process document requests asynchronously."""
+        action = request.get("action", "import")
+
+        # Document import and processing (I/O-bound operations)
+        if action == "import":
+            return await self._import_document_async(
+                request.get("content"),
+                request.get("format", "text"),
+                request.get("metadata")
+            )
+        elif action == "import_url":
+            return await self._import_from_url_async(request.get("url"))
+        elif action == "parse":
+            return await asyncio.to_thread(self.parse_document, request.get("doc_id"))
+
+        # Code analysis operations
+        elif action == "analyze_code":
+            return await asyncio.to_thread(self.analyze_code, request.get("doc_id"))
+        elif action == "extract_functions":
+            return await asyncio.to_thread(self.extract_functions, request.get("doc_id"))
+        elif action == "extract_classes":
+            return await asyncio.to_thread(self.extract_classes, request.get("doc_id"))
+
+        # Document manipulation
+        elif action == "chunk":
+            return await asyncio.to_thread(self.chunk_document, request.get("doc_id"))
+        elif action == "get":
+            return await asyncio.to_thread(self.get_document, request.get("doc_id"))
+        elif action == "list":
+            return await asyncio.to_thread(self.list_documents, request.get("format"), request.get("limit", 50))
+        elif action == "delete":
+            return await asyncio.to_thread(self.delete_document, request.get("doc_id"))
+
+        # Vector DB operations
+        elif action == "enable_vector_db":
+            return await asyncio.to_thread(self._enable_vector_db)
+        elif action == "store_vectors":
+            return await asyncio.to_thread(self.store_document_vectors, request.get("doc_id"))
+
+        # Metadata operations
+        elif action == "add_tags":
+            return await asyncio.to_thread(self.add_tags, request.get("doc_id"), request.get("tags", []))
+        elif action == "add_category":
+            return await asyncio.to_thread(self.add_category, request.get("doc_id"), request.get("category"))
+
+        else:
+            return {"status": "error", "message": f"Unknown action: {action}"}
+
+    # Async wrapper methods for I/O-bound operations
+    async def _import_document_async(self, content: str, format_str: str = "text", metadata: Optional[Dict] = None) -> Dict[str, Any]:
+        """Import document asynchronously."""
+        return await asyncio.to_thread(self.import_document, content, format_str, metadata)
+
+    async def _import_from_url_async(self, url: str) -> Dict[str, Any]:
+        """Import from URL asynchronously."""
+        return await asyncio.to_thread(self.import_from_url, url)
 
     def import_document(
         self, content: str, format_str: str = "text", metadata: Optional[Dict] = None
