@@ -66,6 +66,44 @@ class SocraticCounselorGenerateQuestionResponse(AgentResponse):
 # ============================================================================
 
 
+class CodeGeneratorGenerateRequest(BaseModel):
+    """Request to generate code."""
+
+    action: Literal["generate"] = "generate"
+    prompt: str = Field(..., description="Code generation prompt")
+    language: str = Field(default="python", description="Programming language")
+    project_id: Optional[str] = Field(None, description="Project ID")
+
+
+class CodeGeneratorGenerateProjectRequest(BaseModel):
+    """Request to generate a project."""
+
+    action: Literal["generate_project"] = "generate_project"
+    project: ProjectContext = Field(..., description="Project context")
+    current_user: Optional[str] = Field(None, description="Current user ID")
+
+
+class CodeGeneratorGenerateWithExplanationRequest(BaseModel):
+    """Request to generate code with explanation."""
+
+    action: Literal["generate_with_explanation"] = "generate_with_explanation"
+    project: ProjectContext = Field(..., description="Project context")
+    current_user: Optional[str] = Field(None, description="Current user ID")
+
+
+class CodeGeneratorGetProjectRequest(BaseModel):
+    """Request to get project details."""
+
+    action: Literal["get_project"] = "get_project"
+    project_id: str = Field(..., description="Project ID")
+
+
+class CodeGeneratorListProjectsRequest(BaseModel):
+    """Request to list projects."""
+
+    action: Literal["list_projects"] = "list_projects"
+
+
 class CodeGeneratorGenerateArtifactRequest(BaseModel):
     """Request to generate code artifact."""
 
@@ -417,6 +455,11 @@ __all__ = [
     "SocraticCounselorGenerateQuestionRequest",
     "SocraticCounselorGenerateQuestionResponse",
     # Code Generator
+    "CodeGeneratorGenerateRequest",
+    "CodeGeneratorGenerateProjectRequest",
+    "CodeGeneratorGenerateWithExplanationRequest",
+    "CodeGeneratorGetProjectRequest",
+    "CodeGeneratorListProjectsRequest",
     "CodeGeneratorGenerateArtifactRequest",
     "CodeGeneratorGenerateDocumentationRequest",
     "CodeGeneratorGenerateArtifactResponse",
