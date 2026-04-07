@@ -21,6 +21,7 @@ from .base import BaseAgent
 
 class DocumentFormat(Enum):
     """Supported document formats."""
+
     TEXT = "text"
     PDF = "pdf"
     MARKDOWN = "markdown"
@@ -31,6 +32,7 @@ class DocumentFormat(Enum):
 
 class CodeLanguage(Enum):
     """Supported programming languages."""
+
     PYTHON = "python"
     JAVASCRIPT = "javascript"
     TYPESCRIPT = "typescript"
@@ -109,9 +111,7 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing
         if action == "import":
             return self.import_document(
-                request.get("content"),
-                request.get("format", "text"),
-                request.get("metadata")
+                request.get("content"), request.get("format", "text"), request.get("metadata")
             )
         elif action == "import_url":
             return self.import_from_url(request.get("url"))
@@ -158,9 +158,7 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing (I/O-bound operations)
         if action == "import":
             return await self._import_document_async(
-                request.get("content"),
-                request.get("format", "text"),
-                request.get("metadata")
+                request.get("content"), request.get("format", "text"), request.get("metadata")
             )
         elif action == "import_url":
             return await self._import_from_url_async(request.get("url"))
@@ -181,7 +179,9 @@ class DocumentProcessor(BaseAgent):
         elif action == "get":
             return await asyncio.to_thread(self.get_document, request.get("doc_id"))
         elif action == "list":
-            return await asyncio.to_thread(self.list_documents, request.get("format"), request.get("limit", 50))
+            return await asyncio.to_thread(
+                self.list_documents, request.get("format"), request.get("limit", 50)
+            )
         elif action == "delete":
             return await asyncio.to_thread(self.delete_document, request.get("doc_id"))
 
@@ -193,15 +193,21 @@ class DocumentProcessor(BaseAgent):
 
         # Metadata operations
         elif action == "add_tags":
-            return await asyncio.to_thread(self.add_tags, request.get("doc_id"), request.get("tags", []))
+            return await asyncio.to_thread(
+                self.add_tags, request.get("doc_id"), request.get("tags", [])
+            )
         elif action == "add_category":
-            return await asyncio.to_thread(self.add_category, request.get("doc_id"), request.get("category"))
+            return await asyncio.to_thread(
+                self.add_category, request.get("doc_id"), request.get("category")
+            )
 
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
     # Async wrapper methods for I/O-bound operations
-    async def _import_document_async(self, content: str, format_str: str = "text", metadata: Optional[Dict] = None) -> Dict[str, Any]:
+    async def _import_document_async(
+        self, content: str, format_str: str = "text", metadata: Optional[Dict] = None
+    ) -> Dict[str, Any]:
         """Import document asynchronously."""
         return await asyncio.to_thread(self.import_document, content, format_str, metadata)
 
@@ -367,7 +373,7 @@ class DocumentProcessor(BaseAgent):
         chunk_size = chunk_size or self.chunk_size
 
         # Simple chunking by sentences
-        sentences = re.split(r'[.!?]\s+', doc.content)
+        sentences = re.split(r"[.!?]\s+", doc.content)
         chunks = []
         current_chunk = ""
 
@@ -418,7 +424,7 @@ class DocumentProcessor(BaseAgent):
                 "chunk_count": doc.chunk_count,
                 "tags": list(doc.tags),
                 "categories": list(doc.categories),
-            }
+            },
         }
 
     def list_documents(self, format_str: Optional[str] = None, limit: int = 50) -> Dict[str, Any]:
@@ -551,16 +557,16 @@ class DocumentProcessor(BaseAgent):
         content = doc.content
 
         # Extract imports (simplified)
-        imports = re.findall(r'^(?:import|from)\s+(.+?)(?:\s+import)?', content, re.MULTILINE)
+        imports = re.findall(r"^(?:import|from)\s+(.+?)(?:\s+import)?", content, re.MULTILINE)
         doc.code_imports.update(imports)
 
         # Extract function definitions (simplified)
-        functions = re.findall(r'(?:def|function)\s+(\w+)\s*\(', content)
+        functions = re.findall(r"(?:def|function)\s+(\w+)\s*\(", content)
         for func_name in functions:
             doc.code_functions.append({"name": func_name, "type": "function"})
 
         # Extract class definitions (simplified)
-        classes = re.findall(r'(?:class|struct)\s+(\w+)', content)
+        classes = re.findall(r"(?:class|struct)\s+(\w+)", content)
         for class_name in classes:
             doc.code_classes.append({"name": class_name, "type": "class"})
 
@@ -591,7 +597,7 @@ class DocumentProcessor(BaseAgent):
 
     def _parse_markdown_document(self, doc: ProcessedDocument) -> Dict[str, Any]:
         """Parse markdown document."""
-        headers = re.findall(r'^#{1,6}\s+(.+)$', doc.content, re.MULTILINE)
+        headers = re.findall(r"^#{1,6}\s+(.+)$", doc.content, re.MULTILINE)
         return {
             "status": "success",
             "agent": self.name,

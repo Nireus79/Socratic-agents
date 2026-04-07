@@ -96,7 +96,9 @@ class ContextAnalyzer(BaseAgent):
         elif action == "extract_entities":
             return self.extract_entities(request.get("content"))
         elif action == "build_model":
-            return self.build_context_model(request.get("name"), request.get("content"), request.get("domain"))
+            return self.build_context_model(
+                request.get("name"), request.get("content"), request.get("domain")
+            )
         elif action == "detect_relationships":
             return self.detect_relationships(request.get("content"))
         elif action == "identify_domain":
@@ -104,7 +106,9 @@ class ContextAnalyzer(BaseAgent):
         elif action == "find_relevant_context":
             return self.find_relevant_context(request.get("query"), request.get("limit", 5))
         elif action == "store":
-            return self.store_context(request.get("name"), request.get("content"), request.get("metadata"))
+            return self.store_context(
+                request.get("name"), request.get("content"), request.get("metadata")
+            )
         elif action == "retrieve":
             return self.retrieve_context(request.get("name"))
         elif action == "list":
@@ -167,7 +171,9 @@ class ContextAnalyzer(BaseAgent):
             "total_entities_stored": len(self.entity_index),
         }
 
-    def build_context_model(self, name: str, content: str, domain: Optional[str] = None) -> Dict[str, Any]:
+    def build_context_model(
+        self, name: str, content: str, domain: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Build a semantic context model."""
         if not name or not content:
             return {"status": "error", "message": "Name and content required"}
@@ -254,7 +260,9 @@ class ContextAnalyzer(BaseAgent):
             "relevance_scores": {name: score for name, score in relevant},
         }
 
-    def store_context(self, name: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def store_context(
+        self, name: str, content: str, metadata: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Store a context."""
         if not name or not content:
             return {"status": "error", "message": "Name and content required"}
@@ -339,31 +347,33 @@ class ContextAnalyzer(BaseAgent):
         entities = {}
 
         # Extract capitalized words (likely proper nouns/entities)
-        proper_nouns = re.findall(r'\b[A-Z][a-z]+\b', content)
+        proper_nouns = re.findall(r"\b[A-Z][a-z]+\b", content)
         for noun in set(proper_nouns):
             entities[noun] = "entity"
 
         # Extract code-like identifiers
-        identifiers = re.findall(r'\b[a-z_][a-z0-9_]*\b', content)
+        identifiers = re.findall(r"\b[a-z_][a-z0-9_]*\b", content)
         for identifier in set(identifiers)[:5]:  # Limit to avoid noise
             if len(identifier) > 2:
                 entities[identifier] = "concept"
 
         # Extract key terms from patterns
-        if re.search(r'\b(function|method|class|interface|module)\b', content):
+        if re.search(r"\b(function|method|class|interface|module)\b", content):
             entities["function"] = "concept"
-        if re.search(r'\b(parameter|argument|variable|data)\b', content):
+        if re.search(r"\b(parameter|argument|variable|data)\b", content):
             entities["data"] = "concept"
 
         return entities
 
-    def _analyze_entity_relationships(self, entities: Dict[str, str]) -> Dict[str, List[Tuple[str, str]]]:
+    def _analyze_entity_relationships(
+        self, entities: Dict[str, str]
+    ) -> Dict[str, List[Tuple[str, str]]]:
         """Analyze relationships between entities."""
         relationships = defaultdict(list)
 
         entity_list = list(entities.keys())
         for i, entity1 in enumerate(entity_list):
-            for entity2 in entity_list[i + 1:]:
+            for entity2 in entity_list[i + 1 :]:
                 # Simple heuristic: entities close in name might be related
                 if set(entity1.lower()) & set(entity2.lower()):
                     relationships["semantic_similarity"].append((entity1, entity2))

@@ -20,6 +20,7 @@ from .base import BaseAgent
 
 class UserRole(Enum):
     """User roles with permission levels."""
+
     ADMIN = "admin"
     INSTRUCTOR = "instructor"
     STUDENT = "student"
@@ -28,6 +29,7 @@ class UserRole(Enum):
 
 class UserStatus(Enum):
     """User account status."""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
@@ -156,13 +158,19 @@ class UserManager(BaseAgent):
         elif action == "update_learning_stats":
             return self.update_learning_stats(request.get("user_id"), request.get("stats"))
         elif action == "set_subscription":
-            return self.set_subscription(request.get("user_id"), request.get("subscription_type"), request.get("duration_days"))
+            return self.set_subscription(
+                request.get("user_id"),
+                request.get("subscription_type"),
+                request.get("duration_days"),
+            )
         elif action == "check_quota":
             return self.check_quota(request.get("user_id"), request.get("resource"))
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
-    def create_user(self, user_id: str, email: str, full_name: str, role: str = "student") -> Dict[str, Any]:
+    def create_user(
+        self, user_id: str, email: str, full_name: str, role: str = "student"
+    ) -> Dict[str, Any]:
         """Create a new user."""
         if not user_id or not email or not full_name:
             return {"status": "error", "message": "User ID, email, and full name required"}
@@ -225,7 +233,9 @@ class UserManager(BaseAgent):
             "updated": True,
         }
 
-    def update_preferences(self, user_id: str, preferences: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def update_preferences(
+        self, user_id: str, preferences: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Update user preferences."""
         if not user_id:
             return {"status": "error", "message": "User ID required"}
@@ -243,7 +253,9 @@ class UserManager(BaseAgent):
             "preferences": user.preferences,
         }
 
-    def update_settings(self, user_id: str, settings: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def update_settings(
+        self, user_id: str, settings: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Update user notification settings."""
         if not user_id:
             return {"status": "error", "message": "User ID required"}
@@ -316,7 +328,9 @@ class UserManager(BaseAgent):
             "new_status": "archived",
         }
 
-    def list_users(self, role: Optional[str] = None, status: Optional[str] = None) -> Dict[str, Any]:
+    def list_users(
+        self, role: Optional[str] = None, status: Optional[str] = None
+    ) -> Dict[str, Any]:
         """List users with optional filtering."""
         users = list(self.users.values())
 
@@ -374,7 +388,9 @@ class UserManager(BaseAgent):
             "ended": True,
         }
 
-    def record_activity(self, user_id: str, activity: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def record_activity(
+        self, user_id: str, activity: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Record user activity."""
         if not user_id:
             return {"status": "error", "message": "User ID required"}
@@ -466,7 +482,9 @@ class UserManager(BaseAgent):
             "has_permission": has_permission,
         }
 
-    def update_learning_stats(self, user_id: str, stats: Optional[Dict[str, int]] = None) -> Dict[str, Any]:
+    def update_learning_stats(
+        self, user_id: str, stats: Optional[Dict[str, int]] = None
+    ) -> Dict[str, Any]:
         """Update user learning statistics."""
         if not user_id:
             return {"status": "error", "message": "User ID required"}
@@ -488,7 +506,9 @@ class UserManager(BaseAgent):
             "learning_stats": user.learning_stats,
         }
 
-    def set_subscription(self, user_id: str, subscription_type: str, duration_days: int = 30) -> Dict[str, Any]:
+    def set_subscription(
+        self, user_id: str, subscription_type: str, duration_days: int = 30
+    ) -> Dict[str, Any]:
         """Set user subscription."""
         if not user_id or not subscription_type:
             return {"status": "error", "message": "User ID and subscription type required"}

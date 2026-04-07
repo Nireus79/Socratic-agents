@@ -20,6 +20,7 @@ from .base import BaseAgent
 
 class ProjectStatus(Enum):
     """Project lifecycle status."""
+
     ACTIVE = "active"
     ARCHIVED = "archived"
     DELETED = "deleted"
@@ -28,6 +29,7 @@ class ProjectStatus(Enum):
 
 class TeamMemberRole(Enum):
     """Team member roles with permission levels."""
+
     OWNER = "owner"
     ADMIN = "admin"
     DEVELOPER = "developer"
@@ -36,6 +38,7 @@ class TeamMemberRole(Enum):
 
 class SubscriptionTier(Enum):
     """Subscription tiers with feature limits."""
+
     FREE = "free"
     PRO = "pro"
     ENTERPRISE = "enterprise"
@@ -102,25 +105,18 @@ class ProjectManager(BaseAgent):
         # Project creation and basic operations
         if action == "create":
             return self.create_project(
-                request.get("project_name"),
-                request.get("description", ""),
-                request.get("owner_id")
+                request.get("project_name"), request.get("description", ""), request.get("owner_id")
             )
         elif action == "list":
             return self.list_projects(
-                request.get("filter"),
-                request.get("tags"),
-                request.get("status")
+                request.get("filter"), request.get("tags"), request.get("status")
             )
         elif action == "get":
             return self.get_project(request.get("project_id"))
 
         # GitHub integration
         elif action == "import_github":
-            return self.import_from_github(
-                request.get("project_id"),
-                request.get("github_url")
-            )
+            return self.import_from_github(request.get("project_id"), request.get("github_url"))
         elif action == "sync_github":
             return self.sync_with_github(request.get("project_id"))
         elif action == "push_to_github":
@@ -129,22 +125,15 @@ class ProjectManager(BaseAgent):
         # Team management
         elif action == "add_team_member":
             return self.add_team_member(
-                request.get("project_id"),
-                request.get("user_id"),
-                request.get("role", "developer")
+                request.get("project_id"), request.get("user_id"), request.get("role", "developer")
             )
         elif action == "remove_team_member":
-            return self.remove_team_member(
-                request.get("project_id"),
-                request.get("user_id")
-            )
+            return self.remove_team_member(request.get("project_id"), request.get("user_id"))
         elif action == "list_team":
             return self.list_team_members(request.get("project_id"))
         elif action == "invite_team_member":
             return self.invite_team_member(
-                request.get("project_id"),
-                request.get("email"),
-                request.get("role", "developer")
+                request.get("project_id"), request.get("email"), request.get("role", "developer")
             )
 
         # Lifecycle operations
@@ -157,10 +146,7 @@ class ProjectManager(BaseAgent):
 
         # Subscription and quota
         elif action == "set_subscription":
-            return self.set_subscription_tier(
-                request.get("project_id"),
-                request.get("tier")
-            )
+            return self.set_subscription_tier(request.get("project_id"), request.get("tier"))
         elif action == "get_quota":
             return self.get_quota_status(request.get("project_id"))
 
@@ -169,9 +155,7 @@ class ProjectManager(BaseAgent):
             return self.add_task(request.get("project_id"), request.get("task"))
         elif action == "update_task":
             return self.update_task(
-                request.get("project_id"),
-                request.get("task_id"),
-                request.get("updates")
+                request.get("project_id"), request.get("task_id"), request.get("updates")
             )
         elif action == "list_tasks":
             return self.list_tasks(request.get("project_id"))
@@ -194,7 +178,7 @@ class ProjectManager(BaseAgent):
             project.team_members[owner_id] = {
                 "id": owner_id,
                 "role": TeamMemberRole.OWNER.value,
-                "joined_at": datetime.utcnow()
+                "joined_at": datetime.utcnow(),
             }
             project.team_roles[owner_id] = TeamMemberRole.OWNER
 
@@ -233,14 +217,14 @@ class ProjectManager(BaseAgent):
                 "subscription_tier": project.subscription_tier.value,
                 "file_count": project.file_count,
                 "quota_used": project.quota_used,
-            }
+            },
         }
 
     def list_projects(
         self,
         filter_str: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> Dict[str, Any]:
         """List projects with intelligent filtering."""
         projects_list = list(self.projects.values())
@@ -260,7 +244,8 @@ class ProjectManager(BaseAgent):
         if filter_str:
             query = filter_str.lower()
             projects_list = [
-                p for p in projects_list
+                p
+                for p in projects_list
                 if query in p.name.lower() or query in p.description.lower()
             ]
 
@@ -364,7 +349,7 @@ class ProjectManager(BaseAgent):
         project.team_members[user_id] = {
             "id": user_id,
             "role": role,
-            "joined_at": datetime.utcnow()
+            "joined_at": datetime.utcnow(),
         }
         project.team_roles[user_id] = role_enum
 
@@ -428,7 +413,7 @@ class ProjectManager(BaseAgent):
             "email": email,
             "role": role,
             "created_at": datetime.utcnow(),
-            "accepted": False
+            "accepted": False,
         }
 
         return {
@@ -535,7 +520,9 @@ class ProjectManager(BaseAgent):
             return {"status": "error", "message": f"Project {project_id} not found"}
 
         project = self.projects[project_id]
-        usage_percent = (project.quota_used / project.quota_limit * 100) if project.quota_limit > 0 else 0
+        usage_percent = (
+            (project.quota_used / project.quota_limit * 100) if project.quota_limit > 0 else 0
+        )
 
         return {
             "status": "success",
@@ -571,14 +558,14 @@ class ProjectManager(BaseAgent):
             "project_id": project_id,
         }
 
-    def update_task(
-        self, project_id: str, task_id: str, updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def update_task(self, project_id: str, task_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
         """Update a task."""
         if not project_id or not task_id:
             return {"status": "error", "message": "Project ID and task ID required"}
 
-        task = next((t for t in self.tasks if t["id"] == task_id and t["project_id"] == project_id), None)
+        task = next(
+            (t for t in self.tasks if t["id"] == task_id and t["project_id"] == project_id), None
+        )
         if not task:
             return {"status": "error", "message": f"Task {task_id} not found"}
 
@@ -621,6 +608,7 @@ class ProjectManager(BaseAgent):
     def _flatten_structure(self, structure: Dict[str, Any]) -> List[str]:
         """Flatten directory structure to file list."""
         files = []
+
         def traverse(node, path=""):
             for key, value in node.items():
                 current_path = f"{path}/{key}" if path else key
@@ -628,6 +616,7 @@ class ProjectManager(BaseAgent):
                     traverse(value, current_path)
                 else:
                     files.append(current_path)
+
         traverse(structure)
         return files
 

@@ -22,6 +22,7 @@ from .base import BaseAgent
 
 class ProviderStatus(Enum):
     """Provider health status."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
@@ -30,6 +31,7 @@ class ProviderStatus(Enum):
 
 class CostTier(Enum):
     """Cost tier for different providers."""
+
     BUDGET = "budget"  # Low-cost providers (Ollama, local models)
     STANDARD = "standard"  # Standard pricing (Claude, GPT-3.5)
     PREMIUM = "premium"  # High-end models (Claude Opus, GPT-4)
@@ -295,7 +297,9 @@ class MultiLlmAgent(BaseAgent):
             "fallback_order": self.fallback_order,
         }
 
-    def add_provider(self, name: str, endpoint: str, cost_tier: str, models: List[str]) -> Dict[str, Any]:
+    def add_provider(
+        self, name: str, endpoint: str, cost_tier: str, models: List[str]
+    ) -> Dict[str, Any]:
         """Add a new LLM provider."""
         if not name or not endpoint or not models:
             return {"status": "error", "message": "Name, endpoint, and models required"}
@@ -440,16 +444,13 @@ class MultiLlmAgent(BaseAgent):
         """Optimize provider order for cost efficiency."""
         # Sort providers by cost tier
         budget_providers = [
-            name for name, p in self.providers.items()
-            if p.cost_tier == CostTier.BUDGET
+            name for name, p in self.providers.items() if p.cost_tier == CostTier.BUDGET
         ]
         standard_providers = [
-            name for name, p in self.providers.items()
-            if p.cost_tier == CostTier.STANDARD
+            name for name, p in self.providers.items() if p.cost_tier == CostTier.STANDARD
         ]
         premium_providers = [
-            name for name, p in self.providers.items()
-            if p.cost_tier == CostTier.PREMIUM
+            name for name, p in self.providers.items() if p.cost_tier == CostTier.PREMIUM
         ]
 
         self.fallback_order = budget_providers + standard_providers + premium_providers
@@ -467,7 +468,12 @@ class MultiLlmAgent(BaseAgent):
     def _init_default_providers(self) -> None:
         """Initialize default providers."""
         providers = [
-            ("anthropic", "https://api.anthropic.com", CostTier.STANDARD, ["claude-opus", "claude-haiku"]),
+            (
+                "anthropic",
+                "https://api.anthropic.com",
+                CostTier.STANDARD,
+                ["claude-opus", "claude-haiku"],
+            ),
             ("openai", "https://api.openai.com", CostTier.PREMIUM, ["gpt-4", "gpt-3.5-turbo"]),
             ("ollama", "http://localhost:11434", CostTier.BUDGET, ["llama2", "mistral"]),
         ]
@@ -480,6 +486,7 @@ class MultiLlmAgent(BaseAgent):
     def _execute_query(self, provider: LlmProvider, prompt: str) -> QueryResult:
         """Execute query with provider."""
         import time
+
         start_time = time.time()
 
         # Simulate query execution
@@ -492,7 +499,9 @@ class MultiLlmAgent(BaseAgent):
         provider.total_tokens += tokens_used
         provider.total_cost += cost
 
-        return QueryResult(provider.name, provider.models[0], response, tokens_used, cost, latency_ms)
+        return QueryResult(
+            provider.name, provider.models[0], response, tokens_used, cost, latency_ms
+        )
 
     def _calculate_cost(self, tier: CostTier, tokens: int) -> float:
         """Calculate cost based on tier and tokens."""

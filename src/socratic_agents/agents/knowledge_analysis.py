@@ -151,7 +151,9 @@ class KnowledgeAnalysis(BaseAgent):
         elif action == "identify_gaps":
             return await self._identify_knowledge_gaps_async(request.get("knowledge"))
         elif action == "categorize":
-            return await self._categorize_knowledge_async(request.get("items"), request.get("categories"))
+            return await self._categorize_knowledge_async(
+                request.get("items"), request.get("categories")
+            )
         elif action == "list_patterns":
             return await asyncio.to_thread(self.list_patterns)
         elif action == "list_insights":
@@ -162,7 +164,9 @@ class KnowledgeAnalysis(BaseAgent):
             return {"status": "error", "message": f"Unknown action: {action}"}
 
     # Async wrapper methods
-    async def _analyze_knowledge_async(self, knowledge: str, analysis_depth: str = "standard") -> Dict[str, Any]:
+    async def _analyze_knowledge_async(
+        self, knowledge: str, analysis_depth: str = "standard"
+    ) -> Dict[str, Any]:
         """Analyze knowledge asynchronously."""
         return await asyncio.to_thread(self.analyze_knowledge, knowledge, analysis_depth)
 
@@ -182,7 +186,9 @@ class KnowledgeAnalysis(BaseAgent):
         """Identify knowledge gaps asynchronously."""
         return await asyncio.to_thread(self.identify_knowledge_gaps, knowledge)
 
-    async def _categorize_knowledge_async(self, items: List[str], categories: List[str]) -> Dict[str, Any]:
+    async def _categorize_knowledge_async(
+        self, items: List[str], categories: List[str]
+    ) -> Dict[str, Any]:
         """Categorize knowledge asynchronously."""
         return await asyncio.to_thread(self.categorize_knowledge, items, categories)
 
@@ -191,10 +197,12 @@ class KnowledgeAnalysis(BaseAgent):
         if not knowledge:
             return {"status": "error", "message": "Knowledge content required"}
 
-        self.knowledge_history.append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "content_length": len(knowledge),
-        })
+        self.knowledge_history.append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "content_length": len(knowledge),
+            }
+        )
 
         # Extract patterns
         patterns = self._detect_patterns(knowledge)
@@ -216,9 +224,9 @@ class KnowledgeAnalysis(BaseAgent):
             "patterns_found": len(patterns),
             "insights_generated": len(insights),
             "topics_identified": list(self.topic_index.keys())[:10],
-            "top_insights": [i.to_dict() for i in sorted(
-                insights, key=lambda x: x.importance, reverse=True
-            )[:3]],
+            "top_insights": [
+                i.to_dict() for i in sorted(insights, key=lambda x: x.importance, reverse=True)[:3]
+            ],
         }
 
     def extract_patterns(self, knowledge: str) -> Dict[str, Any]:
@@ -286,7 +294,7 @@ class KnowledgeAnalysis(BaseAgent):
             return {"status": "error", "message": "Knowledge content required"}
 
         # Analyze what's present
-        words = set(re.findall(r'\b\w+\b', knowledge.lower()))
+        words = set(re.findall(r"\b\w+\b", knowledge.lower()))
         common_domains = {
             "architecture": {"design", "pattern", "structure", "component"},
             "testing": {"test", "unit", "integration", "coverage"},
@@ -299,11 +307,13 @@ class KnowledgeAnalysis(BaseAgent):
         for domain, keywords in common_domains.items():
             coverage = len(keywords & words) / len(keywords)
             if coverage < 0.5:
-                gaps.append({
-                    "domain": domain,
-                    "coverage": coverage,
-                    "missing_concepts": list(keywords - words),
-                })
+                gaps.append(
+                    {
+                        "domain": domain,
+                        "coverage": coverage,
+                        "missing_concepts": list(keywords - words),
+                    }
+                )
 
         return {
             "status": "success",
@@ -313,7 +323,9 @@ class KnowledgeAnalysis(BaseAgent):
             "coverage_score": 1.0 - (len(gaps) / len(common_domains)),
         }
 
-    def categorize_knowledge(self, items: Optional[List[str]] = None, categories: Optional[List[str]] = None) -> Dict[str, Any]:
+    def categorize_knowledge(
+        self, items: Optional[List[str]] = None, categories: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """Categorize knowledge items."""
         if not items:
             return {"status": "error", "message": "Items list required"}
@@ -384,12 +396,18 @@ class KnowledgeAnalysis(BaseAgent):
             "topics_count": len(self.topic_index),
             "relationships_count": sum(len(r) for r in self.entity_relationships.values()),
             "analysis_history_count": len(self.knowledge_history),
-            "top_patterns": [p.to_dict() for p in sorted(
-                self.patterns.values(), key=lambda p: p.confidence, reverse=True
-            )[:3]],
-            "top_insights": [i.to_dict() for i in sorted(
-                self.insights.values(), key=lambda i: i.importance, reverse=True
-            )[:3]],
+            "top_patterns": [
+                p.to_dict()
+                for p in sorted(self.patterns.values(), key=lambda p: p.confidence, reverse=True)[
+                    :3
+                ]
+            ],
+            "top_insights": [
+                i.to_dict()
+                for i in sorted(self.insights.values(), key=lambda i: i.importance, reverse=True)[
+                    :3
+                ]
+            ],
             "category_distribution": self.category_distribution,
         }
 
@@ -399,7 +417,7 @@ class KnowledgeAnalysis(BaseAgent):
         patterns = []
 
         # Frequency patterns
-        words = re.findall(r'\b\w+\b', content.lower())
+        words = re.findall(r"\b\w+\b", content.lower())
         word_freq = Counter(words)
         common_words = word_freq.most_common(5)
 
@@ -416,7 +434,7 @@ class KnowledgeAnalysis(BaseAgent):
             )
 
         # Structure patterns (code-like content)
-        if re.search(r'\b(def|class|function|method|interface)\b', content):
+        if re.search(r"\b(def|class|function|method|interface)\b", content):
             patterns.append(
                 KnowledgePattern(
                     "structure",
@@ -427,7 +445,7 @@ class KnowledgeAnalysis(BaseAgent):
             )
 
         # Documentation patterns
-        if re.search(r'\b(parameter|return|argument|example)\b', content, re.IGNORECASE):
+        if re.search(r"\b(parameter|return|argument|example)\b", content, re.IGNORECASE):
             patterns.append(
                 KnowledgePattern(
                     "documentation",
@@ -442,7 +460,7 @@ class KnowledgeAnalysis(BaseAgent):
     def _build_topic_index(self, content: str) -> None:
         """Build index of topics."""
         # Extract noun-like words (simple heuristic)
-        words = re.findall(r'\b[A-Z][a-z]+\b', content)  # Capitalized words
+        words = re.findall(r"\b[A-Z][a-z]+\b", content)  # Capitalized words
         for word in set(words):
             self.topic_index[word] = self.topic_index.get(word, set())
 

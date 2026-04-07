@@ -19,6 +19,7 @@ from .base import BaseAgent
 
 class ErrorSeverity(Enum):
     """Error severity levels."""
+
     CRITICAL = "critical"
     ERROR = "error"
     WARNING = "warning"
@@ -27,6 +28,7 @@ class ErrorSeverity(Enum):
 
 class ErrorType(Enum):
     """Error classification types."""
+
     SYNTAX_ERROR = "syntax_error"
     IMPORT_ERROR = "import_error"
     UNDEFINED_VARIABLE = "undefined_variable"
@@ -105,6 +107,19 @@ class CodeValidator(BaseAgent):
             return self._handle_generate_report(request)
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
+
+    def validate(self, code: str, language: str = "python") -> Dict[str, Any]:
+        """
+        Validate code directly.
+
+        Args:
+            code: Code to validate
+            language: Programming language
+
+        Returns:
+            Validation result dictionary
+        """
+        return self._handle_validate({"code": code, "language": language})
 
     def _handle_validate(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Comprehensive code validation."""
@@ -260,9 +275,7 @@ class CodeValidator(BaseAgent):
             if key not in unique_issues:
                 unique_issues[key] = issue
 
-        sorted_issues = sorted(
-            unique_issues.values(), key=lambda x: (x.line, x.severity.value)
-        )
+        sorted_issues = sorted(unique_issues.values(), key=lambda x: (x.line, x.severity.value))
         return sorted_issues
 
     def _static_analysis(self, code: str, language: str) -> List[ValidationIssue]:
@@ -299,11 +312,22 @@ class CodeValidator(BaseAgent):
             return issues
 
         # Check for undefined imports
-        import_pattern = r'^\s*(?:from|import)\s+(\w+)'
+        import_pattern = r"^\s*(?:from|import)\s+(\w+)"
         imports = re.findall(import_pattern, code, re.MULTILINE)
         stdlib_modules = {
-            "sys", "os", "re", "json", "math", "datetime", "collections",
-            "itertools", "functools", "operator", "string", "io", "time",
+            "sys",
+            "os",
+            "re",
+            "json",
+            "math",
+            "datetime",
+            "collections",
+            "itertools",
+            "functools",
+            "operator",
+            "string",
+            "io",
+            "time",
         }
         for imp in imports:
             if imp not in stdlib_modules and imp not in code.split():
@@ -311,9 +335,9 @@ class CodeValidator(BaseAgent):
                 pass
 
         # Check for undefined variables (simple heuristic)
-        defined = set(re.findall(r'^\s*(\w+)\s*=', code, re.MULTILINE))
-        used = set(re.findall(r'\b([a-zA-Z_]\w*)\b', code))
-        undefined = used - defined - set(['if', 'else', 'for', 'while', 'def', 'class'])
+        defined = set(re.findall(r"^\s*(\w+)\s*=", code, re.MULTILINE))
+        used = set(re.findall(r"\b([a-zA-Z_]\w*)\b", code))
+        undefined = used - defined - set(["if", "else", "for", "while", "def", "class"])
 
         return issues
 
@@ -322,11 +346,15 @@ class CodeValidator(BaseAgent):
         issues = []
 
         # Check for missing semicolons
-        lines = code.split('\n')
+        lines = code.split("\n")
         for idx, line in enumerate(lines):
             stripped = line.strip()
-            if stripped and not stripped.endswith((';', '{', '}', ',', ':')) and not stripped.startswith('//'):
-                if any(kw in stripped for kw in ['var ', 'let ', 'const ', 'return ', 'throw ']):
+            if (
+                stripped
+                and not stripped.endswith((";", "{", "}", ",", ":"))
+                and not stripped.startswith("//")
+            ):
+                if any(kw in stripped for kw in ["var ", "let ", "const ", "return ", "throw "]):
                     issues.append(
                         ValidationIssue(
                             ErrorSeverity.WARNING,
@@ -344,8 +372,8 @@ class CodeValidator(BaseAgent):
         issues = []
 
         # Check for missing closing braces
-        open_braces = code.count('{')
-        close_braces = code.count('}')
+        open_braces = code.count("{")
+        close_braces = code.count("}")
         if open_braces != close_braces:
             issues.append(
                 ValidationIssue(
@@ -408,7 +436,7 @@ class CodeValidator(BaseAgent):
         """Check code style and conventions."""
         issues = []
 
-        lines = code.split('\n')
+        lines = code.split("\n")
 
         # Check line length
         for idx, line in enumerate(lines):
@@ -469,9 +497,9 @@ class CodeValidator(BaseAgent):
             },
             "language": language,
             "code_metrics": {
-                "lines": len(code.split('\n')),
+                "lines": len(code.split("\n")),
                 "characters": len(code),
-                "blank_lines": len([l for l in code.split('\n') if not l.strip()]),
+                "blank_lines": len([l for l in code.split("\n") if not l.strip()]),
             },
             "issues_by_severity": {
                 "critical": [i.to_dict() for i in critical],

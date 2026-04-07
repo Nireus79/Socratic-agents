@@ -20,6 +20,7 @@ from .base import BaseAgent
 
 class QuestionPriority(Enum):
     """Question priority levels."""
+
     CRITICAL = 0
     HIGH = 1
     NORMAL = 2
@@ -28,6 +29,7 @@ class QuestionPriority(Enum):
 
 class QuestionStatus(Enum):
     """Question lifecycle status."""
+
     PENDING = "pending"
     ASSIGNED = "assigned"
     IN_PROGRESS = "in_progress"
@@ -144,7 +146,9 @@ class QuestionQueueAgent(BaseAgent):
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
-    def add_question(self, text: str, priority: str = "normal", category: str = "general") -> Dict[str, Any]:
+    def add_question(
+        self, text: str, priority: str = "normal", category: str = "general"
+    ) -> Dict[str, Any]:
         """Add question to queue."""
         if not text:
             return {"status": "error", "message": "Question text required"}
@@ -182,7 +186,11 @@ class QuestionQueueAgent(BaseAgent):
             candidates = [q for q in self.queue if q.category == category]
 
         if not candidates:
-            return {"status": "success", "agent": self.name, "message": f"No questions in {category} category"}
+            return {
+                "status": "success",
+                "agent": self.name,
+                "message": f"No questions in {category} category",
+            }
 
         question = candidates[0]
 
@@ -262,7 +270,9 @@ class QuestionQueueAgent(BaseAgent):
             "answer": question.answer,
         }
 
-    def list_queue(self, status: Optional[str] = None, category: Optional[str] = None) -> Dict[str, Any]:
+    def list_queue(
+        self, status: Optional[str] = None, category: Optional[str] = None
+    ) -> Dict[str, Any]:
         """List questions in queue."""
         questions = list(self.queue)
 
@@ -412,7 +422,9 @@ class QuestionQueueAgent(BaseAgent):
             health_score -= 10
 
         # Deduct for old questions
-        old_questions = [q for q in self.queue if datetime.utcnow() - q.created_at > timedelta(hours=24)]
+        old_questions = [
+            q for q in self.queue if datetime.utcnow() - q.created_at > timedelta(hours=24)
+        ]
         if old_questions:
             health_score -= min(len(old_questions), 20)
 

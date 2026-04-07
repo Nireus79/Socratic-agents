@@ -201,13 +201,15 @@ class QualityController(BaseAgent):
             Approval request with all paths analyzed and recommendation
         """
         if not workflow_definition:
-            return {"status": "error", "agent": self.name, "message": "Workflow definition required"}
+            return {
+                "status": "error",
+                "agent": self.name,
+                "message": "Workflow definition required",
+            }
 
         try:
             # Create optimizer with BALANCED strategy (50% cost, 30% risk, 20% quality)
-            optimizer = WorkflowOptimizer(
-                workflow_definition, strategy=DecisionStrategy.BALANCED
-            )
+            optimizer = WorkflowOptimizer(workflow_definition, strategy=DecisionStrategy.BALANCED)
 
             # Run optimization (enumerates, calculates, selects)
             optimization_result = optimizer.optimize_workflow()
@@ -259,7 +261,11 @@ class QualityController(BaseAgent):
             Status of approval submission
         """
         if approval_id not in self.pending_approvals:
-            return {"status": "error", "agent": self.name, "message": f"Approval {approval_id} not found"}
+            return {
+                "status": "error",
+                "agent": self.name,
+                "message": f"Approval {approval_id} not found",
+            }
 
         approval = self.pending_approvals.pop(approval_id)
         approval["status"] = "approved" if approved else "rejected"

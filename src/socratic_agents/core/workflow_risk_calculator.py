@@ -90,7 +90,9 @@ class WorkflowRiskCalculator:
             "rework_probability": round(rework_probability, 3),
             "missing_categories": missing_categories,
             "missing_category_count": len(missing_categories),
-            "coverage_percentage": round((len(covered_set) / len(self.required_categories)) * 100, 1),
+            "coverage_percentage": round(
+                (len(covered_set) / len(self.required_categories)) * 100, 1
+            ),
         }
 
     def _calculate_incompleteness_risk(self, covered_categories: set) -> float:
@@ -115,7 +117,9 @@ class WorkflowRiskCalculator:
         incompleteness = missing_count / total_required
         return min(1.0, incompleteness)
 
-    def _calculate_complexity_risk(self, nodes: List[str], node_definitions: Dict[str, Any]) -> float:
+    def _calculate_complexity_risk(
+        self, nodes: List[str], node_definitions: Dict[str, Any]
+    ) -> float:
         """
         Calculate complexity risk (30% weight in overall risk).
 

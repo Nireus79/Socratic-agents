@@ -37,7 +37,9 @@ class WorkflowCostCalculator:
         self.pricing_model = pricing_model
         self.rate_per_token = self.PRICING_MODELS.get(pricing_model, 0.000045)
 
-    def calculate_path_cost(self, nodes: List[str], node_definitions: Dict[str, Any]) -> Dict[str, Any]:
+    def calculate_path_cost(
+        self, nodes: List[str], node_definitions: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Calculate total cost for a workflow path.
 

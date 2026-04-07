@@ -24,6 +24,7 @@ from .base import BaseAgent
 
 class BranchStatus(Enum):
     """Branch status enumeration."""
+
     ACTIVE = "active"
     MERGED = "merged"
     ARCHIVED = "archived"
@@ -32,6 +33,7 @@ class BranchStatus(Enum):
 
 class PRStatus(Enum):
     """Pull Request status."""
+
     DRAFT = "draft"
     OPEN = "open"
     REVIEW = "review"
@@ -42,6 +44,7 @@ class PRStatus(Enum):
 
 class WebhookEvent(Enum):
     """Supported webhook events."""
+
     PUSH = "push"
     PULL_REQUEST = "pull_request"
     ISSUE = "issue"
@@ -325,7 +328,9 @@ class GithubSyncHandler(BaseAgent):
             "switched": True,
         }
 
-    def record_commit(self, message: str, author: str, files: Optional[List[str]] = None) -> Dict[str, Any]:
+    def record_commit(
+        self, message: str, author: str, files: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """Record a commit on current branch."""
         if not message or not author:
             return {"status": "error", "message": "Message and author required"}
@@ -346,7 +351,9 @@ class GithubSyncHandler(BaseAgent):
             "total_commits": len(self.commits),
         }
 
-    def create_pull_request(self, title: str, source_branch: str, target_branch: str = "main") -> Dict[str, Any]:
+    def create_pull_request(
+        self, title: str, source_branch: str, target_branch: str = "main"
+    ) -> Dict[str, Any]:
         """Create a pull request."""
         if not title or not source_branch:
             return {"status": "error", "message": "Title and source branch required"}
@@ -470,7 +477,9 @@ class GithubSyncHandler(BaseAgent):
             "registered": True,
         }
 
-    def handle_webhook(self, event: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def handle_webhook(
+        self, event: str, payload: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Handle webhook event."""
         if not event:
             return {"status": "error", "message": "Event required"}

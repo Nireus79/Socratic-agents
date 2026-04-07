@@ -7,9 +7,11 @@ from .base import BaseAgent
 
 try:
     from ..models.skill_models import AgentSkill, SkillRecommendation
+
     MODELS_AVAILABLE = True
 except ImportError:
     MODELS_AVAILABLE = False
+
     # Fallback classes
     class AgentSkill:
         def __init__(self, **kwargs):

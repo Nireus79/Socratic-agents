@@ -78,7 +78,9 @@ class NoteManager(BaseAgent):
         action = request.get("action", "list")
 
         if action == "create":
-            return self.create_note(request.get("title"), request.get("content"), request.get("category"))
+            return self.create_note(
+                request.get("title"), request.get("content"), request.get("category")
+            )
         elif action == "get":
             return self.get_note(request.get("note_id"))
         elif action == "update":
@@ -122,11 +124,13 @@ class NoteManager(BaseAgent):
         self.category_index[category].add(note.id)
 
         # Record in history
-        self.note_history[note.id].append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "action": "created",
-            "content": note.content,
-        })
+        self.note_history[note.id].append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "action": "created",
+                "content": note.content,
+            }
+        )
 
         return {
             "status": "success",
@@ -177,12 +181,14 @@ class NoteManager(BaseAgent):
         note.updated_at = datetime.utcnow()
 
         # Record in history
-        self.note_history[note_id].append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "action": "updated",
-            "old_content": old_content,
-            "new_content": content,
-        })
+        self.note_history[note_id].append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "action": "updated",
+                "old_content": old_content,
+                "new_content": content,
+            }
+        )
 
         return {
             "status": "success",
@@ -248,7 +254,7 @@ class NoteManager(BaseAgent):
             # Simple semantic matching on words
             query_words = set(query.lower().split())
             for note in self.notes.values():
-                note_words = set(re.findall(r'\w+', note.content.lower()))
+                note_words = set(re.findall(r"\w+", note.content.lower()))
                 if query_words & note_words:
                     results.append(note)
 

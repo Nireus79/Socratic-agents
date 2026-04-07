@@ -125,7 +125,11 @@ class SystemMonitor(BaseAgent):
             "status": "success",
             "agent": self.name,
             "health_score": round(self.health_score, 1),
-            "system_status": "healthy" if self.health_score > 80 else "degraded" if self.health_score > 60 else "critical",
+            "system_status": (
+                "healthy"
+                if self.health_score > 80
+                else "degraded" if self.health_score > 60 else "critical"
+            ),
             "uptime_percent": round(self.uptime_percent, 2),
             "active_alerts": len(self.alerts),
         }
@@ -299,19 +303,23 @@ class SystemMonitor(BaseAgent):
 
         for name, metric in self.metrics.items():
             if metric._get_status() == "critical":
-                self.alerts.append({
-                    "severity": "critical",
-                    "metric": name,
-                    "message": f"{name} at {metric.current_value}{metric.unit} (critical: {metric.threshold_critical})",
-                    "timestamp": datetime.utcnow().isoformat(),
-                })
+                self.alerts.append(
+                    {
+                        "severity": "critical",
+                        "metric": name,
+                        "message": f"{name} at {metric.current_value}{metric.unit} (critical: {metric.threshold_critical})",
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+                )
             elif metric._get_status() == "warning":
-                self.alerts.append({
-                    "severity": "warning",
-                    "metric": name,
-                    "message": f"{name} at {metric.current_value}{metric.unit} (warning: {metric.threshold_warning})",
-                    "timestamp": datetime.utcnow().isoformat(),
-                })
+                self.alerts.append(
+                    {
+                        "severity": "warning",
+                        "metric": name,
+                        "message": f"{name} at {metric.current_value}{metric.unit} (warning: {metric.threshold_warning})",
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+                )
 
     def _health_summary(self) -> str:
         """Get health summary text."""

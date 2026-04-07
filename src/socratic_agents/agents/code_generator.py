@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ProjectType(Enum):
     """Supported project types."""
+
     WEB_APP = "web_app"
     REST_API = "rest_api"
     LIBRARY = "library"
@@ -163,7 +164,7 @@ class CodeGenerator(BaseAgent):
         except KeyError:
             return {
                 "status": "error",
-                "message": f"Unsupported project type: {project_type_str}. Options: {[t.value for t in ProjectType]}"
+                "message": f"Unsupported project type: {project_type_str}. Options: {[t.value for t in ProjectType]}",
             }
 
         # Create project object
@@ -199,9 +200,7 @@ class CodeGenerator(BaseAgent):
                     content=json.dumps(
                         {
                             "type": project_type.value,
-                            "files": {
-                                path: f["content"] for path, f in project_structure.items()
-                            }
+                            "files": {path: f["content"] for path, f in project_structure.items()},
                         },
                         indent=2,
                     ),
@@ -210,7 +209,9 @@ class CodeGenerator(BaseAgent):
             except Exception as e:
                 self.logger.warning(f"Failed to store project artifact: {e}")
 
-        self.logger.info(f"Generated {project_type.value} project {project_id} with {files_count} files")
+        self.logger.info(
+            f"Generated {project_type.value} project {project_id} with {files_count} files"
+        )
 
         return {
             "status": "success",
@@ -322,7 +323,9 @@ class CodeGenerator(BaseAgent):
         files = {}
 
         # Common files for all projects
-        files["README.md"] = self._generate_readme(project_name, description, language, requirements)
+        files["README.md"] = self._generate_readme(
+            project_name, description, language, requirements
+        )
 
         if language == "python":
             # Python project structure
@@ -331,21 +334,27 @@ class CodeGenerator(BaseAgent):
 
             if project_type == ProjectType.LIBRARY:
                 files[f"src/{project_name}/__init__.py"] = self._generate_python_init()
-                files[f"src/{project_name}/core.py"] = self._generate_python_module(project_name, description)
+                files[f"src/{project_name}/core.py"] = self._generate_python_module(
+                    project_name, description
+                )
                 files[f"tests/test_{project_name}.py"] = self._generate_python_test(project_name)
                 files["setup.py"] = self._generate_python_setup(project_name, description)
 
             elif project_type == ProjectType.CLI_TOOL:
                 files[f"src/{project_name}/__init__.py"] = self._generate_python_init()
                 files[f"src/{project_name}/cli.py"] = self._generate_python_cli(project_name)
-                files[f"src/{project_name}/core.py"] = self._generate_python_module(project_name, description)
+                files[f"src/{project_name}/core.py"] = self._generate_python_module(
+                    project_name, description
+                )
                 files["setup.py"] = self._generate_python_setup(project_name, description)
 
             elif project_type == ProjectType.REST_API:
                 files[f"src/app.py"] = self._generate_python_flask_app(project_name)
                 files[f"src/routes.py"] = self._generate_python_routes()
                 files[f"src/models.py"] = self._generate_python_models()
-                files["requirements.txt"] = "flask\nflask-cors\npydantic\n" + "\n".join(requirements)
+                files["requirements.txt"] = "flask\nflask-cors\npydantic\n" + "\n".join(
+                    requirements
+                )
 
             elif project_type == ProjectType.MICROSERVICE:
                 files[f"src/service.py"] = self._generate_python_microservice(project_name)
@@ -362,17 +371,25 @@ class CodeGenerator(BaseAgent):
         elif language in ["javascript", "typescript"]:
             # JavaScript/TypeScript project structure
             files[".gitignore"] = self._generate_js_gitignore()
-            files["package.json"] = self._generate_package_json(project_name, description, language, requirements)
+            files["package.json"] = self._generate_package_json(
+                project_name, description, language, requirements
+            )
             files["tsconfig.json"] = self._generate_tsconfig() if language == "typescript" else ""
 
             if project_type == ProjectType.WEB_APP:
                 files["src/index.html"] = self._generate_html_template(project_name)
-                files[f"src/index.{('ts' if language == 'typescript' else 'js')}"] = self._generate_js_main(project_name)
+                files[f"src/index.{('ts' if language == 'typescript' else 'js')}"] = (
+                    self._generate_js_main(project_name)
+                )
                 files["src/style.css"] = self._generate_css_template()
 
             elif project_type == ProjectType.REST_API:
-                files["src/server.ts" if language == "typescript" else "src/server.js"] = self._generate_node_api()
-                files["src/routes.ts" if language == "typescript" else "src/routes.js"] = self._generate_node_routes()
+                files["src/server.ts" if language == "typescript" else "src/server.js"] = (
+                    self._generate_node_api()
+                )
+                files["src/routes.ts" if language == "typescript" else "src/routes.js"] = (
+                    self._generate_node_routes()
+                )
 
         return {k: v for k, v in files.items() if v}  # Remove empty files
 
@@ -818,7 +835,9 @@ build/
         """Generate package.json."""
         is_ts = language == "typescript"
         dependencies = {
-            "express": "^4.18.0" if "express" in requirements or "rest_api" in str(requirements) else None,
+            "express": (
+                "^4.18.0" if "express" in requirements or "rest_api" in str(requirements) else None
+            ),
             "typescript": "^5.0.0" if is_ts else None,
         }
         dependencies = {k: v for k, v in dependencies.items() if v}
@@ -912,7 +931,7 @@ h1 {
 
     def _generate_node_api(self) -> str:
         """Generate Node.js REST API server."""
-        return '''import express from "express";
+        return """import express from "express";
 
 const app = express();
 app.use(express.json());
@@ -924,11 +943,11 @@ app.get("/", (req, res) => {
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });
-'''
+"""
 
     def _generate_node_routes(self) -> str:
         """Generate Node.js routes."""
-        return '''import express from "express";
+        return """import express from "express";
 
 const router = express.Router();
 
@@ -941,7 +960,7 @@ router.post("/api/data", (req, res) => {
 });
 
 export default router;
-'''
+"""
 
     def _generate_dockerfile(self, language: str) -> str:
         """Generate Dockerfile."""

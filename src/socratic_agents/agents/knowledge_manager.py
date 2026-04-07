@@ -19,6 +19,7 @@ from .base import BaseAgent
 
 class DocumentCategory(Enum):
     """Document categorization."""
+
     CODE = "code"
     DOCUMENTATION = "documentation"
     SPECIFICATION = "specification"
@@ -85,9 +86,7 @@ class KnowledgeManager(BaseAgent):
         """Initialize the Knowledge Manager."""
         super().__init__(name="KnowledgeManager", llm_client=llm_client)
         self.knowledge_base: Dict[str, KnowledgeDocument] = {}
-        self.category_index: Dict[str, Set[str]] = {
-            cat.value: set() for cat in DocumentCategory
-        }
+        self.category_index: Dict[str, Set[str]] = {cat.value: set() for cat in DocumentCategory}
         self.tag_index: Dict[str, Set[str]] = {}
         self.vector_db_enabled = False
         self.vector_dimension = 384  # Default for sentence-transformers
@@ -99,39 +98,28 @@ class KnowledgeManager(BaseAgent):
         # Document operations
         if action == "add":
             return self.add_document(
-                request.get("content"),
-                request.get("doc_type", "text"),
-                request.get("metadata")
+                request.get("content"), request.get("doc_type", "text"), request.get("metadata")
             )
         elif action == "get":
             return self.get_document(request.get("doc_id"))
         elif action == "update":
             return self.update_document(
-                request.get("doc_id"),
-                request.get("content"),
-                request.get("metadata")
+                request.get("doc_id"), request.get("content"), request.get("metadata")
             )
         elif action == "delete":
             return self.delete_document(request.get("doc_id"))
         elif action == "list":
             return self.list_documents(
-                request.get("category"),
-                request.get("tags"),
-                request.get("limit", 50)
+                request.get("category"), request.get("tags"), request.get("limit", 50)
             )
 
         # Search operations
         elif action == "search":
             return self.search_documents(
-                request.get("query"),
-                request.get("mode", "full_text"),
-                request.get("category")
+                request.get("query"), request.get("mode", "full_text"), request.get("category")
             )
         elif action == "semantic_search":
-            return self.semantic_search(
-                request.get("query"),
-                request.get("limit", 10)
-            )
+            return self.semantic_search(request.get("query"), request.get("limit", 10))
 
         # Organization operations
         elif action == "add_category":
@@ -141,10 +129,7 @@ class KnowledgeManager(BaseAgent):
         elif action == "remove_tag":
             return self.remove_tag(request.get("doc_id"), request.get("tag"))
         elif action == "relate_documents":
-            return self.relate_documents(
-                request.get("doc_id1"),
-                request.get("doc_id2")
-            )
+            return self.relate_documents(request.get("doc_id1"), request.get("doc_id2"))
 
         # Vector DB operations
         elif action == "enable_vector_db":
@@ -208,7 +193,7 @@ class KnowledgeManager(BaseAgent):
                 "metadata": doc.metadata,
                 "access_count": doc.access_count,
                 "created_at": doc.created_at.isoformat(),
-            }
+            },
         }
 
     def update_document(
@@ -455,7 +440,9 @@ class KnowledgeManager(BaseAgent):
             "doc_id2": doc_id2,
         }
 
-    def enable_vector_database(self, model: str = "sentence-transformers/all-MiniLM-L6-v2") -> Dict[str, Any]:
+    def enable_vector_database(
+        self, model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    ) -> Dict[str, Any]:
         """Enable vector database for semantic search."""
         self.vector_db_enabled = True
         self.logger.info(f"Enabled vector database with model: {model}")
@@ -492,9 +479,7 @@ class KnowledgeManager(BaseAgent):
     def get_knowledge_stats(self) -> Dict[str, Any]:
         """Get statistics about knowledge base."""
         total_docs = len(self.knowledge_base)
-        category_counts = {
-            cat: len(doc_ids) for cat, doc_ids in self.category_index.items()
-        }
+        category_counts = {cat: len(doc_ids) for cat, doc_ids in self.category_index.items()}
         tag_counts = len(self.tag_index)
         total_access = sum(d.access_count for d in self.knowledge_base.values())
 
@@ -510,11 +495,9 @@ class KnowledgeManager(BaseAgent):
 
     def get_trending_documents(self, limit: int = 10) -> Dict[str, Any]:
         """Get most-accessed documents."""
-        trending = sorted(
-            self.knowledge_base.values(),
-            key=lambda d: d.access_count,
-            reverse=True
-        )[:limit]
+        trending = sorted(self.knowledge_base.values(), key=lambda d: d.access_count, reverse=True)[
+            :limit
+        ]
 
         return {
             "status": "success",

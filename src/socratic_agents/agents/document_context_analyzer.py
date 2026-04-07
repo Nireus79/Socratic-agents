@@ -28,16 +28,20 @@ class DocumentAnalysis:
         self.analyzed_at = datetime.utcnow()
 
         # Structure analysis
-        self.paragraphs = content.split('\n\n')
-        self.sentences = re.split(r'[.!?]+', content)
-        self.words = re.findall(r'\b\w+\b', content)
+        self.paragraphs = content.split("\n\n")
+        self.sentences = re.split(r"[.!?]+", content)
+        self.words = re.findall(r"\b\w+\b", content)
 
         # Computed metrics
         self.paragraph_count = len(self.paragraphs)
         self.sentence_count = len([s for s in self.sentences if s.strip()])
         self.word_count = len(self.words)
-        self.avg_word_length = sum(len(w) for w in self.words) / len(self.words) if self.words else 0
-        self.avg_sentence_length = self.word_count / self.sentence_count if self.sentence_count > 0 else 0
+        self.avg_word_length = (
+            sum(len(w) for w in self.words) / len(self.words) if self.words else 0
+        )
+        self.avg_sentence_length = (
+            self.word_count / self.sentence_count if self.sentence_count > 0 else 0
+        )
 
         # Linguistic features
         self.word_frequency = Counter(w.lower() for w in self.words)
@@ -168,11 +172,11 @@ class DocumentContextAnalyzer(BaseAgent):
             return {"status": "error", "message": "Document required"}
 
         # Identify context regions (paragraphs with substantial content)
-        lines = document.split('\n')
+        lines = document.split("\n")
         context_lines = [line for line in lines if len(line.strip()) > 10]
 
         # Extract key concepts
-        words = re.findall(r'\b\w+\b', document)
+        words = re.findall(r"\b\w+\b", document)
         word_freq = Counter(words)
         key_concepts = [word for word, _ in word_freq.most_common(10)]
 
@@ -210,7 +214,7 @@ class DocumentContextAnalyzer(BaseAgent):
             return {"status": "error", "message": "Document required"}
 
         # Extract capitalized words (likely topics)
-        topics = re.findall(r'\b[A-Z][a-z]+(?:\s[A-Z][a-z]+)*\b', document)
+        topics = re.findall(r"\b[A-Z][a-z]+(?:\s[A-Z][a-z]+)*\b", document)
         topic_freq = Counter(topics)
         top_topics = [topic for topic, _ in topic_freq.most_common(limit)]
 
@@ -228,17 +232,17 @@ class DocumentContextAnalyzer(BaseAgent):
             return {"status": "error", "message": "Document required"}
 
         # Extract concepts (words that appear frequently and have context)
-        words = re.findall(r'\b\w{4,}\b', document.lower())  # Words with 4+ chars
+        words = re.findall(r"\b\w{4,}\b", document.lower())  # Words with 4+ chars
         word_freq = Counter(words)
         concepts = [word for word, count in word_freq.most_common(10) if count > 1]
 
         # Create relationships based on co-occurrence
-        sentences = re.split(r'[.!?]+', document)
+        sentences = re.split(r"[.!?]+", document)
         relationships = set()
         for sentence in sentences:
             sent_concepts = [w for w in concepts if w in sentence.lower()]
             for i, c1 in enumerate(sent_concepts):
-                for c2 in sent_concepts[i + 1:]:
+                for c2 in sent_concepts[i + 1 :]:
                     relationships.add((c1, c2))
                     self.semantic_graph[c1].add(c2)
                     self.semantic_graph[c2].add(c1)
@@ -258,11 +262,11 @@ class DocumentContextAnalyzer(BaseAgent):
             return {"status": "error", "message": "Document required"}
 
         # Extract sentences and score them
-        sentences = re.split(r'[.!?]+', document)
+        sentences = re.split(r"[.!?]+", document)
         sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
 
         # Score sentences by keyword frequency
-        words = re.findall(r'\b\w+\b', document.lower())
+        words = re.findall(r"\b\w+\b", document.lower())
         word_freq = Counter(words)
 
         sentence_scores = []
@@ -273,7 +277,9 @@ class DocumentContextAnalyzer(BaseAgent):
         # Select top sentences
         summary_count = max(1, int(len(sentences) * ratio))
         top_sentences = sorted(sentence_scores, key=lambda x: x[1], reverse=True)[:summary_count]
-        summary = '. '.join(s[0] for s in sorted(top_sentences, key=lambda x: sentences.index(x[0])))
+        summary = ". ".join(
+            s[0] for s in sorted(top_sentences, key=lambda x: sentences.index(x[0]))
+        )
 
         return {
             "status": "success",
@@ -296,7 +302,7 @@ class DocumentContextAnalyzer(BaseAgent):
         analysis = DocumentAnalysis(doc_id, document)
 
         # Extract main topics
-        topics = re.findall(r'\b[A-Z][a-z]+\b', document)
+        topics = re.findall(r"\b[A-Z][a-z]+\b", document)
         top_topics = [t for t, _ in Counter(topics).most_common(5)]
 
         # Detect language (simplified)
@@ -343,7 +349,8 @@ class DocumentContextAnalyzer(BaseAgent):
             "documents_analyzed": len(self.analyzed_docs),
             "total_words": sum(a.word_count for a in self.analyzed_docs.values()),
             "avg_word_count": round(
-                sum(a.word_count for a in self.analyzed_docs.values()) / max(len(self.analyzed_docs), 1),
+                sum(a.word_count for a in self.analyzed_docs.values())
+                / max(len(self.analyzed_docs), 1),
                 0,
             ),
             "document_ids": list(self.analyzed_docs.keys()),
@@ -392,7 +399,7 @@ class DocumentContextAnalyzer(BaseAgent):
     def _build_semantic_relationships(self, content: str, doc_id: str) -> None:
         """Build semantic relationships within document."""
         # Index keywords for document
-        keywords = re.findall(r'\b[a-zA-Z]{4,}\b', content)
+        keywords = re.findall(r"\b[a-zA-Z]{4,}\b", content)
         self.document_index[doc_id] = set(keywords)
 
     def _calculate_complexity(self, analysis: DocumentAnalysis) -> str:
