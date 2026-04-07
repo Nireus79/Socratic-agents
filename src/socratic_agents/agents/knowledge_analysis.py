@@ -403,7 +403,7 @@ class KnowledgeAnalysis(BaseAgent):
                 insights.append(
                     Insight(
                         "Dominant Theme Identified",
-                        f"Key topic '{pattern.description.split(\"'\")[1]}' dominates the knowledge",
+                        f"Key topic '{pattern.description.split(chr(39))[1]}' dominates the knowledge",
                         "trend",
                         pattern.confidence,
                         [pattern.id],
