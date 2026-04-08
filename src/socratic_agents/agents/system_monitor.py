@@ -129,7 +129,9 @@ class SystemMonitor(BaseAgent):
             "system_status": (
                 "healthy"
                 if self.health_score > 80
-                else "degraded" if self.health_score > 60 else "critical"
+                else "degraded"
+                if self.health_score > 60
+                else "critical"
             ),
             "uptime_percent": round(self.uptime_percent, 2),
             "active_alerts": len(self.alerts),
