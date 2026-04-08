@@ -113,19 +113,27 @@ class DocumentContextAnalyzer(BaseAgent):
         action = request.get("action", "analyze")
 
         if action == "analyze":
-            return self.analyze_document(cast(str, request.get("document")), cast(Optional[str], request.get("doc_id")))
+            return self.analyze_document(
+                cast(str, request.get("document")), cast(Optional[str], request.get("doc_id"))
+            )
         elif action == "extract_context":
             return self.extract_context(cast(str, request.get("document")))
         elif action == "extract_themes":
             return self.extract_themes(cast(str, request.get("document")))
         elif action == "extract_topics":
-            return self.extract_topics(cast(str, request.get("document")), cast(int, request.get("limit", 5)))
+            return self.extract_topics(
+                cast(str, request.get("document")), cast(int, request.get("limit", 5))
+            )
         elif action == "build_semantic_graph":
             return self.build_semantic_graph(cast(str, request.get("document")))
         elif action == "summarize":
-            return self.summarize_document(cast(str, request.get("document")), cast(float, request.get("ratio", 0.3)))
+            return self.summarize_document(
+                cast(str, request.get("document")), cast(float, request.get("ratio", 0.3))
+            )
         elif action == "generate_metadata":
-            return self.generate_metadata(cast(str, request.get("document")), cast(Optional[str], request.get("doc_id")))
+            return self.generate_metadata(
+                cast(str, request.get("document")), cast(Optional[str], request.get("doc_id"))
+            )
         elif action == "analyze_structure":
             return self.analyze_structure(cast(str, request.get("document")))
         elif action == "list":

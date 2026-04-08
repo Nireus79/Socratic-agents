@@ -90,7 +90,8 @@ class SkillGeneratorAgent(BaseAgent):
             )
         elif action == "list":
             return self.list_active_skills(
-                agent_name=cast(Optional[str], request.get("agent_name")), phase=cast(Optional[str], request.get("phase"))
+                agent_name=cast(Optional[str], request.get("agent_name")),
+                phase=cast(Optional[str], request.get("phase")),
             )
         else:
             return {"status": "error", "agent": self.name, "message": f"Unknown action: {action}"}

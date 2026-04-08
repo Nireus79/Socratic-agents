@@ -123,7 +123,10 @@ class KnowledgeAnalysis(BaseAgent):
         elif action == "identify_gaps":
             return self.identify_knowledge_gaps(cast(str, request.get("knowledge")))
         elif action == "categorize":
-            return self.categorize_knowledge(cast(Optional[List[str]], request.get("items")), cast(Optional[List[str]], request.get("categories")))
+            return self.categorize_knowledge(
+                cast(Optional[List[str]], request.get("items")),
+                cast(Optional[List[str]], request.get("categories")),
+            )
         elif action == "list_patterns":
             return self.list_patterns()
         elif action == "list_insights":
@@ -145,14 +148,19 @@ class KnowledgeAnalysis(BaseAgent):
         elif action == "extract_patterns":
             return await self._extract_patterns_async(cast(str, request.get("knowledge")))
         elif action == "generate_insights":
-            return await self._generate_insights_async(cast(Optional[List[str]], request.get("patterns")))
+            return await self._generate_insights_async(
+                cast(Optional[List[str]], request.get("patterns"))
+            )
         elif action == "detect_relationships":
-            return await self._detect_relationships_async(cast(Optional[List[str]], request.get("entities")))
+            return await self._detect_relationships_async(
+                cast(Optional[List[str]], request.get("entities"))
+            )
         elif action == "identify_gaps":
             return await self._identify_knowledge_gaps_async(cast(str, request.get("knowledge")))
         elif action == "categorize":
             return await self._categorize_knowledge_async(
-                cast(Optional[List[str]], request.get("items")), cast(Optional[List[str]], request.get("categories"))
+                cast(Optional[List[str]], request.get("items")),
+                cast(Optional[List[str]], request.get("categories")),
             )
         elif action == "list_patterns":
             return await asyncio.to_thread(self.list_patterns)

@@ -130,9 +130,7 @@ class ContextAnalyzer(BaseAgent):
 
         except Exception as e:
             self.logger.error(f"Error processing request: {e}")
-            return ContextAnalyzerAnalyzeResponse(
-                status="error", message=str(e)
-            ).model_dump()
+            return ContextAnalyzerAnalyzeResponse(status="error", message=str(e)).model_dump()
 
     def analyze_context(self, content: str, domain: Optional[str] = None) -> Dict[str, Any]:
         """Analyze content and extract context."""

@@ -154,9 +154,13 @@ class MultiLlmAgent(BaseAgent):
         action = request.get("action", "query")
 
         if action == "query":
-            return self.query(cast(str, request.get("prompt")), cast(Optional[str], request.get("model")))
+            return self.query(
+                cast(str, request.get("prompt")), cast(Optional[str], request.get("model"))
+            )
         elif action == "query_all":
-            return self.query_all_providers(cast(str, request.get("prompt")), cast(Optional[str], request.get("model")))
+            return self.query_all_providers(
+                cast(str, request.get("prompt")), cast(Optional[str], request.get("model"))
+            )
         elif action == "switch_provider":
             return self.switch_provider(cast(str, request.get("provider")))
         elif action == "set_fallback":

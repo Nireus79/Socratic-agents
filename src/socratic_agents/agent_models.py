@@ -9,7 +9,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Literal
 from pydantic import BaseModel, Field
 
-
 # ============================================================================
 # BASE MODELS - Used by multiple agents
 # ============================================================================
@@ -30,9 +29,7 @@ class ProjectContext(BaseModel):
 class AgentResponse(BaseModel):
     """Base response model for all agents."""
 
-    status: Literal["success", "error", "warning"] = Field(
-        ..., description="Response status"
-    )
+    status: Literal["success", "error", "warning"] = Field(..., description="Response status")
     message: Optional[str] = Field(default=None, description="Status message")
     agent: Optional[str] = Field(default=None, description="Agent name")
     timestamp: Optional[datetime] = Field(

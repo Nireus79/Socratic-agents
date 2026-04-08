@@ -98,7 +98,9 @@ class KnowledgeManager(BaseAgent):
         # Document operations
         if action == "add":
             return self.add_document(
-                cast(str, request.get("content")), request.get("doc_type", "text"), request.get("metadata")
+                cast(str, request.get("content")),
+                request.get("doc_type", "text"),
+                request.get("metadata"),
             )
         elif action == "get":
             return self.get_document(cast(str, request.get("doc_id")))
@@ -110,26 +112,34 @@ class KnowledgeManager(BaseAgent):
             return self.delete_document(cast(str, request.get("doc_id")))
         elif action == "list":
             return self.list_documents(
-                request.get("category"), cast(Optional[List[str]], request.get("tags")), request.get("limit", 50)
+                request.get("category"),
+                cast(Optional[List[str]], request.get("tags")),
+                request.get("limit", 50),
             )
 
         # Search operations
         elif action == "search":
             return self.search_documents(
-                cast(str, request.get("query")), request.get("mode", "full_text"), request.get("category")
+                cast(str, request.get("query")),
+                request.get("mode", "full_text"),
+                request.get("category"),
             )
         elif action == "semantic_search":
             return self.semantic_search(cast(str, request.get("query")), request.get("limit", 10))
 
         # Organization operations
         elif action == "add_category":
-            return self.add_category(cast(str, request.get("doc_id")), cast(str, request.get("category")))
+            return self.add_category(
+                cast(str, request.get("doc_id")), cast(str, request.get("category"))
+            )
         elif action == "add_tag":
             return self.add_tag(cast(str, request.get("doc_id")), cast(str, request.get("tag")))
         elif action == "remove_tag":
             return self.remove_tag(cast(str, request.get("doc_id")), cast(str, request.get("tag")))
         elif action == "relate_documents":
-            return self.relate_documents(cast(str, request.get("doc_id1")), cast(str, request.get("doc_id2")))
+            return self.relate_documents(
+                cast(str, request.get("doc_id1")), cast(str, request.get("doc_id2"))
+            )
 
         # Vector DB operations
         elif action == "enable_vector_db":
@@ -137,7 +147,9 @@ class KnowledgeManager(BaseAgent):
                 request.get("model", "sentence-transformers/all-MiniLM-L6-v2")
             )
         elif action == "index_vector":
-            return self.index_vector(cast(str, request.get("doc_id")), cast(List[float], request.get("vector")))
+            return self.index_vector(
+                cast(str, request.get("doc_id")), cast(List[float], request.get("vector"))
+            )
 
         # Analytics
         elif action == "get_stats":

@@ -57,7 +57,9 @@ class QualityController(BaseAgent):
         elif action == "optimize_workflow":
             return self._optimize_workflow(cast(Dict[str, Any], request.get("workflow_definition")))
         elif action == "submit_approval":
-            return self._submit_approval(cast(str, request.get("workflow_id")), cast(bool, request.get("approved", False)))
+            return self._submit_approval(
+                cast(str, request.get("workflow_id")), cast(bool, request.get("approved", False))
+            )
         elif action == "get_pending_approvals":
             return self._get_pending_approvals()
         else:

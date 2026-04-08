@@ -111,7 +111,9 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing
         if action == "import":
             return self.import_document(
-                cast(str, request.get("content")), cast(str, request.get("format", "text")), cast(Optional[Dict[str, Any]], request.get("metadata"))
+                cast(str, request.get("content")),
+                cast(str, request.get("format", "text")),
+                cast(Optional[Dict[str, Any]], request.get("metadata")),
             )
         elif action == "import_url":
             return self.import_from_url(cast(str, request.get("url")))
@@ -132,7 +134,9 @@ class DocumentProcessor(BaseAgent):
         elif action == "get":
             return self.get_document(cast(str, request.get("doc_id")))
         elif action == "list":
-            return self.list_documents(cast(Optional[str], request.get("format")), cast(int, request.get("limit", 50)))
+            return self.list_documents(
+                cast(Optional[str], request.get("format")), cast(int, request.get("limit", 50))
+            )
         elif action == "delete":
             return self.delete_document(cast(str, request.get("doc_id")))
 
@@ -144,9 +148,13 @@ class DocumentProcessor(BaseAgent):
 
         # Metadata operations
         elif action == "add_tags":
-            return self.add_tags(cast(str, request.get("doc_id")), cast(List[str], request.get("tags", [])))
+            return self.add_tags(
+                cast(str, request.get("doc_id")), cast(List[str], request.get("tags", []))
+            )
         elif action == "add_category":
-            return self.add_category(cast(str, request.get("doc_id")), cast(str, request.get("category")))
+            return self.add_category(
+                cast(str, request.get("doc_id")), cast(str, request.get("category"))
+            )
 
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
@@ -158,7 +166,9 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing (I/O-bound operations)
         if action == "import":
             return await self._import_document_async(
-                cast(str, request.get("content")), cast(str, request.get("format", "text")), cast(Optional[Dict[str, Any]], request.get("metadata"))
+                cast(str, request.get("content")),
+                cast(str, request.get("format", "text")),
+                cast(Optional[Dict[str, Any]], request.get("metadata")),
             )
         elif action == "import_url":
             return await self._import_from_url_async(cast(str, request.get("url")))
@@ -180,7 +190,9 @@ class DocumentProcessor(BaseAgent):
             return await asyncio.to_thread(self.get_document, cast(str, request.get("doc_id")))
         elif action == "list":
             return await asyncio.to_thread(
-                self.list_documents, cast(Optional[str], request.get("format")), cast(int, request.get("limit", 50))
+                self.list_documents,
+                cast(Optional[str], request.get("format")),
+                cast(int, request.get("limit", 50)),
             )
         elif action == "delete":
             return await asyncio.to_thread(self.delete_document, cast(str, request.get("doc_id")))
@@ -189,16 +201,22 @@ class DocumentProcessor(BaseAgent):
         elif action == "enable_vector_db":
             return await asyncio.to_thread(self._enable_vector_db)
         elif action == "store_vectors":
-            return await asyncio.to_thread(self.store_document_vectors, cast(str, request.get("doc_id")))
+            return await asyncio.to_thread(
+                self.store_document_vectors, cast(str, request.get("doc_id"))
+            )
 
         # Metadata operations
         elif action == "add_tags":
             return await asyncio.to_thread(
-                self.add_tags, cast(str, request.get("doc_id")), cast(List[str], request.get("tags", []))
+                self.add_tags,
+                cast(str, request.get("doc_id")),
+                cast(List[str], request.get("tags", [])),
             )
         elif action == "add_category":
             return await asyncio.to_thread(
-                self.add_category, cast(str, request.get("doc_id")), cast(str, request.get("category"))
+                self.add_category,
+                cast(str, request.get("doc_id")),
+                cast(str, request.get("category")),
             )
 
         else:

@@ -98,7 +98,9 @@ class SystemMonitor(BaseAgent):
         elif action == "alerts":
             return self.check_alerts()
         elif action == "update_metric":
-            return self.update_metric(cast(str, request.get("metric_name")), cast(float, request.get("value")))
+            return self.update_metric(
+                cast(str, request.get("metric_name")), cast(float, request.get("value"))
+            )
         elif action == "get_metric":
             return self.get_metric(cast(str, request.get("metric_name")))
         elif action == "uptime":

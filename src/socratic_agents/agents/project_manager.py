@@ -105,18 +105,24 @@ class ProjectManager(BaseAgent):
         # Project creation and basic operations
         if action == "create":
             return self.create_project(
-                cast(str, request.get("project_name")), cast(str, request.get("description", "")), cast(Optional[str], request.get("owner_id"))
+                cast(str, request.get("project_name")),
+                cast(str, request.get("description", "")),
+                cast(Optional[str], request.get("owner_id")),
             )
         elif action == "list":
             return self.list_projects(
-                cast(Optional[str], request.get("filter")), cast(Optional[List[str]], request.get("tags")), cast(Optional[str], request.get("status"))
+                cast(Optional[str], request.get("filter")),
+                cast(Optional[List[str]], request.get("tags")),
+                cast(Optional[str], request.get("status")),
             )
         elif action == "get":
             return self.get_project(cast(str, request.get("project_id")))
 
         # GitHub integration
         elif action == "import_github":
-            return self.import_from_github(cast(str, request.get("project_id")), cast(str, request.get("github_url")))
+            return self.import_from_github(
+                cast(str, request.get("project_id")), cast(str, request.get("github_url"))
+            )
         elif action == "sync_github":
             return self.sync_with_github(cast(str, request.get("project_id")))
         elif action == "push_to_github":
@@ -125,15 +131,21 @@ class ProjectManager(BaseAgent):
         # Team management
         elif action == "add_team_member":
             return self.add_team_member(
-                cast(str, request.get("project_id")), cast(str, request.get("user_id")), cast(str, request.get("role", "developer"))
+                cast(str, request.get("project_id")),
+                cast(str, request.get("user_id")),
+                cast(str, request.get("role", "developer")),
             )
         elif action == "remove_team_member":
-            return self.remove_team_member(cast(str, request.get("project_id")), cast(str, request.get("user_id")))
+            return self.remove_team_member(
+                cast(str, request.get("project_id")), cast(str, request.get("user_id"))
+            )
         elif action == "list_team":
             return self.list_team_members(cast(str, request.get("project_id")))
         elif action == "invite_team_member":
             return self.invite_team_member(
-                cast(str, request.get("project_id")), cast(str, request.get("email")), cast(str, request.get("role", "developer"))
+                cast(str, request.get("project_id")),
+                cast(str, request.get("email")),
+                cast(str, request.get("role", "developer")),
             )
 
         # Lifecycle operations
@@ -146,16 +158,22 @@ class ProjectManager(BaseAgent):
 
         # Subscription and quota
         elif action == "set_subscription":
-            return self.set_subscription_tier(cast(str, request.get("project_id")), cast(str, request.get("tier")))
+            return self.set_subscription_tier(
+                cast(str, request.get("project_id")), cast(str, request.get("tier"))
+            )
         elif action == "get_quota":
             return self.get_quota_status(cast(str, request.get("project_id")))
 
         # Task management
         elif action == "add_task":
-            return self.add_task(cast(str, request.get("project_id")), cast(str, request.get("task")))
+            return self.add_task(
+                cast(str, request.get("project_id")), cast(str, request.get("task"))
+            )
         elif action == "update_task":
             return self.update_task(
-                cast(str, request.get("project_id")), cast(str, request.get("task_id")), cast(Dict[str, Any], request.get("updates"))
+                cast(str, request.get("project_id")),
+                cast(str, request.get("task_id")),
+                cast(Dict[str, Any], request.get("updates")),
             )
         elif action == "list_tasks":
             return self.list_tasks(cast(str, request.get("project_id")))

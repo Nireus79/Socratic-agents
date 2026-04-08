@@ -201,7 +201,10 @@ class CodeGenerator(BaseAgent):
                     content=json.dumps(
                         {
                             "type": project_type.value,
-                            "files": {path: cast(Dict[str, Any], f)["content"] for path, f in project_structure.items()},
+                            "files": {
+                                path: cast(Dict[str, Any], f)["content"]
+                                for path, f in project_structure.items()
+                            },
                         },
                         indent=2,
                     ),

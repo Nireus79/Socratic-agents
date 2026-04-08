@@ -160,11 +160,17 @@ class GithubSyncHandler(BaseAgent):
         if action == "authenticate":
             return self.authenticate(cast(str, request.get("token")))
         elif action == "create_repo":
-            return self.create_repository(cast(str, request.get("repo_name")), cast(str, request.get("description", "")))
+            return self.create_repository(
+                cast(str, request.get("repo_name")), cast(str, request.get("description", ""))
+            )
         elif action == "sync":
-            return self.sync_repository(cast(str, request.get("repo")), cast(str, request.get("direction", "pull")))
+            return self.sync_repository(
+                cast(str, request.get("repo")), cast(str, request.get("direction", "pull"))
+            )
         elif action == "create_branch":
-            return self.create_branch(cast(str, request.get("branch_name")), cast(str, request.get("source", "main")))
+            return self.create_branch(
+                cast(str, request.get("branch_name")), cast(str, request.get("source", "main"))
+            )
         elif action == "delete_branch":
             return self.delete_branch(cast(str, request.get("branch_name")))
         elif action == "switch_branch":
@@ -182,17 +188,28 @@ class GithubSyncHandler(BaseAgent):
                 cast(str, request.get("target_branch", "main")),
             )
         elif action == "update_pr":
-            return self.update_pr_status(cast(str, request.get("pr_id")), cast(str, request.get("status")))
+            return self.update_pr_status(
+                cast(str, request.get("pr_id")), cast(str, request.get("status"))
+            )
         elif action == "add_reviewer":
-            return self.add_pr_reviewer(cast(str, request.get("pr_id")), cast(str, request.get("reviewer")))
+            return self.add_pr_reviewer(
+                cast(str, request.get("pr_id")), cast(str, request.get("reviewer"))
+            )
         elif action == "approve_pr":
-            return self.approve_pull_request(cast(str, request.get("pr_id")), cast(str, request.get("reviewer")))
+            return self.approve_pull_request(
+                cast(str, request.get("pr_id")), cast(str, request.get("reviewer"))
+            )
         elif action == "merge_pr":
             return self.merge_pull_request(cast(str, request.get("pr_id")))
         elif action == "register_webhook":
-            return self.register_webhook(cast(str, request.get("event")), cast(str, request.get("url")))
+            return self.register_webhook(
+                cast(str, request.get("event")), cast(str, request.get("url"))
+            )
         elif action == "handle_webhook":
-            return self.handle_webhook(cast(str, request.get("event")), cast(Optional[Dict[str, Any]], request.get("payload")))
+            return self.handle_webhook(
+                cast(str, request.get("event")),
+                cast(Optional[Dict[str, Any]], request.get("payload")),
+            )
         elif action == "status":
             return self.sync_status()
         elif action == "history":
@@ -202,7 +219,9 @@ class GithubSyncHandler(BaseAgent):
         elif action == "list_prs":
             return self.list_pull_requests()
         elif action == "detect_conflicts":
-            return self.detect_conflicts(cast(str, request.get("branch1")), cast(str, request.get("branch2")))
+            return self.detect_conflicts(
+                cast(str, request.get("branch1")), cast(str, request.get("branch2"))
+            )
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 

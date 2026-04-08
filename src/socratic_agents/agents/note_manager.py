@@ -79,18 +79,24 @@ class NoteManager(BaseAgent):
 
         if action == "create":
             return self.create_note(
-                cast(str, request.get("title")), cast(str, request.get("content")), request.get("category", "general")
+                cast(str, request.get("title")),
+                cast(str, request.get("content")),
+                request.get("category", "general"),
             )
         elif action == "get":
             return self.get_note(cast(str, request.get("note_id")))
         elif action == "update":
-            return self.update_note(cast(str, request.get("note_id")), cast(str, request.get("content")))
+            return self.update_note(
+                cast(str, request.get("note_id")), cast(str, request.get("content"))
+            )
         elif action == "delete":
             return self.delete_note(cast(str, request.get("note_id")))
         elif action == "list":
             return self.list_notes(request.get("category"), request.get("limit", 50))
         elif action == "search":
-            return self.search_notes(cast(str, request.get("query")), request.get("mode", "full_text"))
+            return self.search_notes(
+                cast(str, request.get("query")), request.get("mode", "full_text")
+            )
         elif action == "add_tag":
             return self.add_tag(cast(str, request.get("note_id")), cast(str, request.get("tag")))
         elif action == "remove_tag":
@@ -102,9 +108,13 @@ class NoteManager(BaseAgent):
         elif action == "restore":
             return self.restore_note(cast(str, request.get("note_id")))
         elif action == "share":
-            return self.share_note(cast(str, request.get("note_id")), cast(str, request.get("user_id")))
+            return self.share_note(
+                cast(str, request.get("note_id")), cast(str, request.get("user_id"))
+            )
         elif action == "unshare":
-            return self.unshare_note(cast(str, request.get("note_id")), cast(str, request.get("user_id")))
+            return self.unshare_note(
+                cast(str, request.get("note_id")), cast(str, request.get("user_id"))
+            )
         elif action == "get_history":
             return self.get_note_history(cast(str, request.get("note_id")))
         elif action == "export":

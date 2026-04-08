@@ -128,11 +128,20 @@ class UserManager(BaseAgent):
         elif action == "get":
             return self.get_user(cast(str, request.get("user_id")))
         elif action == "update":
-            return self.update_user(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("updates")))
+            return self.update_user(
+                cast(str, request.get("user_id")),
+                cast(Optional[Dict[str, Any]], request.get("updates")),
+            )
         elif action == "update_preferences":
-            return self.update_preferences(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("preferences")))
+            return self.update_preferences(
+                cast(str, request.get("user_id")),
+                cast(Optional[Dict[str, Any]], request.get("preferences")),
+            )
         elif action == "update_settings":
-            return self.update_settings(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("settings")))
+            return self.update_settings(
+                cast(str, request.get("user_id")),
+                cast(Optional[Dict[str, Any]], request.get("settings")),
+            )
         elif action == "delete":
             return self.delete_user(cast(str, request.get("user_id")))
         elif action == "deactivate":
@@ -140,23 +149,39 @@ class UserManager(BaseAgent):
         elif action == "archive":
             return self.archive_user(cast(str, request.get("user_id")))
         elif action == "list":
-            return self.list_users(cast(Optional[str], request.get("role")), cast(Optional[str], request.get("status")))
+            return self.list_users(
+                cast(Optional[str], request.get("role")), cast(Optional[str], request.get("status"))
+            )
         elif action == "start_session":
             return self.start_session(cast(str, request.get("user_id")))
         elif action == "end_session":
             return self.end_session(cast(str, request.get("session_id")))
         elif action == "record_activity":
-            return self.record_activity(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("activity")))
+            return self.record_activity(
+                cast(str, request.get("user_id")),
+                cast(Optional[Dict[str, Any]], request.get("activity")),
+            )
         elif action == "get_activity":
-            return self.get_user_activity(cast(str, request.get("user_id")), cast(int, request.get("limit", 10)))
+            return self.get_user_activity(
+                cast(str, request.get("user_id")), cast(int, request.get("limit", 10))
+            )
         elif action == "grant_permission":
-            return self.grant_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
+            return self.grant_permission(
+                cast(str, request.get("user_id")), cast(str, request.get("permission"))
+            )
         elif action == "revoke_permission":
-            return self.revoke_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
+            return self.revoke_permission(
+                cast(str, request.get("user_id")), cast(str, request.get("permission"))
+            )
         elif action == "check_permission":
-            return self.check_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
+            return self.check_permission(
+                cast(str, request.get("user_id")), cast(str, request.get("permission"))
+            )
         elif action == "update_learning_stats":
-            return self.update_learning_stats(cast(str, request.get("user_id")), cast(Optional[Dict[str, int]], request.get("stats")))
+            return self.update_learning_stats(
+                cast(str, request.get("user_id")),
+                cast(Optional[Dict[str, int]], request.get("stats")),
+            )
         elif action == "set_subscription":
             return self.set_subscription(
                 cast(str, request.get("user_id")),
@@ -164,7 +189,9 @@ class UserManager(BaseAgent):
                 cast(int, request.get("duration_days")),
             )
         elif action == "check_quota":
-            return self.check_quota(cast(str, request.get("user_id")), cast(str, request.get("resource")))
+            return self.check_quota(
+                cast(str, request.get("user_id")), cast(str, request.get("resource"))
+            )
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 

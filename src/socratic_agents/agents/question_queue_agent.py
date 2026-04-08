@@ -122,21 +122,32 @@ class QuestionQueueAgent(BaseAgent):
         elif action == "next":
             return self.get_next_question(cast(Optional[str], request.get("category")))
         elif action == "assign":
-            return self.assign_question(cast(str, request.get("question_id")), cast(str, request.get("agent")))
+            return self.assign_question(
+                cast(str, request.get("question_id")), cast(str, request.get("agent"))
+            )
         elif action == "answer":
-            return self.answer_question(cast(str, request.get("question_id")), cast(str, request.get("answer")))
+            return self.answer_question(
+                cast(str, request.get("question_id")), cast(str, request.get("answer"))
+            )
         elif action == "get":
             return self.get_question(cast(str, request.get("question_id")))
         elif action == "list":
-            return self.list_queue(cast(Optional[str], request.get("status")), cast(Optional[str], request.get("category")))
+            return self.list_queue(
+                cast(Optional[str], request.get("status")),
+                cast(Optional[str], request.get("category")),
+            )
         elif action == "remove":
             return self.remove_question(cast(str, request.get("question_id")))
         elif action == "requeue":
             return self.requeue_question(cast(str, request.get("question_id")))
         elif action == "set_dependency":
-            return self.set_dependency(cast(str, request.get("question_id")), cast(str, request.get("depends_on")))
+            return self.set_dependency(
+                cast(str, request.get("question_id")), cast(str, request.get("depends_on"))
+            )
         elif action == "relate":
-            return self.relate_questions(cast(str, request.get("question_id")), cast(str, request.get("related_id")))
+            return self.relate_questions(
+                cast(str, request.get("question_id")), cast(str, request.get("related_id"))
+            )
         elif action == "batch_process":
             return self.batch_process(cast(int, request.get("limit", 10)))
         elif action == "stats":
