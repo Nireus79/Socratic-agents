@@ -13,7 +13,7 @@ This agent orchestrates project lifecycle:
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 from .base import BaseAgent
 
@@ -105,60 +105,60 @@ class ProjectManager(BaseAgent):
         # Project creation and basic operations
         if action == "create":
             return self.create_project(
-                request.get("project_name"), request.get("description", ""), request.get("owner_id")
+                cast(str, request.get("project_name")), cast(str, request.get("description", "")), cast(Optional[str], request.get("owner_id"))
             )
         elif action == "list":
             return self.list_projects(
-                request.get("filter"), request.get("tags"), request.get("status")
+                cast(Optional[str], request.get("filter")), cast(Optional[List[str]], request.get("tags")), cast(Optional[str], request.get("status"))
             )
         elif action == "get":
-            return self.get_project(request.get("project_id"))
+            return self.get_project(cast(str, request.get("project_id")))
 
         # GitHub integration
         elif action == "import_github":
-            return self.import_from_github(request.get("project_id"), request.get("github_url"))
+            return self.import_from_github(cast(str, request.get("project_id")), cast(str, request.get("github_url")))
         elif action == "sync_github":
-            return self.sync_with_github(request.get("project_id"))
+            return self.sync_with_github(cast(str, request.get("project_id")))
         elif action == "push_to_github":
-            return self.push_to_github(request.get("project_id"))
+            return self.push_to_github(cast(str, request.get("project_id")))
 
         # Team management
         elif action == "add_team_member":
             return self.add_team_member(
-                request.get("project_id"), request.get("user_id"), request.get("role", "developer")
+                cast(str, request.get("project_id")), cast(str, request.get("user_id")), cast(str, request.get("role", "developer"))
             )
         elif action == "remove_team_member":
-            return self.remove_team_member(request.get("project_id"), request.get("user_id"))
+            return self.remove_team_member(cast(str, request.get("project_id")), cast(str, request.get("user_id")))
         elif action == "list_team":
-            return self.list_team_members(request.get("project_id"))
+            return self.list_team_members(cast(str, request.get("project_id")))
         elif action == "invite_team_member":
             return self.invite_team_member(
-                request.get("project_id"), request.get("email"), request.get("role", "developer")
+                cast(str, request.get("project_id")), cast(str, request.get("email")), cast(str, request.get("role", "developer"))
             )
 
         # Lifecycle operations
         elif action == "archive":
-            return self.archive_project(request.get("project_id"))
+            return self.archive_project(cast(str, request.get("project_id")))
         elif action == "restore":
-            return self.restore_project(request.get("project_id"))
+            return self.restore_project(cast(str, request.get("project_id")))
         elif action == "delete":
-            return self.delete_project(request.get("project_id"))
+            return self.delete_project(cast(str, request.get("project_id")))
 
         # Subscription and quota
         elif action == "set_subscription":
-            return self.set_subscription_tier(request.get("project_id"), request.get("tier"))
+            return self.set_subscription_tier(cast(str, request.get("project_id")), cast(str, request.get("tier")))
         elif action == "get_quota":
-            return self.get_quota_status(request.get("project_id"))
+            return self.get_quota_status(cast(str, request.get("project_id")))
 
         # Task management
         elif action == "add_task":
-            return self.add_task(request.get("project_id"), request.get("task"))
+            return self.add_task(cast(str, request.get("project_id")), cast(str, request.get("task")))
         elif action == "update_task":
             return self.update_task(
-                request.get("project_id"), request.get("task_id"), request.get("updates")
+                cast(str, request.get("project_id")), cast(str, request.get("task_id")), cast(Dict[str, Any], request.get("updates"))
             )
         elif action == "list_tasks":
-            return self.list_tasks(request.get("project_id"))
+            return self.list_tasks(cast(str, request.get("project_id")))
 
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}

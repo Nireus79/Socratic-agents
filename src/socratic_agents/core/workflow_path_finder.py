@@ -1,6 +1,6 @@
 """WorkflowPathFinder - Enumerates all valid execution paths through workflow graph."""
 
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 
 class WorkflowPath:
@@ -50,10 +50,10 @@ class WorkflowPathFinder:
             workflow_definition: Workflow graph with nodes, edges, and configuration
         """
         self.workflow = workflow_definition
-        self.nodes = workflow_definition.get("nodes", {})
-        self.edges = workflow_definition.get("edges", [])
-        self.start_nodes = workflow_definition.get("start_nodes", [])
-        self.end_nodes = workflow_definition.get("end_nodes", [])
+        self.nodes = cast(Dict[str, Any], workflow_definition.get("nodes", {}))
+        self.edges = cast(List[Dict[str, Any]], workflow_definition.get("edges", []))
+        self.start_nodes = cast(List[str], workflow_definition.get("start_nodes", []))
+        self.end_nodes = cast(List[str], workflow_definition.get("end_nodes", []))
         self.adjacency_list = self._build_adjacency_list()
 
     def find_all_paths(self) -> List[WorkflowPath]:
@@ -84,15 +84,15 @@ class WorkflowPathFinder:
         Returns:
             Dictionary mapping node IDs to list of (target_node_id, edge_id) tuples
         """
-        adjacency = {}
+        adjacency: Dict[str, list[tuple[str, Optional[str]]]] = {}
 
         for node_id in self.nodes:
             adjacency[node_id] = []
 
         for edge in self.edges:
-            source = edge.get("source")
-            target = edge.get("target")
-            edge_id = edge.get("id")
+            source = cast(Optional[str], edge.get("source"))
+            target = cast(Optional[str], edge.get("target"))
+            edge_id = cast(Optional[str], edge.get("id"))
 
             if source and target:
                 adjacency[source].append((target, edge_id))
@@ -125,7 +125,7 @@ class WorkflowPathFinder:
             visited.add(current)
 
             # Explore neighbors
-            for neighbor, edge_id in self.adjacency_list.get(current, []):
+            for neighbor, edge_id in cast(List[tuple], self.adjacency_list.get(current, [])):
                 if neighbor not in visited:
                     nodes.append(neighbor)
                     edges.append(edge_id)
@@ -156,9 +156,9 @@ class WorkflowPathFinder:
         covered = set()
 
         for node_id in node_sequence:
-            node = self.nodes.get(node_id, {})
-            node_type = node.get("type", "")
-            node_categories = node.get("covers_categories", [])
+            node = cast(Dict[str, Any], self.nodes.get(node_id, {}))
+            node_type = cast(str, node.get("type", ""))
+            node_categories = cast(List[str], node.get("covers_categories", []))
 
             # Add explicitly defined categories
             covered.update(node_categories)

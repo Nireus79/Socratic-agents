@@ -13,7 +13,7 @@ This agent:
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 from .base import BaseAgent
 
@@ -113,25 +113,25 @@ class DocumentContextAnalyzer(BaseAgent):
         action = request.get("action", "analyze")
 
         if action == "analyze":
-            return self.analyze_document(request.get("document"), request.get("doc_id"))
+            return self.analyze_document(cast(str, request.get("document")), cast(Optional[str], request.get("doc_id")))
         elif action == "extract_context":
-            return self.extract_context(request.get("document"))
+            return self.extract_context(cast(str, request.get("document")))
         elif action == "extract_themes":
-            return self.extract_themes(request.get("document"))
+            return self.extract_themes(cast(str, request.get("document")))
         elif action == "extract_topics":
-            return self.extract_topics(request.get("document"), request.get("limit", 5))
+            return self.extract_topics(cast(str, request.get("document")), cast(int, request.get("limit", 5)))
         elif action == "build_semantic_graph":
-            return self.build_semantic_graph(request.get("document"))
+            return self.build_semantic_graph(cast(str, request.get("document")))
         elif action == "summarize":
-            return self.summarize_document(request.get("document"), request.get("ratio", 0.3))
+            return self.summarize_document(cast(str, request.get("document")), cast(float, request.get("ratio", 0.3)))
         elif action == "generate_metadata":
-            return self.generate_metadata(request.get("document"), request.get("doc_id"))
+            return self.generate_metadata(cast(str, request.get("document")), cast(Optional[str], request.get("doc_id")))
         elif action == "analyze_structure":
-            return self.analyze_structure(request.get("document"))
+            return self.analyze_structure(cast(str, request.get("document")))
         elif action == "list":
             return self.list_analyzed()
         elif action == "get_analysis":
-            return self.get_analysis(request.get("doc_id"))
+            return self.get_analysis(cast(str, request.get("doc_id")))
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 

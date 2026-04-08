@@ -12,7 +12,7 @@ This agent:
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from .base import BaseAgent
 
@@ -98,18 +98,18 @@ class SystemMonitor(BaseAgent):
         elif action == "alerts":
             return self.check_alerts()
         elif action == "update_metric":
-            return self.update_metric(request.get("metric_name"), request.get("value"))
+            return self.update_metric(cast(str, request.get("metric_name")), cast(float, request.get("value")))
         elif action == "get_metric":
-            return self.get_metric(request.get("metric_name"))
+            return self.get_metric(cast(str, request.get("metric_name")))
         elif action == "uptime":
             return self.get_uptime()
         elif action == "diagnostics":
             return self.get_diagnostics()
         elif action == "set_threshold":
             return self.set_threshold(
-                request.get("metric_name"),
-                request.get("warning"),
-                request.get("critical"),
+                cast(str, request.get("metric_name")),
+                cast(float, request.get("warning")),
+                cast(float, request.get("critical")),
             )
         elif action == "clear_alerts":
             return self.clear_alerts()

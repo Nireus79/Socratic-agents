@@ -13,7 +13,7 @@ This agent:
 
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 from .base import BaseAgent
 
@@ -46,7 +46,7 @@ class UserProfile:
         self.role = role
         self.status = UserStatus.ACTIVE
         self.created_at = datetime.utcnow()
-        self.last_login = None
+        self.last_login: Optional[datetime] = None
         self.preferences: Dict[str, Any] = {}
         self.learning_stats = {
             "questions_answered": 0,
@@ -61,7 +61,7 @@ class UserProfile:
         }
         self.permissions: Set[str] = self._get_default_permissions(role)
         self.subscription_status = "free"
-        self.subscription_expires = None
+        self.subscription_expires: Optional[datetime] = None
 
     def _get_default_permissions(self, role: UserRole) -> Set[str]:
         """Get default permissions for a role."""
@@ -120,51 +120,51 @@ class UserManager(BaseAgent):
 
         if action == "create":
             return self.create_user(
-                request.get("user_id"),
-                request.get("email"),
-                request.get("full_name"),
-                request.get("role", "student"),
+                cast(str, request.get("user_id")),
+                cast(str, request.get("email")),
+                cast(str, request.get("full_name")),
+                cast(str, request.get("role", "student")),
             )
         elif action == "get":
-            return self.get_user(request.get("user_id"))
+            return self.get_user(cast(str, request.get("user_id")))
         elif action == "update":
-            return self.update_user(request.get("user_id"), request.get("updates"))
+            return self.update_user(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("updates")))
         elif action == "update_preferences":
-            return self.update_preferences(request.get("user_id"), request.get("preferences"))
+            return self.update_preferences(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("preferences")))
         elif action == "update_settings":
-            return self.update_settings(request.get("user_id"), request.get("settings"))
+            return self.update_settings(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("settings")))
         elif action == "delete":
-            return self.delete_user(request.get("user_id"))
+            return self.delete_user(cast(str, request.get("user_id")))
         elif action == "deactivate":
-            return self.deactivate_user(request.get("user_id"))
+            return self.deactivate_user(cast(str, request.get("user_id")))
         elif action == "archive":
-            return self.archive_user(request.get("user_id"))
+            return self.archive_user(cast(str, request.get("user_id")))
         elif action == "list":
-            return self.list_users(request.get("role"), request.get("status"))
+            return self.list_users(cast(Optional[str], request.get("role")), cast(Optional[str], request.get("status")))
         elif action == "start_session":
-            return self.start_session(request.get("user_id"))
+            return self.start_session(cast(str, request.get("user_id")))
         elif action == "end_session":
-            return self.end_session(request.get("session_id"))
+            return self.end_session(cast(str, request.get("session_id")))
         elif action == "record_activity":
-            return self.record_activity(request.get("user_id"), request.get("activity"))
+            return self.record_activity(cast(str, request.get("user_id")), cast(Optional[Dict[str, Any]], request.get("activity")))
         elif action == "get_activity":
-            return self.get_user_activity(request.get("user_id"), request.get("limit", 10))
+            return self.get_user_activity(cast(str, request.get("user_id")), cast(int, request.get("limit", 10)))
         elif action == "grant_permission":
-            return self.grant_permission(request.get("user_id"), request.get("permission"))
+            return self.grant_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
         elif action == "revoke_permission":
-            return self.revoke_permission(request.get("user_id"), request.get("permission"))
+            return self.revoke_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
         elif action == "check_permission":
-            return self.check_permission(request.get("user_id"), request.get("permission"))
+            return self.check_permission(cast(str, request.get("user_id")), cast(str, request.get("permission")))
         elif action == "update_learning_stats":
-            return self.update_learning_stats(request.get("user_id"), request.get("stats"))
+            return self.update_learning_stats(cast(str, request.get("user_id")), cast(Optional[Dict[str, int]], request.get("stats")))
         elif action == "set_subscription":
             return self.set_subscription(
-                request.get("user_id"),
-                request.get("subscription_type"),
-                request.get("duration_days"),
+                cast(str, request.get("user_id")),
+                cast(str, request.get("subscription_type")),
+                cast(int, request.get("duration_days")),
             )
         elif action == "check_quota":
-            return self.check_quota(request.get("user_id"), request.get("resource"))
+            return self.check_quota(cast(str, request.get("user_id")), cast(str, request.get("resource")))
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 

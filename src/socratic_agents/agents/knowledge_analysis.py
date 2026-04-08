@@ -14,7 +14,7 @@ import asyncio
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 from .base import BaseAgent
 
@@ -111,19 +111,19 @@ class KnowledgeAnalysis(BaseAgent):
 
         if action == "analyze":
             return self.analyze_knowledge(
-                request.get("knowledge"),
-                request.get("analysis_depth", "standard"),
+                cast(str, request.get("knowledge")),
+                cast(str, request.get("analysis_depth", "standard")),
             )
         elif action == "extract_patterns":
-            return self.extract_patterns(request.get("knowledge"))
+            return self.extract_patterns(cast(str, request.get("knowledge")))
         elif action == "generate_insights":
-            return self.generate_insights(request.get("patterns"))
+            return self.generate_insights(cast(Optional[List[str]], request.get("patterns")))
         elif action == "detect_relationships":
-            return self.detect_relationships(request.get("entities"))
+            return self.detect_relationships(cast(Optional[List[str]], request.get("entities")))
         elif action == "identify_gaps":
-            return self.identify_knowledge_gaps(request.get("knowledge"))
+            return self.identify_knowledge_gaps(cast(str, request.get("knowledge")))
         elif action == "categorize":
-            return self.categorize_knowledge(request.get("items"), request.get("categories"))
+            return self.categorize_knowledge(cast(Optional[List[str]], request.get("items")), cast(Optional[List[str]], request.get("categories")))
         elif action == "list_patterns":
             return self.list_patterns()
         elif action == "list_insights":
@@ -139,20 +139,20 @@ class KnowledgeAnalysis(BaseAgent):
 
         if action == "analyze":
             return await self._analyze_knowledge_async(
-                request.get("knowledge"),
-                request.get("analysis_depth", "standard"),
+                cast(str, request.get("knowledge")),
+                cast(str, request.get("analysis_depth", "standard")),
             )
         elif action == "extract_patterns":
-            return await self._extract_patterns_async(request.get("knowledge"))
+            return await self._extract_patterns_async(cast(str, request.get("knowledge")))
         elif action == "generate_insights":
-            return await self._generate_insights_async(request.get("patterns"))
+            return await self._generate_insights_async(cast(Optional[List[str]], request.get("patterns")))
         elif action == "detect_relationships":
-            return await self._detect_relationships_async(request.get("entities"))
+            return await self._detect_relationships_async(cast(Optional[List[str]], request.get("entities")))
         elif action == "identify_gaps":
-            return await self._identify_knowledge_gaps_async(request.get("knowledge"))
+            return await self._identify_knowledge_gaps_async(cast(str, request.get("knowledge")))
         elif action == "categorize":
             return await self._categorize_knowledge_async(
-                request.get("items"), request.get("categories")
+                cast(Optional[List[str]], request.get("items")), cast(Optional[List[str]], request.get("categories"))
             )
         elif action == "list_patterns":
             return await asyncio.to_thread(self.list_patterns)
@@ -174,11 +174,11 @@ class KnowledgeAnalysis(BaseAgent):
         """Extract patterns asynchronously."""
         return await asyncio.to_thread(self.extract_patterns, knowledge)
 
-    async def _generate_insights_async(self, patterns: List[KnowledgePattern]) -> Dict[str, Any]:
+    async def _generate_insights_async(self, patterns: Optional[List[str]]) -> Dict[str, Any]:
         """Generate insights asynchronously."""
         return await asyncio.to_thread(self.generate_insights, patterns)
 
-    async def _detect_relationships_async(self, entities: List[str]) -> Dict[str, Any]:
+    async def _detect_relationships_async(self, entities: Optional[List[str]]) -> Dict[str, Any]:
         """Detect relationships asynchronously."""
         return await asyncio.to_thread(self.detect_relationships, entities)
 
@@ -187,7 +187,7 @@ class KnowledgeAnalysis(BaseAgent):
         return await asyncio.to_thread(self.identify_knowledge_gaps, knowledge)
 
     async def _categorize_knowledge_async(
-        self, items: List[str], categories: List[str]
+        self, items: Optional[List[str]], categories: Optional[List[str]]
     ) -> Dict[str, Any]:
         """Categorize knowledge asynchronously."""
         return await asyncio.to_thread(self.categorize_knowledge, items, categories)
@@ -251,9 +251,9 @@ class KnowledgeAnalysis(BaseAgent):
         if not self.patterns:
             return {"status": "error", "message": "No patterns available for analysis"}
 
-        pattern_list = []
+        pattern_list: List[KnowledgePattern] = []
         if patterns:
-            pattern_list = [self.patterns.get(pid) for pid in patterns if pid in self.patterns]
+            pattern_list = [self.patterns[pid] for pid in patterns if pid in self.patterns]
         else:
             pattern_list = list(self.patterns.values())
 

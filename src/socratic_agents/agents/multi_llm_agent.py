@@ -15,7 +15,7 @@ This agent:
 from collections import defaultdict
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from .base import BaseAgent
 
@@ -56,8 +56,8 @@ class LlmProvider:
         self.status = ProviderStatus.HEALTHY
         self.success_count = 0
         self.failure_count = 0
-        self.last_used = None
-        self.last_error = None
+        self.last_used: Optional[datetime] = None
+        self.last_error: Optional[str] = None
         self.total_tokens = 0
         self.total_cost = 0.0
 
@@ -137,7 +137,7 @@ class MultiLlmAgent(BaseAgent):
         """Initialize the Multi-LLM Agent."""
         super().__init__(name="MultiLlmAgent", llm_client=llm_client)
         self.providers: Dict[str, LlmProvider] = {}
-        self.active_provider = "anthropic"
+        self.active_provider: Optional[str] = "anthropic"
         self.fallback_order: List[str] = []
         self.query_history: List[QueryResult] = []
         self.provider_stats: Dict[str, Dict[str, Any]] = defaultdict(dict)
@@ -154,32 +154,32 @@ class MultiLlmAgent(BaseAgent):
         action = request.get("action", "query")
 
         if action == "query":
-            return self.query(request.get("prompt"), request.get("model"))
+            return self.query(cast(str, request.get("prompt")), cast(Optional[str], request.get("model")))
         elif action == "query_all":
-            return self.query_all_providers(request.get("prompt"), request.get("model"))
+            return self.query_all_providers(cast(str, request.get("prompt")), cast(Optional[str], request.get("model")))
         elif action == "switch_provider":
-            return self.switch_provider(request.get("provider"))
+            return self.switch_provider(cast(str, request.get("provider")))
         elif action == "set_fallback":
-            return self.set_fallback_order(request.get("providers"))
+            return self.set_fallback_order(cast(List[str], request.get("providers")))
         elif action == "add_provider":
             return self.add_provider(
-                request.get("name"),
-                request.get("endpoint"),
-                request.get("cost_tier"),
-                request.get("models"),
+                cast(str, request.get("name")),
+                cast(str, request.get("endpoint")),
+                cast(str, request.get("cost_tier")),
+                cast(List[str], request.get("models")),
             )
         elif action == "remove_provider":
-            return self.remove_provider(request.get("provider"))
+            return self.remove_provider(cast(str, request.get("provider")))
         elif action == "list_providers":
             return self.list_providers()
         elif action == "provider_stats":
-            return self.get_provider_stats(request.get("provider"))
+            return self.get_provider_stats(cast(str, request.get("provider")))
         elif action == "health_check":
             return self.health_check_all()
         elif action == "query_history":
-            return self.get_query_history(request.get("limit", 10))
+            return self.get_query_history(cast(int, request.get("limit", 10)))
         elif action == "set_budget":
-            return self.set_budget(request.get("limit"))
+            return self.set_budget(cast(float, request.get("limit")))
         elif action == "budget_status":
             return self.get_budget_status()
         elif action == "cost_analysis":
@@ -198,8 +198,8 @@ class MultiLlmAgent(BaseAgent):
 
         # Get provider to use
         provider_name = model or self.active_provider
-        if provider_name not in self.providers:
-            return self._handle_provider_not_found(provider_name)
+        if not provider_name or provider_name not in self.providers:
+            return self._handle_provider_not_found(provider_name or "unknown")
 
         provider = self.providers[provider_name]
 
@@ -424,8 +424,8 @@ class MultiLlmAgent(BaseAgent):
 
     def analyze_costs(self) -> Dict[str, Any]:
         """Analyze costs across providers."""
-        costs_by_provider = defaultdict(float)
-        queries_by_provider = defaultdict(int)
+        costs_by_provider: Dict[str, float] = defaultdict(float)
+        queries_by_provider: Dict[str, int] = defaultdict(int)
 
         for result in self.query_history:
             costs_by_provider[result.provider] += result.cost

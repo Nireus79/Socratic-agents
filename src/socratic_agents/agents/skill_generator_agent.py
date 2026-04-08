@@ -1,24 +1,24 @@
 """Skill Generator Agent for adaptive skill generation based on maturity and learning data."""
 
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from .base import BaseAgent
 
 try:
-    from ..models.skill_models import AgentSkill, SkillRecommendation
+    from ..models.skill_models import AgentSkill, SkillRecommendation  # type: ignore[assignment]
 
     MODELS_AVAILABLE = True
 except ImportError:
     MODELS_AVAILABLE = False
 
     # Fallback classes
-    class AgentSkill:
+    class AgentSkill:  # type: ignore[no-redef]
         def __init__(self, **kwargs):
             for k, v in kwargs.items():
                 setattr(self, k, v)
 
-    class SkillRecommendation:
+    class SkillRecommendation:  # type: ignore[no-redef]
         def __init__(self, **kwargs):
             for k, v in kwargs.items():
                 setattr(self, k, v)
@@ -78,19 +78,19 @@ class SkillGeneratorAgent(BaseAgent):
 
         if action == "generate":
             return self.generate_skills(
-                maturity_data=request.get("maturity_data"),
-                learning_data=request.get("learning_data"),
-                context=request.get("context", {}),
+                maturity_data=cast(Optional[Dict[str, Any]], request.get("maturity_data")),
+                learning_data=cast(Optional[Dict[str, Any]], request.get("learning_data")),
+                context=cast(Dict[str, Any], request.get("context", {})),
             )
         elif action == "evaluate":
             return self.evaluate_skill_effectiveness(
-                skill_id=request.get("skill_id", ""),
-                feedback=request.get("feedback"),
-                effectiveness_score=request.get("effectiveness_score"),
+                skill_id=cast(str, request.get("skill_id", "")),
+                feedback=cast(Optional[str], request.get("feedback")),
+                effectiveness_score=cast(Optional[float], request.get("effectiveness_score")),
             )
         elif action == "list":
             return self.list_active_skills(
-                agent_name=request.get("agent_name"), phase=request.get("phase")
+                agent_name=cast(Optional[str], request.get("agent_name")), phase=cast(Optional[str], request.get("phase"))
             )
         else:
             return {"status": "error", "agent": self.name, "message": f"Unknown action: {action}"}

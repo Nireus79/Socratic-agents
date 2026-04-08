@@ -1,6 +1,6 @@
 """WorkflowRiskCalculator - Evaluates risk for workflow paths."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, cast
 
 
 class WorkflowRiskCalculator:
@@ -41,7 +41,7 @@ class WorkflowRiskCalculator:
         "rework": 0.30,
     }
 
-    def __init__(self, required_categories: List[str] = None):
+    def __init__(self, required_categories: Optional[List[str]] = None):
         """
         Initialize risk calculator.
 
@@ -136,8 +136,8 @@ class WorkflowRiskCalculator:
         complexity_points = 0
 
         for node_id in nodes:
-            node = node_definitions.get(node_id, {})
-            node_type = node.get("type", "").lower()
+            node = cast(Dict[str, Any], node_definitions.get(node_id, {}))
+            node_type = cast(str, node.get("type", "")).lower()
 
             # Map node type to complexity weight
             for type_key, weight in self.NODE_TYPE_WEIGHTS.items():

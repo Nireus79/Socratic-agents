@@ -14,7 +14,7 @@ import re
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, cast
 
 from .base import BaseAgent
 
@@ -111,42 +111,42 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing
         if action == "import":
             return self.import_document(
-                request.get("content"), request.get("format", "text"), request.get("metadata")
+                cast(str, request.get("content")), cast(str, request.get("format", "text")), cast(Optional[Dict[str, Any]], request.get("metadata"))
             )
         elif action == "import_url":
-            return self.import_from_url(request.get("url"))
+            return self.import_from_url(cast(str, request.get("url")))
         elif action == "parse":
-            return self.parse_document(request.get("doc_id"))
+            return self.parse_document(cast(str, request.get("doc_id")))
 
         # Code-specific operations
         elif action == "analyze_code":
-            return self.analyze_code(request.get("doc_id"))
+            return self.analyze_code(cast(str, request.get("doc_id")))
         elif action == "extract_functions":
-            return self.extract_functions(request.get("doc_id"))
+            return self.extract_functions(cast(str, request.get("doc_id")))
         elif action == "extract_classes":
-            return self.extract_classes(request.get("doc_id"))
+            return self.extract_classes(cast(str, request.get("doc_id")))
 
         # Document manipulation
         elif action == "chunk":
-            return self.chunk_document(request.get("doc_id"))
+            return self.chunk_document(cast(str, request.get("doc_id")))
         elif action == "get":
-            return self.get_document(request.get("doc_id"))
+            return self.get_document(cast(str, request.get("doc_id")))
         elif action == "list":
-            return self.list_documents(request.get("format"), request.get("limit", 50))
+            return self.list_documents(cast(Optional[str], request.get("format")), cast(int, request.get("limit", 50)))
         elif action == "delete":
-            return self.delete_document(request.get("doc_id"))
+            return self.delete_document(cast(str, request.get("doc_id")))
 
         # Vector DB operations
         elif action == "enable_vector_db":
             return self._enable_vector_db()
         elif action == "store_vectors":
-            return self.store_document_vectors(request.get("doc_id"))
+            return self.store_document_vectors(cast(str, request.get("doc_id")))
 
         # Metadata operations
         elif action == "add_tags":
-            return self.add_tags(request.get("doc_id"), request.get("tags", []))
+            return self.add_tags(cast(str, request.get("doc_id")), cast(List[str], request.get("tags", [])))
         elif action == "add_category":
-            return self.add_category(request.get("doc_id"), request.get("category"))
+            return self.add_category(cast(str, request.get("doc_id")), cast(str, request.get("category")))
 
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
@@ -158,47 +158,47 @@ class DocumentProcessor(BaseAgent):
         # Document import and processing (I/O-bound operations)
         if action == "import":
             return await self._import_document_async(
-                request.get("content"), request.get("format", "text"), request.get("metadata")
+                cast(str, request.get("content")), cast(str, request.get("format", "text")), cast(Optional[Dict[str, Any]], request.get("metadata"))
             )
         elif action == "import_url":
-            return await self._import_from_url_async(request.get("url"))
+            return await self._import_from_url_async(cast(str, request.get("url")))
         elif action == "parse":
-            return await asyncio.to_thread(self.parse_document, request.get("doc_id"))
+            return await asyncio.to_thread(self.parse_document, cast(str, request.get("doc_id")))
 
         # Code analysis operations
         elif action == "analyze_code":
-            return await asyncio.to_thread(self.analyze_code, request.get("doc_id"))
+            return await asyncio.to_thread(self.analyze_code, cast(str, request.get("doc_id")))
         elif action == "extract_functions":
-            return await asyncio.to_thread(self.extract_functions, request.get("doc_id"))
+            return await asyncio.to_thread(self.extract_functions, cast(str, request.get("doc_id")))
         elif action == "extract_classes":
-            return await asyncio.to_thread(self.extract_classes, request.get("doc_id"))
+            return await asyncio.to_thread(self.extract_classes, cast(str, request.get("doc_id")))
 
         # Document manipulation
         elif action == "chunk":
-            return await asyncio.to_thread(self.chunk_document, request.get("doc_id"))
+            return await asyncio.to_thread(self.chunk_document, cast(str, request.get("doc_id")))
         elif action == "get":
-            return await asyncio.to_thread(self.get_document, request.get("doc_id"))
+            return await asyncio.to_thread(self.get_document, cast(str, request.get("doc_id")))
         elif action == "list":
             return await asyncio.to_thread(
-                self.list_documents, request.get("format"), request.get("limit", 50)
+                self.list_documents, cast(Optional[str], request.get("format")), cast(int, request.get("limit", 50))
             )
         elif action == "delete":
-            return await asyncio.to_thread(self.delete_document, request.get("doc_id"))
+            return await asyncio.to_thread(self.delete_document, cast(str, request.get("doc_id")))
 
         # Vector DB operations
         elif action == "enable_vector_db":
             return await asyncio.to_thread(self._enable_vector_db)
         elif action == "store_vectors":
-            return await asyncio.to_thread(self.store_document_vectors, request.get("doc_id"))
+            return await asyncio.to_thread(self.store_document_vectors, cast(str, request.get("doc_id")))
 
         # Metadata operations
         elif action == "add_tags":
             return await asyncio.to_thread(
-                self.add_tags, request.get("doc_id"), request.get("tags", [])
+                self.add_tags, cast(str, request.get("doc_id")), cast(List[str], request.get("tags", []))
             )
         elif action == "add_category":
             return await asyncio.to_thread(
-                self.add_category, request.get("doc_id"), request.get("category")
+                self.add_category, cast(str, request.get("doc_id")), cast(str, request.get("category"))
             )
 
         else:

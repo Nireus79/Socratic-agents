@@ -10,7 +10,7 @@ This agent:
 """
 
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from socrates_maturity import MaturityCalculator
 
@@ -45,19 +45,19 @@ class QualityController(BaseAgent):
         action = request.get("action", "check")
 
         if action == "check":
-            return self.check_quality(request.get("code"))  # type: ignore[arg-type]
+            return self.check_quality(cast(str, request.get("code")))
         elif action == "run_tests":
             return self.run_tests()
         elif action == "report":
             return self.generate_report()
         elif action == "detect_weak_areas":
-            return self.detect_weak_areas(request.get("code"))  # type: ignore[arg-type]
+            return self.detect_weak_areas(cast(str, request.get("code")))
         elif action == "apply_skills":
-            return self.apply_skills(request.get("skills", []))
+            return self.apply_skills(cast(List[Dict[str, Any]], request.get("skills", [])))
         elif action == "optimize_workflow":
-            return self._optimize_workflow(request.get("workflow_definition"))  # type: ignore[arg-type]
+            return self._optimize_workflow(cast(Dict[str, Any], request.get("workflow_definition")))
         elif action == "submit_approval":
-            return self._submit_approval(request.get("workflow_id"), request.get("approved", False))
+            return self._submit_approval(cast(str, request.get("workflow_id")), cast(bool, request.get("approved", False)))
         elif action == "get_pending_approvals":
             return self._get_pending_approvals()
         else:
