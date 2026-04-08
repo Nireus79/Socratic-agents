@@ -13,13 +13,13 @@ This agent:
 import re
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set, Tuple, cast
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .base import BaseAgent
 from ..agent_models import (
     ContextAnalyzerAnalyzeRequest,
     ContextAnalyzerAnalyzeResponse,
 )
+from .base import BaseAgent
 
 
 class ContextEntity:
