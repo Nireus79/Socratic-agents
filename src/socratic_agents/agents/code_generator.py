@@ -378,22 +378,21 @@ class CodeGenerator(BaseAgent):
             files["package.json"] = self._generate_package_json(
                 project_name, description, language, requirements
             )
-            files["tsconfig.json"] = self._generate_tsconfig() if language == "typescript" else ""
+            tsconfig = self._generate_tsconfig() if language == "typescript" else ""
+            files["tsconfig.json"] = tsconfig
 
             if project_type == ProjectType.WEB_APP:
                 files["src/index.html"] = self._generate_html_template(project_name)
-                files[
-                    f"src/index.{('ts' if language == 'typescript' else 'js')}"
-                ] = self._generate_js_main(project_name)
+                js_ext = "ts" if language == "typescript" else "js"
+                index_file = f"src/index.{js_ext}"
+                files[index_file] = self._generate_js_main(project_name)
                 files["src/style.css"] = self._generate_css_template()
 
             elif project_type == ProjectType.REST_API:
-                files[
-                    "src/server.ts" if language == "typescript" else "src/server.js"
-                ] = self._generate_node_api()
-                files[
-                    "src/routes.ts" if language == "typescript" else "src/routes.js"
-                ] = self._generate_node_routes()
+                server_file = "src/server.ts" if language == "typescript" else "src/server.js"
+                files[server_file] = self._generate_node_api()
+                routes_file = "src/routes.ts" if language == "typescript" else "src/routes.js"
+                files[routes_file] = self._generate_node_routes()
 
         return {k: v for k, v in files.items() if v}  # Remove empty files
 
