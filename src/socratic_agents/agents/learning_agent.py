@@ -8,18 +8,19 @@ Integrates with socratic-learning library to provide:
 - Interaction logging and tracking
 """
 
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
 from .base import BaseAgent
 
 try:
-    from socratic_learning.analytics.learning_engine import LearningEngine, UserProfile
+    from socratic_learning.analytics.learning_engine import LearningEngine
     from socratic_learning.analytics.maturity_calculator import MaturityCalculator
-    from socratic_learning.analytics.pattern_detector import PatternDetector
     from socratic_learning.analytics.metrics_collector import MetricsCollector
+    from socratic_learning.analytics.pattern_detector import PatternDetector
     from socratic_learning.recommendations.engine import RecommendationEngine
     from socratic_learning.storage.sqlite_store import SQLiteLearningStore
+
     SOCRATIC_LEARNING_AVAILABLE = True
 except ImportError:
     SOCRATIC_LEARNING_AVAILABLE = False
@@ -44,6 +45,7 @@ class LearningAgent(BaseAgent):
             database_path: Path to SQLite database for persistence
         """
         super().__init__(name="LearningAgent", llm_client=llm_client)
+        self.llm_client = llm_client
         self.interactions: List[Dict[str, Any]] = []
         self.patterns: List[str] = []
 
@@ -389,9 +391,7 @@ class LearningAgent(BaseAgent):
             responses_quality = [
                 i.get("quality_score", 0.5) for i in self.interactions if i.get("response")
             ]
-            topic_interactions = [
-                i.get("topic", "general") for i in self.interactions
-            ]
+            topic_interactions = [i.get("topic", "general") for i in self.interactions]
 
             # Build profile using learning engine
             profile = self.learning_engine.build_user_profile(

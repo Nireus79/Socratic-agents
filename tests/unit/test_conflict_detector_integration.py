@@ -1,7 +1,8 @@
 """Integration tests for AgentConflictDetector with socratic-conflict library."""
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 from src.socratic_agents.agents.conflict_detector import AgentConflictDetector
 
@@ -148,10 +149,12 @@ class TestProcessMethod:
         """Test process method with detect action and items."""
         detector = AgentConflictDetector()
 
-        result = detector.process({
-            "action": "detect",
-            "items": ["a", "b", "a"],
-        })
+        result = detector.process(
+            {
+                "action": "detect",
+                "items": ["a", "b", "a"],
+            }
+        )
 
         assert result["status"] == "success"
         assert "conflicts" in result
@@ -181,10 +184,12 @@ class TestProcessMethod:
         """Test process method with missing required parameters."""
         detector = AgentConflictDetector()
 
-        result = detector.process({
-            "action": "detect",
-            # Missing items or agent_states
-        })
+        result = detector.process(
+            {
+                "action": "detect",
+                # Missing items or agent_states
+            }
+        )
 
         assert result["status"] == "error"
 

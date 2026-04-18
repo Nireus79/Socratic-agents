@@ -1,42 +1,67 @@
-"""Quality Controller Agent - Quality assurance and testing.
+"""Quality Controller Agent - Quality assurance, workflow approval, and optimization.
 
-This agent uses the MaturityCalculator from socrates-maturity to estimate
-project phase and identify weak areas that need skill-based improvement.
+This agent:
+1. Analyzes code quality through pattern detection
+2. Identifies weak areas that need skill-based improvement
+3. Estimates project maturity using MaturityCalculator
+4. Manages workflow approval system using full WorkflowOptimizer
+5. Prevents greedy optimization by analyzing ALL execution paths
+6. Recommends optimal workflow paths based on cost/risk/quality metrics
 """
 
-from typing import Any, Dict, List, Optional
+import uuid
+from typing import Any, Dict, List, Optional, cast
 
 from socrates_maturity import MaturityCalculator
 
+from ..core.workflow_optimizer import DecisionStrategy, WorkflowOptimizer
 from .base import BaseAgent
 
 
 class QualityController(BaseAgent):
-    """Agent that manages quality assurance and testing."""
+    """
+    Quality assurance and workflow optimization agent.
+
+    Manages code quality assessment, maturity tracking, skill application,
+    and intelligent workflow path selection with human approval gating.
+    """
 
     def __init__(self, llm_client: Optional[Any] = None):
         """Initialize the Quality Controller."""
         super().__init__(name="QualityController", llm_client=llm_client)
         self.tests: List[Dict[str, Any]] = []
         self.quality_score = 100.0
-        # Phase 2: Skill integration fields
+        # Skill integration fields
         self.quality_focus_area: Optional[str] = None
         self.generated_skills: List[Dict[str, Any]] = []
         self.skill_application_log: List[Dict[str, Any]] = []
+        # Workflow approval system
+        self.pending_approvals: Dict[str, Dict[str, Any]] = {}
+        self.approved_workflows: Dict[str, Dict[str, Any]] = {}
+        self.rejected_workflows: Dict[str, Dict[str, Any]] = {}
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process quality control requests."""
         action = request.get("action", "check")
+
         if action == "check":
-            return self.check_quality(request.get("code"))  # type: ignore[arg-type]
+            return self.check_quality(cast(str, request.get("code")))
         elif action == "run_tests":
             return self.run_tests()
         elif action == "report":
             return self.generate_report()
         elif action == "detect_weak_areas":
-            return self.detect_weak_areas(request.get("code"))  # type: ignore[arg-type]
+            return self.detect_weak_areas(cast(str, request.get("code")))
         elif action == "apply_skills":
-            return self.apply_skills(request.get("skills", []))
+            return self.apply_skills(cast(List[Dict[str, Any]], request.get("skills", [])))
+        elif action == "optimize_workflow":
+            return self._optimize_workflow(cast(Dict[str, Any], request.get("workflow_definition")))
+        elif action == "submit_approval":
+            return self._submit_approval(
+                cast(str, request.get("workflow_id")), cast(bool, request.get("approved", False))
+            )
+        elif action == "get_pending_approvals":
+            return self._get_pending_approvals()
         else:
             return {"status": "error", "message": f"Unknown action: {action}"}
 
@@ -44,12 +69,15 @@ class QualityController(BaseAgent):
         """Check code quality."""
         if not code:
             return {"status": "error", "message": "Code required"}
+
         issues = []
         if len(code) < 10:
             issues.append("Code is too short")
         if "TODO" in code:
             issues.append("Contains TODO comments")
+
         quality = max(0, 100 - (len(issues) * 20))
+
         return {"status": "success", "agent": self.name, "quality_score": quality, "issues": issues}
 
     def run_tests(self) -> Dict[str, Any]:
@@ -160,6 +188,145 @@ class QualityController(BaseAgent):
             "focus_area": self.quality_focus_area,
         }
 
+    def _optimize_workflow(self, workflow_definition: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Optimize workflow using full WorkflowOptimizer.
+
+        Enumerates all possible execution paths, calculates comprehensive metrics
+        (cost, risk, quality, ROI), recommends optimal path, and creates approval
+        request for human review.
+
+        Args:
+            workflow_definition: Workflow graph with nodes, edges, start/end nodes
+
+        Returns:
+            Approval request with all paths analyzed and recommendation
+        """
+        if not workflow_definition:
+            return {
+                "status": "error",
+                "agent": self.name,
+                "message": "Workflow definition required",
+            }
+
+        try:
+            # Create optimizer with BALANCED strategy (50% cost, 30% risk, 20% quality)
+            optimizer = WorkflowOptimizer(workflow_definition, strategy=DecisionStrategy.BALANCED)
+
+            # Run optimization (enumerates, calculates, selects)
+            optimization_result = optimizer.optimize_workflow()
+
+            if optimization_result["status"] == "error":
+                return {
+                    "status": "error",
+                    "agent": self.name,
+                    "message": optimization_result["message"],
+                }
+
+            approval_request = optimization_result["approval_request"]
+
+            # Generate approval ID and store
+            approval_id = f"approval_{uuid.uuid4().hex[:8]}"
+
+            self.pending_approvals[approval_id] = {
+                "id": approval_id,
+                "status": "pending",
+                "workflow_definition": workflow_definition,
+                "approval_request": approval_request,
+            }
+
+            return {
+                "status": "pending_approval",
+                "agent": self.name,
+                "approval_id": approval_id,
+                "paths_analyzed": approval_request["paths_analyzed"],
+                "approval_request": approval_request,
+            }
+
+        except Exception as e:
+            self.logger.error(f"Workflow optimization failed: {e}")
+            return {
+                "status": "error",
+                "agent": self.name,
+                "message": f"Workflow optimization failed: {str(e)}",
+            }
+
+    def _submit_approval(self, approval_id: str, approved: bool) -> Dict[str, Any]:
+        """
+        Submit human approval or rejection for a pending workflow.
+
+        Args:
+            approval_id: ID of the approval request
+            approved: True to approve, False to reject
+
+        Returns:
+            Status of approval submission
+        """
+        if approval_id not in self.pending_approvals:
+            return {
+                "status": "error",
+                "agent": self.name,
+                "message": f"Approval {approval_id} not found",
+            }
+
+        approval = self.pending_approvals.pop(approval_id)
+        approval["status"] = "approved" if approved else "rejected"
+
+        if approved:
+            self.approved_workflows[approval_id] = approval
+
+            selected_path_idx = approval["approval_request"]["selected_path_index"]
+            selected_metrics = approval["approval_request"]["recommendation"]["selected_metrics"]
+
+            return {
+                "status": "success",
+                "agent": self.name,
+                "approval_id": approval_id,
+                "approved": True,
+                "selected_path_index": selected_path_idx,
+                "message": f"Workflow approved. Selected path optimizes for: "
+                f"{approval['approval_request']['recommendation']['reason']}",
+                "metrics": selected_metrics,
+            }
+        else:
+            self.rejected_workflows[approval_id] = approval
+
+            return {
+                "status": "success",
+                "agent": self.name,
+                "approval_id": approval_id,
+                "approved": False,
+                "message": "Workflow rejected. Please submit alternative workflow.",
+            }
+
+    def _get_pending_approvals(self) -> Dict[str, Any]:
+        """
+        Get all pending workflow approvals.
+
+        Returns:
+            List of pending approval requests with metrics
+        """
+        pending_list = []
+        for approval_id, approval in self.pending_approvals.items():
+            pending_list.append(
+                {
+                    "approval_id": approval_id,
+                    "paths_analyzed": approval["approval_request"]["paths_analyzed"],
+                    "selection_strategy": approval["approval_request"]["selection_strategy"],
+                    "recommendation": approval["approval_request"]["recommendation"],
+                }
+            )
+
+        return {
+            "status": "success",
+            "agent": self.name,
+            "pending_count": len(self.pending_approvals),
+            "approved_count": len(self.approved_workflows),
+            "rejected_count": len(self.rejected_workflows),
+            "pending_approvals": pending_list,
+        }
+
+    # Code quality assessment methods
     def _assess_code_quality(self, code: str) -> float:
         """Assess code quality (0.0-1.0)."""
         score = 0.8
@@ -215,12 +382,10 @@ class QualityController(BaseAgent):
         from average category score.
         """
         avg_score = sum(category_scores.values()) / len(category_scores)
-        # Use MaturityCalculator for phase estimation
         return MaturityCalculator.estimate_current_phase(avg_score)
 
     def _estimate_completion(self, code: str) -> float:
         """Estimate completion percentage based on code length."""
-        # Simple heuristic: 50 lines = 25%, 200+ lines = 100%
         lines = len(code.split("\n"))
         percent = min(100.0, (lines / 2.0))
         return percent

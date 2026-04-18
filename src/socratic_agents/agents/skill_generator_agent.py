@@ -1,18 +1,43 @@
 """Skill Generator Agent for adaptive skill generation based on maturity and learning data."""
 
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
-from ..models.skill_models import AgentSkill, SkillRecommendation
+from .base import BaseAgent
+
+try:
+    from ..models.skill_models import AgentSkill, SkillRecommendation  # type: ignore[assignment]
+
+    MODELS_AVAILABLE = True
+except ImportError:
+    MODELS_AVAILABLE = False
+
+    # Fallback classes
+    class AgentSkill:  # type: ignore[no-redef]
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+    class SkillRecommendation:  # type: ignore[no-redef]
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
 
-class SkillGeneratorAgent:
+class SkillGeneratorAgent(BaseAgent):
     """
     Generates adaptive skills for agents based on maturity and learning data.
 
     This agent takes maturity phase data and learning metrics, then generates
     targeted behavioral skills to improve agent performance in weak areas.
-    Pure data transformation: no agent dependencies, works standalone.
+
+    Features:
+    - Analyzes weak categories from maturity data
+    - Generates targeted skills for improvement
+    - Evaluates skill effectiveness with feedback
+    - Prioritizes skills by impact
+    - Pure data transformation with no external dependencies
+    - Works as standalone or integrated component
     """
 
     def __init__(self, llm_client: Optional[Any] = None, skill_templates: Optional[Dict] = None):
@@ -23,7 +48,7 @@ class SkillGeneratorAgent:
             llm_client: Optional LLMClient for future LLM-based skill generation
             skill_templates: Optional custom skill templates (uses defaults if None)
         """
-        self.name = "SkillGeneratorAgent"
+        super().__init__(name="SkillGeneratorAgent", llm_client=llm_client)
         self.llm_client = llm_client
         self.skill_templates = skill_templates or self._load_default_templates()
         self.generated_skills: Dict[str, AgentSkill] = {}
@@ -53,19 +78,20 @@ class SkillGeneratorAgent:
 
         if action == "generate":
             return self.generate_skills(
-                maturity_data=request.get("maturity_data"),
-                learning_data=request.get("learning_data"),
-                context=request.get("context", {}),
+                maturity_data=cast(Optional[Dict[str, Any]], request.get("maturity_data")),
+                learning_data=cast(Optional[Dict[str, Any]], request.get("learning_data")),
+                context=cast(Dict[str, Any], request.get("context", {})),
             )
         elif action == "evaluate":
             return self.evaluate_skill_effectiveness(
-                skill_id=request.get("skill_id", ""),
-                feedback=request.get("feedback"),
-                effectiveness_score=request.get("effectiveness_score"),
+                skill_id=cast(str, request.get("skill_id", "")),
+                feedback=cast(Optional[str], request.get("feedback")),
+                effectiveness_score=cast(Optional[float], request.get("effectiveness_score")),
             )
         elif action == "list":
             return self.list_active_skills(
-                agent_name=request.get("agent_name"), phase=request.get("phase")
+                agent_name=cast(Optional[str], request.get("agent_name")),
+                phase=cast(Optional[str], request.get("phase")),
             )
         else:
             return {"status": "error", "agent": self.name, "message": f"Unknown action: {action}"}

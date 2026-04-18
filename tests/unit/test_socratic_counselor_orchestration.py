@@ -1,7 +1,9 @@
 """Unit tests for SocraticCounselor orchestration methods."""
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+
 from src.socratic_agents.agents.socratic_counselor import SocraticCounselor
 
 
@@ -48,11 +50,7 @@ class TestSocraticCounselorInstantiation:
         mock_llm = Mock()
         mock_db = Mock()
 
-        counselor = SocraticCounselor(
-            llm_client=mock_llm,
-            batch_size=3,
-            database=mock_db
-        )
+        counselor = SocraticCounselor(llm_client=mock_llm, batch_size=3, database=mock_db)
 
         assert counselor.llm_client == mock_llm
         assert counselor.batch_size == 3
@@ -68,31 +66,37 @@ class TestGenerateQuestion:
         project = MockProject()
 
         # Add an unanswered question
-        project.pending_questions = [{
-            "id": "q_existing",
-            "question": "Existing question?",
-            "phase": "discovery",
-            "status": "unanswered",
-        }]
+        project.pending_questions = [
+            {
+                "id": "q_existing",
+                "question": "Existing question?",
+                "phase": "discovery",
+                "status": "unanswered",
+            }
+        ]
 
-        result = counselor._generate_question({
-            "project": project,
-            "user_id": "test_user",
-        })
+        result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "test_user",
+            }
+        )
 
         assert result["status"] == "success"
         assert result["question"] == "Existing question?"
-        assert result["existing"] == True
+        assert result["existing"]
 
     def test_generate_question_creates_new_when_none_unanswered(self):
         """Test that new question is generated when no unanswered questions exist."""
         counselor = SocraticCounselor()
         project = MockProject()
 
-        result = counselor._generate_question({
-            "project": project,
-            "user_id": "test_user",
-        })
+        result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "test_user",
+            }
+        )
 
         assert result["status"] == "success"
         assert result["question"] is not None
@@ -104,10 +108,12 @@ class TestGenerateQuestion:
         counselor = SocraticCounselor()
         project = MockProject()
 
-        counselor._generate_question({
-            "project": project,
-            "user_id": "test_user",
-        })
+        counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "test_user",
+            }
+        )
 
         # Check pending_questions
         assert len(project.pending_questions) == 1
@@ -125,10 +131,12 @@ class TestGenerateQuestion:
         mock_db.load_user.return_value = None
         counselor.database = mock_db
 
-        result = counselor._generate_question({
-            "project": project,
-            "user_id": "new_user",
-        })
+        result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "new_user",
+            }
+        )
 
         assert result["status"] == "success"
         assert mock_db.save_user.called
@@ -137,10 +145,12 @@ class TestGenerateQuestion:
         """Test that project is required."""
         counselor = SocraticCounselor()
 
-        result = counselor._generate_question({
-            "user_id": "test_user",
-            # No project
-        })
+        result = counselor._generate_question(
+            {
+                "user_id": "test_user",
+                # No project
+            }
+        )
 
         assert result["status"] == "error"
         assert "required" in result["message"].lower()
@@ -153,17 +163,21 @@ class TestProcessResponse:
         """Test that response is added to conversation_history."""
         counselor = SocraticCounselor()
         project = MockProject()
-        project.pending_questions = [{
-            "id": "q_1",
-            "question": "Test question?",
-            "status": "unanswered",
-        }]
+        project.pending_questions = [
+            {
+                "id": "q_1",
+                "question": "Test question?",
+                "status": "unanswered",
+            }
+        ]
 
-        result = counselor._process_response({
-            "project": project,
-            "user_id": "test_user",
-            "response": "User's answer",
-        })
+        result = counselor._process_response(
+            {
+                "project": project,
+                "user_id": "test_user",
+                "response": "User's answer",
+            }
+        )
 
         assert result["status"] == "success"
 
@@ -176,18 +190,22 @@ class TestProcessResponse:
         """Test that question is marked as answered."""
         counselor = SocraticCounselor()
         project = MockProject()
-        project.pending_questions = [{
-            "id": "q_1",
-            "question": "Test question?",
-            "status": "unanswered",
-            "answer": None,
-        }]
+        project.pending_questions = [
+            {
+                "id": "q_1",
+                "question": "Test question?",
+                "status": "unanswered",
+                "answer": None,
+            }
+        ]
 
-        result = counselor._process_response({
-            "project": project,
-            "user_id": "test_user",
-            "response": "User's answer",
-        })
+        counselor._process_response(
+            {
+                "project": project,
+                "user_id": "test_user",
+                "response": "User's answer",
+            }
+        )
 
         # Check that question is marked answered
         assert project.pending_questions[0]["status"] == "answered"
@@ -197,17 +215,21 @@ class TestProcessResponse:
         """Test that next question is generated and returned."""
         counselor = SocraticCounselor()
         project = MockProject()
-        project.pending_questions = [{
-            "id": "q_1",
-            "question": "First question?",
-            "status": "unanswered",
-        }]
+        project.pending_questions = [
+            {
+                "id": "q_1",
+                "question": "First question?",
+                "status": "unanswered",
+            }
+        ]
 
-        result = counselor._process_response({
-            "project": project,
-            "user_id": "test_user",
-            "response": "User's answer",
-        })
+        result = counselor._process_response(
+            {
+                "project": project,
+                "user_id": "test_user",
+                "response": "User's answer",
+            }
+        )
 
         assert result["status"] == "success"
         assert "next_question" in result
@@ -220,10 +242,12 @@ class TestProcessResponse:
         """Test that project and response are both required."""
         counselor = SocraticCounselor()
 
-        result = counselor._process_response({
-            "user_id": "test_user",
-            # Missing project and response
-        })
+        result = counselor._process_response(
+            {
+                "user_id": "test_user",
+                # Missing project and response
+            }
+        )
 
         assert result["status"] == "error"
 
@@ -237,35 +261,38 @@ class TestFullDialogueFlow:
         project = MockProject()
 
         # Turn 1: Generate first question
-        q1_result = counselor._generate_question({
-            "project": project,
-            "user_id": "user_1",
-        })
+        q1_result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "user_1",
+            }
+        )
         assert q1_result["status"] == "success"
-        q1_text = q1_result["question"]
 
         # Turn 1: Answer first question
-        a1_result = counselor._process_response({
-            "project": project,
-            "user_id": "user_1",
-            "response": "First answer to the question",
-        })
+        a1_result = counselor._process_response(
+            {
+                "project": project,
+                "user_id": "user_1",
+                "response": "First answer to the question",
+            }
+        )
         assert a1_result["status"] == "success"
         assert "next_question" in a1_result
-        q2_text = a1_result["next_question"]
 
         # Verify conversation has 3 messages (Q1, A1, Q2) because next question is generated
         assert len(project.conversation_history) == 3
 
         # Turn 2: Answer second question
-        a2_result = counselor._process_response({
-            "project": project,
-            "user_id": "user_1",
-            "response": "Second answer",
-        })
+        a2_result = counselor._process_response(
+            {
+                "project": project,
+                "user_id": "user_1",
+                "response": "Second answer",
+            }
+        )
         assert a2_result["status"] == "success"
         assert "next_question" in a2_result
-        q3_text = a2_result["next_question"]
 
         # Verify conversation grew (each turn generates next Q)
         assert len(project.conversation_history) == 5  # Q1, A1, Q2, A2, Q3
@@ -279,20 +306,24 @@ class TestFullDialogueFlow:
         project = MockProject()
 
         # Generate first question
-        q1_result = counselor._generate_question({
-            "project": project,
-            "user_id": "user_1",
-        })
+        q1_result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "user_1",
+            }
+        )
         q1_text = q1_result["question"]
 
         # Try to generate again without answering (should return existing)
-        q2_result = counselor._generate_question({
-            "project": project,
-            "user_id": "user_1",
-        })
+        q2_result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "user_1",
+            }
+        )
 
         # Should return existing question
-        assert q2_result.get("existing") == True
+        assert q2_result.get("existing")
         assert q2_result["question"] == q1_text
 
 
@@ -303,9 +334,11 @@ class TestExtractInsights:
         """Test insight extraction with empty response."""
         counselor = SocraticCounselor()
 
-        result = counselor._extract_insights_only({
-            "response": "",
-        })
+        result = counselor._extract_insights_only(
+            {
+                "response": "",
+            }
+        )
 
         assert result["status"] == "error"
 
@@ -313,9 +346,11 @@ class TestExtractInsights:
         """Test insight extraction with valid response."""
         counselor = SocraticCounselor()
 
-        result = counselor._extract_insights_only({
-            "response": "This is a detailed response about the requirements.",
-        })
+        result = counselor._extract_insights_only(
+            {
+                "response": "This is a detailed response about the requirements.",
+            }
+        )
 
         assert result["status"] == "success"
         assert "insights" in result
@@ -332,7 +367,7 @@ class TestSubscriptionValidation:
 
         can_ask, error = counselor._check_subscription_limit(user)
 
-        assert can_ask == True
+        assert can_ask
         assert error is None
 
     def test_subscription_free_tier_limited(self):
@@ -343,7 +378,7 @@ class TestSubscriptionValidation:
 
         can_ask, error = counselor._check_subscription_limit(user)
 
-        assert can_ask == False
+        assert not can_ask
         assert "limit" in error.lower()
 
 
@@ -356,10 +391,12 @@ class TestPhasedQuestions:
         project = MockProject()
         project.phase = "discovery"
 
-        result = counselor._generate_question({
-            "project": project,
-            "user_id": "user_1",
-        })
+        result = counselor._generate_question(
+            {
+                "project": project,
+                "user_id": "user_1",
+            }
+        )
 
         assert result["status"] == "success"
         question = result["question"]

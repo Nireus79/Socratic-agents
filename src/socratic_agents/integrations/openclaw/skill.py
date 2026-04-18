@@ -126,7 +126,7 @@ class SocraticAgentsSkill:
             Guiding questions
         """
         agent = self.agents["counselor"]
-        return agent.process({"topic": topic, "level": level})
+        return agent.process({"action": "guide", "topic": topic, "level": level})
 
     def generate_code(self, prompt: str, language: str = "python") -> str:
         """

@@ -19,13 +19,14 @@ Now adapted as a standalone module for use in modular Socrates architecture.
 """
 
 import datetime
-import logging
-import uuid
 import json
+import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
+from .base import BaseAgent
 
-class SocraticCounselor:
+
+class SocraticCounselor(BaseAgent):
     """
     Complete Socratic dialogue orchestration engine.
 
@@ -61,16 +62,17 @@ class SocraticCounselor:
             batch_size: Number of questions to generate per request (default: 1).
                        For compatibility, can be set to 3 for legacy behavior.
         """
-        self.name = "SocraticCounselor"
+        super().__init__(name="SocraticCounselor", llm_client=llm_client)
         self.llm_client = llm_client
         self.database = database
-        self.logger = logger or logging.getLogger("socratic_counselor")
+        if logger:
+            self.logger = logger
         self.batch_size = max(1, batch_size)
 
         # Configuration
         self.use_dynamic_questions = True
         self.max_questions_per_phase = 5
-        self.phase_docs_cache = {}
+        self.phase_docs_cache: Dict[str, Any] = {}
 
         # Static questions for fallback
         self.static_questions = {
@@ -151,6 +153,7 @@ class SocraticCounselor:
             "skip_question": self._skip_question,
             "reopen_question": self._reopen_question,
             "generate_answer_suggestions": self._generate_answer_suggestions,
+            "guide": self._guide_handler,
         }
 
         handler = handlers.get(action)
@@ -162,6 +165,66 @@ class SocraticCounselor:
         except Exception as e:
             self.logger.error(f"Error in {action}: {e}", exc_info=True)
             return {"status": "error", "message": str(e)}
+
+    def guide(self, topic: str, level: str = "beginner") -> Dict[str, Any]:
+        """
+        Generate a Socratic question to guide learning on a topic.
+
+        This is a convenience method that creates a temporary project context
+        and generates an initial question on the specified topic.
+
+        Args:
+            topic: The topic to guide learning on
+            level: The learner's level (beginner, intermediate, advanced)
+
+        Returns:
+            Dictionary with status, topic, level, and generated question
+        """
+        result = self._guide_handler({"topic": topic, "level": level})
+        return result
+
+    def _guide_handler(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Internal handler for guide action that can be called via process().
+
+        Args:
+            request: Dictionary with 'topic' and optionally 'level'
+
+        Returns:
+            Dictionary with status, topic, level, and question
+        """
+        topic = request.get("topic")
+        level = request.get("level", "beginner")
+
+        if not topic:
+            return {"status": "error", "message": "Topic is required for guidance"}
+
+        # Create a temporary project context for guidance
+        temp_project = type(
+            "obj",
+            (object,),
+            {
+                "name": f"guidance_{topic}",
+                "conversation_history": [],
+                "pending_questions": [],
+                "metadata": {"topic": topic, "level": level},
+            },
+        )()
+
+        generate_request = {
+            "action": "generate_question",
+            "project": temp_project,
+            "user_id": "guide_user",
+        }
+
+        result = self._generate_question(generate_request)
+
+        # Add topic and level to the response
+        if result.get("status") == "success":
+            result["topic"] = topic
+            result["level"] = level
+
+        return result
 
     # ===== CRITICAL ORCHESTRATION METHODS =====
 
@@ -213,7 +276,11 @@ class SocraticCounselor:
             return {"status": "error", "message": "Project context required"}
 
         # STEP 1: Check for existing unanswered question
-        if not force_refresh and hasattr(project, "pending_questions") and project.pending_questions:
+        if (
+            not force_refresh
+            and hasattr(project, "pending_questions")
+            and project.pending_questions
+        ):
             unanswered = [q for q in project.pending_questions if q.get("status") == "unanswered"]
             if unanswered:
                 self.logger.debug(f"Returning existing unanswered question for {user_id}")
@@ -243,8 +310,10 @@ class SocraticCounselor:
         phase_questions = []
         if hasattr(project, "conversation_history"):
             phase_questions = [
-                msg for msg in project.conversation_history
-                if msg.get("type") == "assistant" and msg.get("phase") == getattr(project, "phase", "discovery")
+                msg
+                for msg in project.conversation_history
+                if msg.get("type") == "assistant"
+                and msg.get("phase") == getattr(project, "phase", "discovery")
             ]
 
         # STEP 5: Generate question
@@ -266,27 +335,31 @@ class SocraticCounselor:
 
         # STEP 6: Store in conversation_history
         if hasattr(project, "conversation_history"):
-            project.conversation_history.append({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "type": "assistant",
-                "content": question,
-                "phase": getattr(project, "phase", "discovery"),
-                "question_number": len(phase_questions) + 1,
-            })
+            project.conversation_history.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "type": "assistant",
+                    "content": question,
+                    "phase": getattr(project, "phase", "discovery"),
+                    "question_number": len(phase_questions) + 1,
+                }
+            )
 
         # STEP 7: Store in pending_questions
         if not hasattr(project, "pending_questions"):
             project.pending_questions = []
 
-        project.pending_questions.append({
-            "id": f"q_{uuid.uuid4().hex[:8]}",
-            "question": question,
-            "phase": getattr(project, "phase", "discovery"),
-            "status": "unanswered",
-            "created_at": datetime.datetime.now().isoformat(),
-            "answer": None,
-            "answered_at": None,
-        })
+        project.pending_questions.append(
+            {
+                "id": f"q_{uuid.uuid4().hex[:8]}",
+                "question": question,
+                "phase": getattr(project, "phase", "discovery"),
+                "status": "unanswered",
+                "created_at": datetime.datetime.now().isoformat(),
+                "answer": None,
+                "answered_at": None,
+            }
+        )
 
         # STEP 8: Update user metrics
         if hasattr(user, "increment_question_usage"):
@@ -350,17 +423,21 @@ class SocraticCounselor:
 
         # STEP 1: Add to conversation_history
         if hasattr(project, "conversation_history"):
-            project.conversation_history.append({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "type": "user",
-                "content": user_response,
-                "phase": getattr(project, "phase", "discovery"),
-                "author": user_id,
-            })
+            project.conversation_history.append(
+                {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "type": "user",
+                    "content": user_response,
+                    "phase": getattr(project, "phase", "discovery"),
+                    "author": user_id,
+                }
+            )
             debug_log.append("response_added")
 
         # STEP 2: Extract insights
-        insights_result = self._extract_insights_only({"response": user_response, "project": project})
+        insights_result = self._extract_insights_only(
+            {"response": user_response, "project": project}
+        )
         insights_data = insights_result.get("insights", {})
         debug_log.append("insights_extracted")
 
@@ -375,9 +452,7 @@ class SocraticCounselor:
                     break
 
         # STEP 4: Conflict detection
-        conflicts = self._handle_conflict_detection(
-            {"project": project, "insights": insights_data}
-        )
+        conflicts = self._handle_conflict_detection({"project": project, "insights": insights_data})
         conflicts_found = conflicts.get("conflicts_found", [])
 
         if conflicts_found:
@@ -407,13 +482,19 @@ class SocraticCounselor:
             debug_log.append("phase_complete")
 
         # STEP 8: Generate NEXT question (CRITICAL!)
-        next_question_result = self._generate_question({
-            "project": project,
-            "user_id": user_id,
-            "force_refresh": True,
-            "knowledge_base": kb_context,
-        })
-        next_question = next_question_result.get("question") if next_question_result.get("status") == "success" else None
+        next_question_result = self._generate_question(
+            {
+                "project": project,
+                "user_id": user_id,
+                "force_refresh": True,
+                "knowledge_base": kb_context,
+            }
+        )
+        next_question = (
+            next_question_result.get("question")
+            if next_question_result.get("status") == "success"
+            else None
+        )
         debug_log.append("next_question_generated")
 
         # STEP 9: Save to database
@@ -551,7 +632,9 @@ class SocraticCounselor:
             chunk_snippets = []
             if chunks:
                 for chunk in chunks[:3]:
-                    content = chunk.get("content", str(chunk)) if isinstance(chunk, dict) else str(chunk)
+                    content = (
+                        chunk.get("content", str(chunk)) if isinstance(chunk, dict) else str(chunk)
+                    )
                     chunk_snippets.append(content[:200])
 
             chunks_context = (
@@ -646,23 +729,23 @@ Return ONLY the question text, nothing else."""
         fallback_questions = {
             "discovery": [
                 f"What is the main purpose of {topic}?",
-                f"Who are the primary users?",
-                f"What problem does this solve?",
+                "Who are the primary users?",
+                "What problem does this solve?",
             ],
             "analysis": [
-                f"What are the main requirements?",
-                f"What constraints apply?",
-                f"How will this be measured?",
+                "What are the main requirements?",
+                "What constraints apply?",
+                "How will this be measured?",
             ],
             "design": [
-                f"How would you structure this?",
-                f"What components are needed?",
-                f"What architecture would fit?",
+                "How would you structure this?",
+                "What components are needed?",
+                "What architecture would fit?",
             ],
             "implementation": [
-                f"What's the first step?",
-                f"What tools would you use?",
-                f"How would you test this?",
+                "What's the first step?",
+                "What tools would you use?",
+                "How would you test this?",
             ],
         }
 
@@ -689,7 +772,6 @@ Return ONLY the question text, nothing else."""
             - 'insights': Extracted insights dictionary
         """
         response = request.get("response", "")
-        project = request.get("project")
 
         if not response:
             return {"status": "error", "message": "Response required", "insights": {}}
@@ -717,7 +799,7 @@ Return ONLY the JSON."""
                 if isinstance(insights_text, str):
                     try:
                         insights = json.loads(insights_text)
-                    except:
+                    except (ValueError, TypeError):
                         insights = {"raw_response": insights_text}
                 else:
                     insights = insights_text or {}
@@ -733,7 +815,7 @@ Return ONLY the JSON."""
                 "raw_response": response,
                 "length": len(response),
                 "confidence": 0.5,
-            }
+            },
         }
 
     def _handle_conflict_detection(self, request: Dict) -> Dict:
@@ -790,9 +872,7 @@ Return ONLY the JSON."""
                 detection_result = conflict_detector.detect_from_agent_states(agent_states)
                 if detection_result["status"] == "success":
                     conflicts_found = detection_result.get("conflicts", [])
-                    self.logger.debug(
-                        f"Full detection: found {len(conflicts_found)} conflicts"
-                    )
+                    self.logger.debug(f"Full detection: found {len(conflicts_found)} conflicts")
 
             except Exception as e:
                 self.logger.debug(f"Full conflict detection error: {e}")
@@ -817,9 +897,7 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
                     try:
                         conflict_data = json.loads(response_text)
                         conflicts_found = conflict_data.get("conflicts", [])
-                        self.logger.debug(
-                            f"LLM detection: found {len(conflicts_found)} conflicts"
-                        )
+                        self.logger.debug(f"LLM detection: found {len(conflicts_found)} conflicts")
                     except json.JSONDecodeError:
                         pass
 
@@ -974,7 +1052,9 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
 
         is_complete = self._check_phase_completion_internal(project)
         phase = getattr(project, "phase", "discovery")
-        maturity = project.maturity_scores.get(phase, 0) if hasattr(project, "maturity_scores") else 0
+        maturity = (
+            project.maturity_scores.get(phase, 0) if hasattr(project, "maturity_scores") else 0
+        )
 
         return {
             "status": "success",
@@ -985,22 +1065,35 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
 
     def _advance_phase(self, request: Dict) -> Dict:
         """
-        Advance project to next phase.
+        Advance project to next phase with QualityController workflow approval.
 
-        Moves project from current phase to next in sequence.
+        Moves project from current phase to next in sequence with workflow optimization.
         Phase sequence: discovery → analysis → design → implementation
+
+        Workflow:
+        1. Validate current phase and next phase
+        2. Build workflow definition for phase transition
+        3. Request optimization approval from QualityController
+        4. Return approval request to user (phase advances only after approval)
 
         Args:
             request: Dictionary with:
-                - 'project': ProjectContext object
+                - 'project': ProjectContext object (required)
+                - 'quality_controller': Optional QualityController instance for approval
+                - 'auto_approve': Boolean to auto-approve (default: False)
 
         Returns:
             Dictionary with:
-            - 'status': 'success' or 'error'
+            - 'status': 'pending_approval' or 'success' or 'error'
             - 'previous_phase': Name of previous phase
             - 'new_phase': Name of new phase
+            - 'approval_id': Approval request ID if pending approval
+            - 'approval_request': Full approval details if available
         """
         project = request.get("project")
+        quality_controller = request.get("quality_controller")
+        auto_approve = request.get("auto_approve", False)
+
         if not project:
             return {"status": "error", "message": "Project required"}
 
@@ -1011,16 +1104,82 @@ Return JSON with 'conflicts' list, each having: 'type', 'description', 'severity
             idx = phases.index(current)
             next_phase = phases[idx + 1] if idx + 1 < len(phases) else current
 
-            if hasattr(project, "phase"):
-                project.phase = next_phase
+            # If no next phase or same phase, just return success
+            if next_phase == current:
+                return {
+                    "status": "success",
+                    "message": "Already in final phase",
+                    "previous_phase": current,
+                    "new_phase": next_phase,
+                }
 
-            self.logger.info(f"Advanced from {current} to {next_phase}")
+            # Build workflow definition for phase transition
+            workflow_definition = self._build_phase_transition_workflow(
+                project, current, next_phase
+            )
 
-            if self.database:
-                self.database.save_project(project)
+            # If QualityController is available, request approval
+            if quality_controller:
+                approval = quality_controller.process(
+                    {
+                        "action": "optimize_workflow",
+                        "workflow_definition": workflow_definition,
+                    }
+                )
 
-            return {"status": "success", "previous_phase": current, "new_phase": next_phase}
+                # If approval is pending and not auto-approving, return approval request
+                if approval.get("status") == "pending_approval" and not auto_approve:
+                    self.logger.info(
+                        f"Phase advancement {current} → {next_phase} pending approval: {approval.get('approval_id')}"
+                    )
+                    return {
+                        "status": "pending_approval",
+                        "previous_phase": current,
+                        "new_phase": next_phase,
+                        "approval_id": approval.get("approval_id"),
+                        "approval_request": approval.get("approval_request"),
+                        "message": "Phase advancement requires approval. Review the workflow optimization details.",
+                    }
+
+                # If auto-approve or approval succeeded, proceed with phase change
+                if approval.get("status") == "success" or auto_approve:
+                    if hasattr(project, "phase"):
+                        project.phase = next_phase
+
+                    self.logger.info(f"Advanced from {current} to {next_phase}")
+
+                    if self.database:
+                        self.database.save_project(project)
+
+                    return {
+                        "status": "success",
+                        "previous_phase": current,
+                        "new_phase": next_phase,
+                        "message": f"Phase advanced to {next_phase}",
+                    }
+                else:
+                    return {
+                        "status": "error",
+                        "message": f"Workflow optimization failed: {approval.get('message', 'Unknown error')}",
+                    }
+            else:
+                # No QualityController, proceed directly
+                if hasattr(project, "phase"):
+                    project.phase = next_phase
+
+                self.logger.info(f"Advanced from {current} to {next_phase}")
+
+                if self.database:
+                    self.database.save_project(project)
+
+                return {
+                    "status": "success",
+                    "previous_phase": current,
+                    "new_phase": next_phase,
+                }
+
         except Exception as e:
+            self.logger.error(f"Phase advancement failed: {e}")
             return {"status": "error", "message": str(e)}
 
     def _rollback_phase(self, request: Dict) -> Dict:
@@ -1140,7 +1299,6 @@ Provide a clear explanation suitable for learning."""
         Returns:
             Dictionary with guidance
         """
-        project = request.get("project")
         question = request.get("question", "")
 
         if self.llm_client:
@@ -1172,7 +1330,7 @@ Don't give the answer, guide the thinking process."""
         """
         project = request.get("project")
 
-        if hasattr(project, "pending_questions") and project.pending_questions:
+        if project and hasattr(project, "pending_questions") and project.pending_questions:
             for q in reversed(project.pending_questions):
                 if q.get("status") == "unanswered":
                     q["status"] = "skipped"
@@ -1201,9 +1359,11 @@ Don't give the answer, guide the thinking process."""
         project = request.get("project")
         question_id = request.get("question_id")
 
-        if hasattr(project, "pending_questions"):
+        if project and hasattr(project, "pending_questions"):
             for q in project.pending_questions:
-                if q.get("status") == "answered" and (not question_id or q.get("id") == question_id):
+                if q.get("status") == "answered" and (
+                    not question_id or q.get("id") == question_id
+                ):
                     q["status"] = "unanswered"
                     q["answered_at"] = None
                     q["answer"] = None
@@ -1229,7 +1389,6 @@ Don't give the answer, guide the thinking process."""
         Returns:
             Dictionary with list of suggestion approaches
         """
-        project = request.get("project")
         question = request.get("question", "")
 
         suggestions = []
@@ -1251,6 +1410,65 @@ Format as a list of brief approaches."""
         return {"status": "success", "suggestions": suggestions}
 
     # ===== HELPER METHODS =====
+
+    def _build_phase_transition_workflow(
+        self, project: Any, current_phase: str, next_phase: str
+    ) -> Dict[str, Any]:
+        """
+        Build workflow definition for phase transition.
+
+        Creates a workflow definition representing the phase transition that can be
+        analyzed by QualityController for optimization and approval.
+
+        The workflow represents the learning objectives and coverage areas for the
+        current and next phases.
+
+        Args:
+            project: ProjectContext object
+            current_phase: Current phase name
+            next_phase: Next phase name
+
+        Returns:
+            Workflow definition with nodes, edges, start/end nodes, and categories
+        """
+        phase_categories = {
+            "discovery": ["goals", "audience", "requirements"],
+            "analysis": ["technical_requirements", "constraints", "dependencies"],
+            "design": ["architecture", "design_patterns", "data_structures"],
+            "implementation": ["coding", "testing", "integration"],
+        }
+
+        # Define nodes for current and next phases
+        nodes = {
+            "current_phase": {
+                "type": "question",
+                "phase": current_phase,
+                "covers_categories": phase_categories.get(current_phase, []),
+            },
+            "next_phase": {
+                "type": "question",
+                "phase": next_phase,
+                "covers_categories": phase_categories.get(next_phase, []),
+            },
+        }
+
+        # Single edge from current to next
+        edges = [
+            {
+                "id": f"e_{current_phase}_to_{next_phase}",
+                "source": "current_phase",
+                "target": "next_phase",
+            }
+        ]
+
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "start_nodes": ["current_phase"],
+            "end_nodes": ["next_phase"],
+            "project_name": getattr(project, "name", "unnamed"),
+            "project_phase": current_phase,
+        }
 
     def _create_default_user(self, user_id: str) -> Dict:
         """

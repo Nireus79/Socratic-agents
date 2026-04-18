@@ -1,11 +1,10 @@
 """Function calling support for LLM agents."""
 
 import inspect
-import json
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Type, get_type_hints
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +34,7 @@ class ParameterSchema:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
-        schema = {
+        schema: Dict[str, Any] = {
             "name": self.name,
             "type": self.type.value,
             "description": self.description,
@@ -77,14 +76,18 @@ class FunctionSchema:
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        p.name: {
-                            "type": p.type.value,
-                            "description": p.description,
-                            "enum": p.enum_values,
-                        } if p.enum_values else {
-                            "type": p.type.value,
-                            "description": p.description,
-                        }
+                        p.name: (
+                            {
+                                "type": p.type.value,
+                                "description": p.description,
+                                "enum": p.enum_values,
+                            }
+                            if p.enum_values
+                            else {
+                                "type": p.type.value,
+                                "description": p.description,
+                            }
+                        )
                         for p in self.parameters
                     },
                     "required": [p.name for p in self.parameters if p.required],
@@ -118,9 +121,7 @@ class FunctionSchema:
                     raise ValueError(f"{param.name} must be string, got {type(value)}")
                 elif param.type == ParameterType.INTEGER and not isinstance(value, int):
                     raise ValueError(f"{param.name} must be integer, got {type(value)}")
-                elif param.type == ParameterType.NUMBER and not isinstance(
-                    value, (int, float)
-                ):
+                elif param.type == ParameterType.NUMBER and not isinstance(value, (int, float)):
                     raise ValueError(f"{param.name} must be number, got {type(value)}")
                 elif param.type == ParameterType.BOOLEAN and not isinstance(value, bool):
                     raise ValueError(f"{param.name} must be boolean, got {type(value)}")
@@ -285,13 +286,13 @@ class FunctionRegistry:
         if annotation == inspect.Parameter.empty or annotation is None:
             return ParameterType.STRING
 
-        if annotation == str:
+        if annotation is str:
             return ParameterType.STRING
-        elif annotation == int:
+        elif annotation is int:
             return ParameterType.INTEGER
         elif annotation in (float, int):
             return ParameterType.NUMBER
-        elif annotation == bool:
+        elif annotation is bool:
             return ParameterType.BOOLEAN
         elif annotation in (list, List):
             return ParameterType.ARRAY
@@ -300,9 +301,9 @@ class FunctionRegistry:
         else:
             # Check for generic types like List[str], Dict[str, Any]
             origin = getattr(annotation, "__origin__", None)
-            if origin == list:
+            if origin is list:
                 return ParameterType.ARRAY
-            elif origin == dict:
+            elif origin is dict:
                 return ParameterType.OBJECT
 
         return ParameterType.STRING
@@ -321,8 +322,11 @@ class FunctionRegistry:
                 desc_lines = []
                 for j in range(i + 1, len(lines)):
                     next_line = lines[j]
-                    if (next_line.strip() and not next_line.startswith(" ") or
-                        any(x in next_line for x in ["Args:", "Returns:", "Raises:"])):
+                    if (
+                        next_line.strip()
+                        and not next_line.startswith(" ")
+                        or any(x in next_line for x in ["Args:", "Returns:", "Raises:"])
+                    ):
                         break
                     if next_line.strip():
                         desc_lines.append(next_line.strip())
