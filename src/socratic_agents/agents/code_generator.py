@@ -382,18 +382,18 @@ class CodeGenerator(BaseAgent):
 
             if project_type == ProjectType.WEB_APP:
                 files["src/index.html"] = self._generate_html_template(project_name)
-                files[f"src/index.{('ts' if language == 'typescript' else 'js')}"] = (
-                    self._generate_js_main(project_name)
-                )
+                files[
+                    f"src/index.{('ts' if language == 'typescript' else 'js')}"
+                ] = self._generate_js_main(project_name)
                 files["src/style.css"] = self._generate_css_template()
 
             elif project_type == ProjectType.REST_API:
-                files["src/server.ts" if language == "typescript" else "src/server.js"] = (
-                    self._generate_node_api()
-                )
-                files["src/routes.ts" if language == "typescript" else "src/routes.js"] = (
-                    self._generate_node_routes()
-                )
+                files[
+                    "src/server.ts" if language == "typescript" else "src/server.js"
+                ] = self._generate_node_api()
+                files[
+                    "src/routes.ts" if language == "typescript" else "src/routes.js"
+                ] = self._generate_node_routes()
 
         return {k: v for k, v in files.items() if v}  # Remove empty files
 

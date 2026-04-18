@@ -646,7 +646,9 @@ class SocraticCounselor(BaseAgent):
             # Build gaps context
             gaps_context = ""
             if gaps:
-                gap_list = [g.get("topic", str(g)) if isinstance(g, dict) else str(g) for g in gaps[:3]]
+                gap_list = [
+                    g.get("topic", str(g)) if isinstance(g, dict) else str(g) for g in gaps[:3]
+                ]
                 gaps_context = f"\nIdentified knowledge gaps: {', '.join(gap_list)}"
 
             # Build document understanding context
@@ -691,7 +693,9 @@ Return ONLY the question text, nothing else."""
 
             # Add explicit deduplication guidance
             if recently_asked:
-                prompt += "\n\n[CRITICAL] Previously asked questions (DO NOT REPEAT OR REPHRASE THESE):\n"
+                prompt += (
+                    "\n\n[CRITICAL] Previously asked questions (DO NOT REPEAT OR REPHRASE THESE):\n"
+                )
                 prompt += "\n".join([f"- {q}" for q in recently_asked[:10]])
                 prompt += "\n[END] Ask a different question that hasn't been covered above."
 
@@ -702,7 +706,9 @@ Return ONLY the question text, nothing else."""
                     # Validate the question is not a duplicate
                     for prev_q in recently_asked:
                         if prev_q.lower().strip() == question.lower().strip():
-                            self.logger.warning(f"Generated duplicate question, regenerating: {question}")
+                            self.logger.warning(
+                                f"Generated duplicate question, regenerating: {question}"
+                            )
                             return None  # Will trigger fallback to static question
                     return question
 
