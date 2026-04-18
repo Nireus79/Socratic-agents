@@ -20,13 +20,7 @@ from .base import BaseAgent
 class HealthMetric:
     """Represents a health metric."""
 
-    def __init__(
-        self,
-        name: str,
-        unit: str,
-        threshold_warning: float,
-        threshold_critical: float,
-    ):
+    def __init__(self, name: str, unit: str, threshold_warning: float, threshold_critical: float):
         self.name = name
         self.unit = unit
         self.threshold_warning = threshold_warning
