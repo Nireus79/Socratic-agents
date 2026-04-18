@@ -470,8 +470,11 @@ class SocraticCounselor:
                 level="intermediate",
                 phase=getattr(project, "phase", "discovery"),
                 kb_context=kb_context,
+                doc_understanding=doc_understanding,
                 conversation_context=conversation_context,
                 recently_asked=recently_asked,
+                conversation_history=getattr(project, "conversation_history", []),
+                question_number=question_count + 1,
             )
             if question:
                 return question
@@ -509,6 +512,9 @@ class SocraticCounselor:
         kb_context: Dict[str, Any],
         conversation_context: str = "",
         recently_asked: Optional[List[str]] = None,
+        doc_understanding: Optional[Dict] = None,
+        conversation_history: Optional[List[Dict]] = None,
+        question_number: int = 1,
     ) -> Optional[str]:
         """
         Generate question using KB chunks and identified gaps.
@@ -524,6 +530,9 @@ class SocraticCounselor:
             kb_context: KB context with chunks and gaps
             conversation_context: Summary of conversation so far
             recently_asked: Questions to avoid repeating
+            doc_understanding: Document analysis with alignment/gaps
+            conversation_history: Full conversation history for context
+            question_number: Ordinal position of this question in the phase
 
         Returns:
             KB-aware question string or None if generation fails
@@ -532,6 +541,7 @@ class SocraticCounselor:
             return None
 
         recently_asked = recently_asked or []
+        conversation_history = conversation_history or []
 
         try:
             chunks = kb_context.get("chunks", [])
@@ -554,33 +564,63 @@ class SocraticCounselor:
             gaps_context = ""
             if gaps:
                 gap_list = [g.get("topic", str(g)) if isinstance(g, dict) else str(g) for g in gaps[:3]]
-                gaps_context = f"\nKnowledge gaps: {', '.join(gap_list)}"
+                gaps_context = f"\nIdentified knowledge gaps: {', '.join(gap_list)}"
 
-            # Build prompt for LLM
-            prompt = f"""Generate ONE Socratic question about "{topic}" at {level} level.
+            # Build document understanding context
+            doc_context = ""
+            if doc_understanding:
+                alignments = doc_understanding.get("alignments", [])
+                coverage = doc_understanding.get("coverage", 0)
+                if alignments:
+                    doc_context += f"\nDocument alignment with project: {coverage}%"
+                    doc_context += "\nHow documentation relates to project:\n"
+                    for align in alignments[:3]:
+                        if isinstance(align, dict):
+                            doc_context += f"- {align.get('relevance', 'Related')} to {align.get('topic', 'project goals')}\n"
 
-Project Phase: {phase}
-Available Context:
-{chunks_context}{gaps_context}
+            # Build conversation history summary for progression guidance
+            progression_guidance = ""
+            if question_number > 1:
+                # Recommend deeper exploration
+                progression_guidance = f"\n\nProgression Context: This is question {question_number} in the {phase} phase."
+                if recently_asked and len(recently_asked) >= 2:
+                    progression_guidance += " The learner has already explored several topics."
+                    progression_guidance += " Ask a question that builds on previous discussions or explores deeper related concepts."
+
+            # Build the comprehensive prompt
+            prompt = f"""Generate ONE Socratic question about "{topic}" at the {level} level for the {phase} phase.
+
+Project Knowledge Base Context:
+{chunks_context}{gaps_context}{doc_context}
 
 Conversation Context: {conversation_context if conversation_context else "Starting fresh"}
+{progression_guidance}
 
-Guidelines:
-- Ground question in specific project context
-- Help the learner discover answers themselves
-- Consider the project phase
-- Make it specific, not generic
-- Address identified gaps if any
+Question Guidelines:
+- Ground the question in the specific project context provided above
+- Help the learner discover insights and answers themselves, don't provide them
+- Make the question specific to the project, NOT generic
+- Adapt to the phase: discovery (broad exploration), analysis (requirements), design (architecture), implementation (code)
+- If knowledge gaps exist, consider questions that help close them
+- Build on previous discussions to create deeper understanding
 
 Return ONLY the question text, nothing else."""
 
+            # Add explicit deduplication guidance
             if recently_asked:
-                prompt += "\n\nDo NOT ask:\n" + "\n".join([f"- {q}" for q in recently_asked[:5]])
+                prompt += "\n\n[CRITICAL] Previously asked questions (DO NOT REPEAT OR REPHRASE THESE):\n"
+                prompt += "\n".join([f"- {q}" for q in recently_asked[:10]])
+                prompt += "\n[END] Ask a different question that hasn't been covered above."
 
             response = self.llm_client.generate_response(prompt)
             if response:
                 question = response.strip()
                 if question:
+                    # Validate the question is not a duplicate
+                    for prev_q in recently_asked:
+                        if prev_q.lower().strip() == question.lower().strip():
+                            self.logger.warning(f"Generated duplicate question, regenerating: {question}")
+                            return None  # Will trigger fallback to static question
                     return question
 
         except Exception as e:
