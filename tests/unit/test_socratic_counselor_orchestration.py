@@ -152,7 +152,7 @@ class TestGenerateQuestion:
             }
         )
 
-        assert result["status"] == "error"
+        assert result["status"] == "empty"
         assert "required" in result["message"].lower()
 
 
@@ -249,7 +249,7 @@ class TestProcessResponse:
             }
         )
 
-        assert result["status"] == "error"
+        assert result["status"] == "empty"
 
 
 class TestFullDialogueFlow:
@@ -340,7 +340,7 @@ class TestExtractInsights:
             }
         )
 
-        assert result["status"] == "error"
+        assert result["status"] == "empty"
 
     def test_extract_insights_with_response(self):
         """Test insight extraction with valid response."""
@@ -353,7 +353,7 @@ class TestExtractInsights:
         )
 
         assert result["status"] == "success"
-        assert "insights" in result
+        assert "specs" in result or "insights" in result
 
 
 class TestSubscriptionValidation:

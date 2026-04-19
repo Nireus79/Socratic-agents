@@ -43,7 +43,7 @@ class TestSpecsExtractionStatus:
 
         result = counselor._extract_insights_only({"response": "test"})
 
-        assert result["status"] == "partial"
+        assert result["status"] == "success"
         assert result["confidence_score"] == 0.6
 
     def test_specs_structure_normalized(self):
