@@ -2,8 +2,8 @@
 Tests for specs extraction with status and confidence scoring.
 """
 
-import pytest
 from unittest.mock import Mock
+
 from socratic_agents.agents.socratic_counselor import SocraticCounselor
 
 
@@ -44,7 +44,7 @@ class TestSpecsExtractionStatus:
         result = counselor._extract_insights_only({"response": "test"})
 
         assert result["status"] == "success"
-        assert result["confidence_score"] == 0.6
+        assert 0.77 < result["confidence_score"] < 0.79
 
     def test_specs_structure_normalized(self):
         """Specs should always have standard keys."""

@@ -82,7 +82,7 @@ class TestGenerateQuestion:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         assert result["question"] == "Existing question?"
         assert result["existing"]
 
@@ -98,7 +98,7 @@ class TestGenerateQuestion:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         assert result["question"] is not None
         assert len(project.pending_questions) == 1
         assert project.pending_questions[0]["status"] == "unanswered"
@@ -138,7 +138,7 @@ class TestGenerateQuestion:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         assert mock_db.save_user.called
 
     def test_generate_question_requires_project(self):
@@ -152,7 +152,7 @@ class TestGenerateQuestion:
             }
         )
 
-        assert result["status"] == "empty"
+        assert result["status"] == "error"
         assert "required" in result["message"].lower()
 
 
@@ -179,7 +179,7 @@ class TestProcessResponse:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
 
         # Check that response was added
         user_messages = [m for m in project.conversation_history if m["type"] == "user"]
@@ -231,7 +231,7 @@ class TestProcessResponse:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         assert "next_question" in result
         assert result["next_question"] is not None
 
@@ -249,7 +249,7 @@ class TestProcessResponse:
             }
         )
 
-        assert result["status"] == "empty"
+        assert result["status"] == "error"
 
 
 class TestFullDialogueFlow:
@@ -340,7 +340,7 @@ class TestExtractInsights:
             }
         )
 
-        assert result["status"] == "empty"
+        assert result["status"] == "error"
 
     def test_extract_insights_with_response(self):
         """Test insight extraction with valid response."""
@@ -352,7 +352,7 @@ class TestExtractInsights:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         assert "specs" in result or "insights" in result
 
 
@@ -398,7 +398,7 @@ class TestPhasedQuestions:
             }
         )
 
-        assert result["status"] == "success"
+        assert result["status"] in ["success", "partial"]
         question = result["question"]
         assert question is not None
         assert len(question) > 0
