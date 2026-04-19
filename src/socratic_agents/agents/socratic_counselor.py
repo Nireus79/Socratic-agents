@@ -801,13 +801,13 @@ Return ONLY the question text, nothing else."""
                     "requirements": [],
                     "gaps": [],
                     "decisions": [],
-                    "questions": []
+                    "questions": [],
                 },
                 "metadata": {
                     "extraction_method": "none",
                     "item_count": 0,
-                    "error": "Response required"
-                }
+                    "error": "Response required",
+                },
             }
 
         self.logger.debug(f"Extracting insights ({len(response)} chars)")
@@ -844,12 +844,12 @@ Return ONLY the JSON."""
                     "requirements": raw_insights.get("requirements", []),
                     "gaps": raw_insights.get("gaps", []),
                     "decisions": raw_insights.get("decisions", []),
-                    "questions": raw_insights.get("questions", [])
+                    "questions": raw_insights.get("questions", []),
                 }
 
                 # Calculate metrics
                 item_count = sum(len(v) if isinstance(v, list) else 0 for v in specs.values())
-                
+
                 # Determine status and confidence
                 if item_count == 0:
                     status = "empty"
@@ -871,8 +871,8 @@ Return ONLY the JSON."""
                     "metadata": {
                         "extraction_method": "llm",
                         "item_count": item_count,
-                        "error": None
-                    }
+                        "error": None,
+                    },
                 }
             except Exception as e:
                 self.logger.error(f"LLM insight extraction failed: {e}")
@@ -885,13 +885,9 @@ Return ONLY the JSON."""
                         "requirements": [],
                         "gaps": [],
                         "decisions": [],
-                        "questions": []
+                        "questions": [],
                     },
-                    "metadata": {
-                        "extraction_method": "llm",
-                        "item_count": 0,
-                        "error": str(e)
-                    }
+                    "metadata": {"extraction_method": "llm", "item_count": 0, "error": str(e)},
                 }
 
         # Fallback: simple keyword extraction
@@ -901,7 +897,7 @@ Return ONLY the JSON."""
             "requirements": self._extract_requirements_fallback(response),
             "gaps": [],
             "decisions": [],
-            "questions": []
+            "questions": [],
         }
 
         item_count = sum(len(v) if isinstance(v, list) else 0 for v in specs.values())
@@ -912,39 +908,35 @@ Return ONLY the JSON."""
             "status": status,
             "confidence_score": confidence,
             "specs": specs,
-            "metadata": {
-                "extraction_method": "fallback",
-                "item_count": item_count,
-                "error": None
-            }
+            "metadata": {"extraction_method": "fallback", "item_count": item_count, "error": None},
         }
 
     def _extract_goals_fallback(self, text: str) -> List[str]:
         """Fallback goal extraction using keywords."""
         goals = []
         keywords = ["goal", "objective", "aim", "purpose", "want to", "build", "create", "develop"]
-        
+
         for sentence in text.split("."):
             sentence_lower = sentence.lower()
             if any(kw in sentence_lower for kw in keywords):
                 cleaned = sentence.strip()
                 if cleaned and cleaned not in goals:
                     goals.append(cleaned)
-        
+
         return goals[:5]  # Limit to 5
 
     def _extract_requirements_fallback(self, text: str) -> List[str]:
         """Fallback requirement extraction using keywords."""
         requirements = []
         keywords = ["require", "need", "must", "should", "feature", "support"]
-        
+
         for sentence in text.split("."):
             sentence_lower = sentence.lower()
             if any(kw in sentence_lower for kw in keywords):
                 cleaned = sentence.strip()
                 if cleaned and cleaned not in requirements:
                     requirements.append(cleaned)
-        
+
         return requirements[:5]  # Limit to 5
 
     def _handle_conflict_detection(self, request: Dict) -> Dict:

@@ -14,7 +14,7 @@ class TestSpecsExtractionStatus:
         """Empty response should return empty status with 0 confidence."""
         counselor = SocraticCounselor()
         result = counselor._extract_insights_only({"response": ""})
-        
+
         assert result["status"] == "empty"
         assert result["confidence_score"] == 0.0
         assert result["metadata"]["item_count"] == 0
@@ -23,12 +23,12 @@ class TestSpecsExtractionStatus:
         """LLM extraction with 8+ items returns success status."""
         counselor = SocraticCounselor()
         counselor.llm_client = Mock()
-        
+
         json_response = '{"goals": ["g1", "g2", "g3"], "requirements": ["r1", "r2", "r3"], "gaps": ["gap1", "gap2"], "decisions": ["d1", "d2"], "questions": ["q1", "q2"]}'
         counselor.llm_client.generate_response.return_value = json_response
-        
+
         result = counselor._extract_insights_only({"response": "test"})
-        
+
         assert result["status"] == "success"
         assert result["confidence_score"] > 0.85
         assert result["metadata"]["item_count"] == 12
@@ -37,12 +37,12 @@ class TestSpecsExtractionStatus:
         """LLM extraction with 3-7 items returns partial status."""
         counselor = SocraticCounselor()
         counselor.llm_client = Mock()
-        
+
         json_response = '{"goals": ["g1"], "requirements": ["r1", "r2"], "gaps": [], "decisions": [], "questions": []}'
         counselor.llm_client.generate_response.return_value = json_response
-        
+
         result = counselor._extract_insights_only({"response": "test"})
-        
+
         assert result["status"] == "partial"
         assert result["confidence_score"] == 0.6
 
@@ -50,12 +50,12 @@ class TestSpecsExtractionStatus:
         """Specs should always have standard keys."""
         counselor = SocraticCounselor()
         counselor.llm_client = Mock()
-        
+
         json_response = '{"goals": ["g1"], "other": "ignored"}'
         counselor.llm_client.generate_response.return_value = json_response
-        
+
         result = counselor._extract_insights_only({"response": "test"})
-        
+
         expected_keys = {"goals", "requirements", "gaps", "decisions", "questions"}
         assert set(result["specs"].keys()) == expected_keys
 
@@ -63,11 +63,10 @@ class TestSpecsExtractionStatus:
         """Confidence score should be between 0.0 and 1.0."""
         counselor = SocraticCounselor()
         counselor.llm_client = Mock()
-        
+
         json_response = '{"goals": ["g1"], "requirements": ["r1"], "gaps": [], "decisions": [], "questions": []}'
         counselor.llm_client.generate_response.return_value = json_response
-        
-        result = counselor._extract_insights_only({"response": "test"})
-        
-        assert 0.0 <= result["confidence_score"] <= 1.0
 
+        result = counselor._extract_insights_only({"response": "test"})
+
+        assert 0.0 <= result["confidence_score"] <= 1.0
