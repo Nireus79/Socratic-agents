@@ -762,9 +762,10 @@ Return ONLY the question text, nothing else."""
 
     def _extract_insights_only(self, request: Dict) -> Dict:
         """
-        Extract insights from response with status and confidence scoring.
+        Extract insights from response without full processing.
 
-        Returns structured result indicating extraction success and quality.
+        Performs insight extraction independently without other processing steps.
+        Useful for confirmation mode or when full processing will happen later.
 
         Args:
             request: Dictionary with:
@@ -773,42 +774,13 @@ Return ONLY the question text, nothing else."""
 
         Returns:
             Dictionary with:
-            {
-                "status": "success|partial|empty|failed",
-                "confidence_score": 0.0-1.0,
-                "specs": {
-                    "goals": [...],
-                    "requirements": [...],
-                    "gaps": [...],
-                    "decisions": [...],
-                    "questions": [...]
-                },
-                "metadata": {
-                    "extraction_method": "llm|fallback",
-                    "item_count": int,
-                    "error": None or str
-                }
-            }
+            - 'status': 'success' or 'error'
+            - 'insights': Extracted insights dictionary
         """
         response = request.get("response", "")
 
         if not response:
-            return {
-                "status": "empty",
-                "confidence_score": 0.0,
-                "specs": {
-                    "goals": [],
-                    "requirements": [],
-                    "gaps": [],
-                    "decisions": [],
-                    "questions": []
-                },
-                "metadata": {
-                    "extraction_method": "none",
-                    "item_count": 0,
-                    "error": "Response required"
-                }
-            }
+            return {"status": "error", "message": "Response required", "insights": {}}
 
         self.logger.debug(f"Extracting insights ({len(response)} chars)")
 
@@ -820,9 +792,9 @@ Return ONLY the question text, nothing else."""
 Response: {response}
 
 Format as structured JSON with keys like:
-- goals: list of project goals mentioned
+- specifications: list of specs
 - requirements: list of requirements
-- gaps: list of knowledge gaps identified
+- gaps: list of knowledge gaps
 - decisions: list of decisions made
 - questions: follow-up questions
 
@@ -832,120 +804,25 @@ Return ONLY the JSON."""
 
                 if isinstance(insights_text, str):
                     try:
-                        raw_insights = json.loads(insights_text)
+                        insights = json.loads(insights_text)
                     except (ValueError, TypeError):
-                        raw_insights = {"raw_response": insights_text}
+                        insights = {"raw_response": insights_text}
                 else:
-                    raw_insights = insights_text or {}
+                    insights = insights_text or {}
 
-                # Normalize to standard keys
-                specs = {
-                    "goals": raw_insights.get("goals", []),
-                    "requirements": raw_insights.get("requirements", []),
-                    "gaps": raw_insights.get("gaps", []),
-                    "decisions": raw_insights.get("decisions", []),
-                    "questions": raw_insights.get("questions", [])
-                }
-
-                # Calculate metrics
-                item_count = sum(len(v) if isinstance(v, list) else 0 for v in specs.values())
-                
-                # Determine status and confidence
-                if item_count == 0:
-                    status = "empty"
-                    confidence = 0.0
-                elif item_count < 3:
-                    status = "partial"
-                    confidence = 0.6
-                elif item_count < 8:
-                    status = "success"
-                    confidence = 0.75 + (item_count / 100)
-                else:
-                    status = "success"
-                    confidence = min(0.85 + (item_count / 100), 0.95)
-
-                return {
-                    "status": status,
-                    "confidence_score": confidence,
-                    "specs": specs,
-                    "metadata": {
-                        "extraction_method": "llm",
-                        "item_count": item_count,
-                        "error": None
-                    }
-                }
+                return {"status": "success", "insights": insights}
             except Exception as e:
-                self.logger.error(f"LLM insight extraction failed: {e}")
-                # Return failed status instead of trying fallback
-                return {
-                    "status": "failed",
-                    "confidence_score": 0.0,
-                    "specs": {
-                        "goals": [],
-                        "requirements": [],
-                        "gaps": [],
-                        "decisions": [],
-                        "questions": []
-                    },
-                    "metadata": {
-                        "extraction_method": "llm",
-                        "item_count": 0,
-                        "error": str(e)
-                    }
-                }
+                self.logger.warning(f"Insight extraction failed: {e}")
 
-        # Fallback: simple keyword extraction
-        self.logger.debug("Using fallback extraction (no LLM client)")
-        specs = {
-            "goals": self._extract_goals_fallback(response),
-            "requirements": self._extract_requirements_fallback(response),
-            "gaps": [],
-            "decisions": [],
-            "questions": []
-        }
-
-        item_count = sum(len(v) if isinstance(v, list) else 0 for v in specs.values())
-        confidence = 0.4 if item_count > 0 else 0.0
-        status = "partial" if item_count > 0 else "empty"
-
+        # Fallback
         return {
-            "status": status,
-            "confidence_score": confidence,
-            "specs": specs,
-            "metadata": {
-                "extraction_method": "fallback",
-                "item_count": item_count,
-                "error": None
-            }
+            "status": "success",
+            "insights": {
+                "raw_response": response,
+                "length": len(response),
+                "confidence": 0.5,
+            },
         }
-
-    def _extract_goals_fallback(self, text: str) -> List[str]:
-        """Fallback goal extraction using keywords."""
-        goals = []
-        keywords = ["goal", "objective", "aim", "purpose", "want to", "build", "create", "develop"]
-        
-        for sentence in text.split("."):
-            sentence_lower = sentence.lower()
-            if any(kw in sentence_lower for kw in keywords):
-                cleaned = sentence.strip()
-                if cleaned and cleaned not in goals:
-                    goals.append(cleaned)
-        
-        return goals[:5]  # Limit to 5
-
-    def _extract_requirements_fallback(self, text: str) -> List[str]:
-        """Fallback requirement extraction using keywords."""
-        requirements = []
-        keywords = ["require", "need", "must", "should", "feature", "support"]
-        
-        for sentence in text.split("."):
-            sentence_lower = sentence.lower()
-            if any(kw in sentence_lower for kw in keywords):
-                cleaned = sentence.strip()
-                if cleaned and cleaned not in requirements:
-                    requirements.append(cleaned)
-        
-        return requirements[:5]  # Limit to 5
 
     def _handle_conflict_detection(self, request: Dict) -> Dict:
         """
