@@ -479,7 +479,6 @@ class WorkflowManager:
             "completed_steps": len(workflow["completed_steps"]),
             "results": workflow["results"],
         }
-        }
     def process_answer_workflow(
         self,
         project,
