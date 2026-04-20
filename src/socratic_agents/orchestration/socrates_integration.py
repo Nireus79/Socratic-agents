@@ -479,6 +479,7 @@ class WorkflowManager:
             "completed_steps": len(workflow["completed_steps"]),
             "results": workflow["results"],
         }
+
     def process_answer_workflow(
         self,
         project,
@@ -503,11 +504,13 @@ class WorkflowManager:
 
         try:
             # Extract specs
-            extract_result = counselor.process({
-                "action": "extract_insights_only",
-                "response": user_response,
-                "project": project,
-            })
+            extract_result = counselor.process(
+                {
+                    "action": "extract_insights_only",
+                    "response": user_response,
+                    "project": project,
+                }
+            )
 
             extracted_specs = extract_result.get("data", {}).get("insights", {})
             self.logger.info(f"Extracted specs: {list(extracted_specs.keys())}")
@@ -520,13 +523,23 @@ class WorkflowManager:
             self._merge_specs_into_project(project, high_confidence)
 
             # Detect conflicts
-            conflicts = detector.process({
-                "new_specs": high_confidence,
-                "project": project,
-            }).get("data", {}).get("conflicts", [])
+            conflicts = (
+                detector.process(
+                    {
+                        "new_specs": high_confidence,
+                        "project": project,
+                    }
+                )
+                .get("data", {})
+                .get("conflicts", [])
+            )
 
             # Update maturity
-            maturity = project.maturity_scores if hasattr(project, "maturity_scores") else {}
+            maturity = (
+                project.maturity_scores
+                if hasattr(project, "maturity_scores")
+                else {}
+            )
             self.logger.info(f"Updated maturity: {maturity}")
 
             # Auto-generate follow-up
@@ -536,33 +549,42 @@ class WorkflowManager:
             if last_q:
                 recently_asked.append(last_q)
 
-            followup_result = counselor.process({
-                "action": "generate_question",
-                "project": project,
-                "user_id": current_user,
-                "recently_asked": recently_asked,
-                "force_refresh": True,
-            })
+            followup_result = counselor.process(
+                {
+                    "action": "generate_question",
+                    "project": project,
+                    "user_id": current_user,
+                    "recently_asked": recently_asked,
+                    "force_refresh": True,
+                }
+            )
 
-            followup_question = followup_result.get("data", {}).get("question", "")
+            followup_question = (
+                followup_result.get("data", {}).get("question", "")
+            )
 
             # Store in conversation history
             if followup_question:
                 if not hasattr(project, "conversation_history"):
                     project.conversation_history = []
 
-                response_turn = len([
-                    m for m in project.conversation_history
-                    if m.get("type") == "assistant"
-                ]) + 1
+                response_turn = len(
+                    [
+                        m
+                        for m in project.conversation_history
+                        if m.get("type") == "assistant"
+                    ]
+                ) + 1
 
-                project.conversation_history.append({
-                    "type": "assistant",
-                    "content": followup_question,
-                    "phase": phase,
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "response_turn": response_turn,
-                })
+                project.conversation_history.append(
+                    {
+                        "type": "assistant",
+                        "content": followup_question,
+                        "phase": phase,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "response_turn": response_turn,
+                    }
+                )
 
             return {
                 "status": "success",
@@ -585,8 +607,12 @@ class WorkflowManager:
         for key, spec_list in specs.items():
             if isinstance(spec_list, list):
                 filtered[key] = [
-                    s for s in spec_list
-                    if isinstance(s, dict) and s.get("confidence_score", 1.0) >= min_confidence
+                    s
+                    for s in spec_list
+                    if (
+                        isinstance(s, dict)
+                        and s.get("confidence_score", 1.0) >= min_confidence
+                    )
                     or isinstance(s, str)
                 ]
             else:
@@ -620,7 +646,11 @@ class WorkflowManager:
                 project.tech_stack.append(text)
 
         for constraint in specs.get("constraints", []):
-            text = constraint if isinstance(constraint, str) else constraint.get("text", "")
+            text = (
+                constraint
+                if isinstance(constraint, str)
+                else constraint.get("text", "")
+            )
             if text and text not in project.constraints:
                 project.constraints.append(text)
 
@@ -628,13 +658,18 @@ class WorkflowManager:
         """Extract previously asked questions (MONOLITHIC PATTERN)."""
         recently_asked = []
         for msg in getattr(project, "conversation_history", []):
-            if msg.get("type") == "assistant" and msg.get("phase") == phase:
+            if (
+                msg.get("type") == "assistant"
+                and msg.get("phase") == phase
+            ):
                 recently_asked.append(msg.get("content", ""))
         return [q for q in recently_asked if q]
 
     def _get_last_question(self, project):
         """Get the most recent question from conversation history."""
-        for msg in reversed(getattr(project, "conversation_history", [])):
+        for msg in reversed(
+            getattr(project, "conversation_history", [])
+        ):
             if msg.get("type") == "assistant":
                 return msg.get("content", "")
         return ""
