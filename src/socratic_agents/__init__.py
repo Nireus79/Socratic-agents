@@ -1,165 +1,39 @@
-"""Socratic Agents - Multi-agent orchestration system for AI workflows."""
+"""Agent implementations for Socrates AI"""
 
-__version__ = "0.3.0"  # Complete orchestration engine (Phase 0a complete, pre-integration)
-__author__ = "Socratic Agents Contributors"
-
-# Core base class
-from .agents.base import BaseAgent
-from .agents.code_generator import CodeGenerator
-from .agents.code_validation_agent import CodeValidator
-from .agents.conflict_detector import AgentConflictDetector
-from .agents.context_analyzer import ContextAnalyzer
-from .agents.document_context_analyzer import DocumentContextAnalyzer
-from .agents.document_processor import DocumentProcessor
-from .agents.github_sync_handler import GithubSyncHandler
-from .agents.knowledge_analysis import KnowledgeAnalysis
-from .agents.knowledge_manager import KnowledgeManager
-from .agents.learning_agent import LearningAgent
-from .agents.multi_llm_agent import MultiLlmAgent
-from .agents.note_manager import NoteManager
-from .agents.project_file_loader import ProjectFileLoader
-from .agents.project_manager import ProjectManager
-from .agents.quality_controller import QualityController
-from .agents.question_queue_agent import QuestionQueueAgent
-from .agents.skill_generator_agent import SkillGeneratorAgent
-
-# Concrete agent implementations
-from .agents.socratic_counselor import SocraticCounselor
-from .agents.system_monitor import SystemMonitor
-from .agents.user_manager import UserManager
-
-# Event system (93 comprehensive event types)
-from .events import EVENT_CATEGORIES, EventBus, EventType
-
-# Function calling support
-from .function_calling import (
-    FunctionCall,
-    FunctionCallExecutor,
-    FunctionRegistry,
-    FunctionSchema,
-    ParameterSchema,
-    ParameterType,
-)
-
-# LLM-enhanced agent wrappers
-from .llm_agents import (
-    LLMAgentError,
-    LLMPoweredCodeGenerator,
-    LLMPoweredCodeValidator,
-    LLMPoweredContextAnalyzer,
-    LLMPoweredCounselor,
-    LLMPoweredKnowledgeManager,
-    LLMPoweredProjectManager,
-    LLMPoweredQualityController,
-)
-
-# Data models
-from .models import AgentSkill, SkillApplicationResult, SkillRecommendation
-
-
-# Error classes for GitHub sync and integration
-class ConflictResolutionError(Exception):
-    """Raised when merge conflict cannot be resolved"""
-
-    pass
-
-
-class TokenExpiredError(Exception):
-    """Raised when GitHub authentication token has expired"""
-
-    pass
-
-
-class PermissionDeniedError(Exception):
-    """Raised when user lacks repository access"""
-
-    pass
-
-
-class RepositoryNotFoundError(Exception):
-    """Raised when repository no longer exists or is inaccessible"""
-
-    pass
-
-
-class NetworkSyncFailedError(Exception):
-    """Raised when sync fails after all retry attempts"""
-
-    pass
-
-
-class FileSizeExceededError(Exception):
-    """Raised when file size exceeds GitHub limits"""
-
-    pass
-
-
-# Backward compatibility alias
-ConflictDetector = AgentConflictDetector
-
-
-# Factory functions
-def create_github_sync_handler(db=None):
-    """Factory function to create GitHub sync handler"""
-    return GithubSyncHandler(db=db)
-
+from .base import Agent
+from .code_generator import CodeGeneratorAgent
+from .code_validation_agent import CodeValidationAgent
+from .conflict_detector import ConflictDetectorAgent
+from .context_analyzer import ContextAnalyzerAgent
+from .document_processor import DocumentProcessorAgent
+from .knowledge_analysis import KnowledgeAnalysisAgent
+from .knowledge_manager import KnowledgeManagerAgent
+from .learning_agent import UserLearningAgent
+from .multi_llm_agent import MultiLLMAgent
+from .note_manager import NoteManagerAgent
+from .project_manager import ProjectManagerAgent
+from .quality_controller import QualityControllerAgent
+from .question_queue_agent import QuestionQueueAgent
+from .socratic_counselor import SocraticCounselorAgent
+from .system_monitor import SystemMonitorAgent
+from .user_manager import UserManagerAgent
 
 __all__ = [
-    # Base class
-    "BaseAgent",
-    # Agent implementations
-    "SocraticCounselor",
-    "CodeGenerator",
-    "CodeValidator",
-    "KnowledgeManager",
-    "LearningAgent",
-    "MultiLlmAgent",
-    "ProjectManager",
-    "ProjectFileLoader",
-    "QualityController",
-    "SkillGeneratorAgent",
-    "ContextAnalyzer",
-    "DocumentProcessor",
-    "GithubSyncHandler",
-    "SystemMonitor",
-    "UserManager",
-    "AgentConflictDetector",
-    "ConflictDetector",  # Backward compatibility alias
-    "KnowledgeAnalysis",
-    "DocumentContextAnalyzer",
-    "NoteManager",
+    "Agent",
+    "ProjectManagerAgent",
+    "UserManagerAgent",
+    "SocraticCounselorAgent",
+    "ContextAnalyzerAgent",
+    "CodeGeneratorAgent",
+    "CodeValidationAgent",
+    "SystemMonitorAgent",
+    "ConflictDetectorAgent",
+    "DocumentProcessorAgent",
+    "NoteManagerAgent",
+    "QualityControllerAgent",
+    "KnowledgeAnalysisAgent",
+    "KnowledgeManagerAgent",
+    "UserLearningAgent",
+    "MultiLLMAgent",
     "QuestionQueueAgent",
-    # Data models
-    "AgentSkill",
-    "SkillApplicationResult",
-    "SkillRecommendation",
-    # LLM-enhanced agent wrappers
-    "LLMPoweredCounselor",
-    "LLMPoweredCodeGenerator",
-    "LLMPoweredCodeValidator",
-    "LLMPoweredProjectManager",
-    "LLMPoweredQualityController",
-    "LLMPoweredKnowledgeManager",
-    "LLMPoweredContextAnalyzer",
-    "LLMAgentError",
-    # Error classes
-    "ConflictResolutionError",
-    "TokenExpiredError",
-    "PermissionDeniedError",
-    "RepositoryNotFoundError",
-    "NetworkSyncFailedError",
-    "FileSizeExceededError",
-    # Factory functions
-    "create_github_sync_handler",
-    # Event system (93 event types)
-    "EventType",
-    "EventBus",
-    "EVENT_CATEGORIES",
-    # Function calling support
-    "FunctionRegistry",
-    "FunctionCallExecutor",
-    "FunctionSchema",
-    "FunctionCall",
-    "ParameterSchema",
-    "ParameterType",
 ]
