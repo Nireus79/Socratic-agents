@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Socratic counselor agent for guided questioning and response processing
 """

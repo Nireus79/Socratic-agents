@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Project File Loader - Auto-loads project files into vector DB for chat sessions
 

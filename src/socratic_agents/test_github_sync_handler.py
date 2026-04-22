@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Comprehensive test suite for GitHub Sync Edge Case Handler
 

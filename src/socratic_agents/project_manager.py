@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Project management agent for Socrates AI
 """

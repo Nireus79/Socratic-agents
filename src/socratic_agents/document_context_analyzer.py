@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Document context analyzer for determining optimal document loading strategies.
 

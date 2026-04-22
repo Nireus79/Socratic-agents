@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Agent implementations for Socrates AI"""
 
 from .base import Agent

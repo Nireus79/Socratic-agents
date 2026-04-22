@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Conflict detection and resolution agent for Socrates AI
 """

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Base Agent class for Socrates AI
 """

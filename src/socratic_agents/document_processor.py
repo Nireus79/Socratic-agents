@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Document processing for importing files into projects
 Extracts content from PDFs, text files, code files, pasted text, and web pages
@@ -11,7 +13,6 @@ from urllib.parse import urlparse
 
 # from socratic_system.parsers import CodeParser  # removed monolith dependency
 # from socratic_system.utils.logger import get_logger  # removed monolith dependency
-
 from .base import Agent
 
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Code generation agent for Socrates AI
 """

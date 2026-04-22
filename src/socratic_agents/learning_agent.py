@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 User Learning Agent - Background learning and personalization.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Quality Controller Agent - Orchestrates maturity tracking and prevents greedy algorithm practices
 """
@@ -13,7 +15,6 @@ from typing import Any, Dict, Optional
 # from socratic_system.events import EventType  # removed monolith dependency
 # from socratic_system.models import ProjectContext  # removed monolith dependency
 # from socratic_system.models.workflow import WorkflowApprovalRequest  # removed monolith dependency
-
 from .base import Agent
 
 

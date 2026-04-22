@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Knowledge Manager Agent for automatic knowledge enrichment
 

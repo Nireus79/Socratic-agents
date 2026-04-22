@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Context analysis agent for Socrates AI
 """
@@ -6,7 +8,6 @@ import datetime
 from typing import Any, Dict, List
 
 # from socratic_system.models import ProjectContext  # removed monolith dependency
-
 from .base import Agent
 
 

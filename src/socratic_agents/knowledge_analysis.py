@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Knowledge Analysis Agent for dynamic knowledge-based question regeneration
 

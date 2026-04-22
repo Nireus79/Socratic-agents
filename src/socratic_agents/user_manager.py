@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 User management agent for Socrates AI
 """

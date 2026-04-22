@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Question Queue Agent - Manages question assignment and tracking for team projects.
 

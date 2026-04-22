@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """Note manager agent for handling project notes"""
 
 from typing import TYPE_CHECKING, Any, Dict
