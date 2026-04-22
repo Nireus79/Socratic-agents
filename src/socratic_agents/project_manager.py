@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from .base import Agent
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration import AgentOrchestrator
+    # from socratic_system.orchestration import AgentOrchestrator  # removed monolith dependency
 
 
 class ProjectManagerAgent(Agent):
@@ -77,13 +77,13 @@ class ProjectManagerAgent(Agent):
             }
 
         # NEW: Check project limit
-        from socratic_system.subscription.checker import SubscriptionChecker
+        # from socratic_system.subscription.checker import SubscriptionChecker  # removed monolith dependency
 
         user = self.orchestrator.database.load_user(owner)
 
         # Create user if they don't exist (for automation/testing)
         if user is None:
-            from socratic_system.models.user import User
+            # from socratic_system.models.user import User  # removed monolith dependency
 
             # Generate unique email for auto-created user
             unique_email = self._generate_auto_user_email(owner)
@@ -206,13 +206,13 @@ class ProjectManagerAgent(Agent):
 
         return {"status": "success", "project": project}
 
-    def _apply_initial_insights(self, project: ProjectContext, insights: Dict) -> None:
+    def _apply_initial_insights(self, project: "ProjectContext", insights: Dict) -> None:
         """Apply extracted insights from description/notes to project context.
 
         This normalizes insights and populates project fields exactly like conversation analysis does.
 
         Args:
-            project: ProjectContext to update
+            project: "ProjectContext" to update
             insights: Dict with extracted insights (goals, requirements, tech_stack, constraints)
         """
         if not insights or not isinstance(insights, dict):
@@ -276,7 +276,7 @@ class ProjectManagerAgent(Agent):
         owner = request.get("owner")
 
         try:
-            from socratic_system.utils.git_repository_manager import GitRepositoryManager
+            # from socratic_system.utils.git_repository_manager import GitRepositoryManager  # removed monolith dependency
 
             git_manager = GitRepositoryManager()
 
@@ -374,7 +374,7 @@ class ProjectManagerAgent(Agent):
         """Get existing user or create new one"""
         user = self.orchestrator.database.load_user(owner)
         if user is None:
-            from socratic_system.models.user import User
+            # from socratic_system.models.user import User  # removed monolith dependency
 
             user = User(
                 username=owner,
@@ -389,7 +389,7 @@ class ProjectManagerAgent(Agent):
 
     def _validate_subscription(self, user, owner: str) -> Dict:
         """Validate user subscription allows project creation"""
-        from socratic_system.subscription.checker import SubscriptionChecker
+        # from socratic_system.subscription.checker import SubscriptionChecker  # removed monolith dependency
 
         # Count only OWNED projects for tier limit, not collaborated projects
         all_projects = self.orchestrator.database.get_user_projects(owner)
@@ -457,7 +457,7 @@ class ProjectManagerAgent(Agent):
         """Save project files to database"""
         self.log("Saving project files to database...")
         try:
-            from socratic_system.database.project_file_manager import ProjectFileManager
+            # from socratic_system.database.project_file_manager import ProjectFileManager  # removed monolith dependency
 
             file_manager = ProjectFileManager(self.orchestrator.database.db_path)
             files_to_save = self._collect_files_to_save(temp_path)
@@ -531,7 +531,7 @@ class ProjectManagerAgent(Agent):
             }
 
         # NEW: Check team member limit
-        from socratic_system.subscription.checker import SubscriptionChecker
+        # from socratic_system.subscription.checker import SubscriptionChecker  # removed monolith dependency
 
         user = self.orchestrator.database.load_user(project.owner)
         current_team_size = len(project.team_members or [])

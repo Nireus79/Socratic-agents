@@ -286,7 +286,7 @@ class QualityControllerAgent(Agent):
             "score_after": score_after,
         }
 
-    def _update_analytics_metrics(self, project: ProjectContext) -> None:
+    def _update_analytics_metrics(self, project: "ProjectContext") -> None:
         """Update real-time analytics metrics after maturity change."""
         logging.debug("Updating analytics metrics")
         try:
@@ -336,7 +336,7 @@ class QualityControllerAgent(Agent):
 
     def _record_maturity_event(
         self,
-        project: ProjectContext,
+        project: "ProjectContext",
         event_type: str,
         score_before: Optional[float] = None,
         score_after: Optional[float] = None,

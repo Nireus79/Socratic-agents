@@ -59,7 +59,7 @@ class ContextAnalyzerAgent(Agent):
 
         return {"status": "success", "analysis": analysis, "relevant_knowledge": relevant_knowledge}
 
-    def get_context_summary(self, project: ProjectContext) -> str:
+    def get_context_summary(self, project: "ProjectContext") -> str:
         """Generate comprehensive project summary"""
         summary_parts = []
 

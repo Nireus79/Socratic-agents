@@ -117,7 +117,7 @@ class CodeGeneratorAgent(Agent):
                     # NEW: Also save files to database for knowledge base integration
                     self.log("Saving generated files to database...")
                     try:
-                        from socratic_system.database.project_file_manager import ProjectFileManager
+                        # from socratic_system.database.project_file_manager import ProjectFileManager  # removed monolith dependency
 
                         file_manager = ProjectFileManager(self.orchestrator.database.db_path)
 
@@ -247,7 +247,7 @@ class CodeGeneratorAgent(Agent):
                 "message": f"Documentation generation failed: {str(e)}",
             }
 
-    def _build_generation_context(self, project: ProjectContext) -> str:
+    def _build_generation_context(self, project: "ProjectContext") -> str:
         """Build comprehensive context for code generation"""
         context_parts = [
             f"Project: {project.name}",

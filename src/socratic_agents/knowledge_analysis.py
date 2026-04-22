@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, Dict
 # from socratic_system.events import EventType  # removed monolith dependency
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
 
 
 class KnowledgeAnalysisAgent(Agent):

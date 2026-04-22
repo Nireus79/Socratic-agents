@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict
 # from socratic_system.models import ProjectNote  # removed monolith dependency
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
 
 
 class NoteManagerAgent(Agent):
@@ -125,7 +125,7 @@ class NoteManagerAgent(Agent):
 
                         # Emit DOCUMENT_IMPORTED event for knowledge base
                         try:
-                            from socratic_system.events import EventType
+                            # from socratic_system.events import EventType  # removed monolith dependency
 
                             if self.orchestrator.event_emitter:
                                 self.orchestrator.event_emitter.emit(

@@ -17,8 +17,8 @@ from colorama import Fore
 from .base import Agent
 
 if TYPE_CHECKING:
-    from socratic_system.models.workflow import WorkflowDefinition, WorkflowExecutionState
-    from socratic_system.orchestration import AgentOrchestrator
+    # from socratic_system.models.workflow import WorkflowDefinition, WorkflowExecutionState  # removed monolith dependency
+    # from socratic_system.orchestration import AgentOrchestrator  # removed monolith dependency
 
 
 class SocraticCounselorAgent(Agent):
@@ -129,13 +129,13 @@ class SocraticCounselorAgent(Agent):
         context = self.orchestrator.context_analyzer.get_context_summary(project)
 
         # NEW: Check question limit
-        from socratic_system.subscription.checker import SubscriptionChecker
+        # from socratic_system.subscription.checker import SubscriptionChecker  # removed monolith dependency
 
         # Get or create user (auto-create for CLI/local users)
         user = self.orchestrator.database.load_user(current_user)
         if user is None:
             # Auto-create user with pro tier for local/CLI use
-            from socratic_system.models.user import User
+            # from socratic_system.models.user import User  # removed monolith dependency
 
             user = User(
                 username=current_user,
@@ -206,10 +206,10 @@ class SocraticCounselorAgent(Agent):
         return {"status": "success", "question": question}
 
     def _generate_dynamic_question(
-        self, project: ProjectContext, context: str, question_count: int, current_user: str = None
+        self, project: "ProjectContext", context: str, question_count: int, current_user: str = None
     ) -> str:
         """Generate contextual questions using Claude with role-aware context"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -364,7 +364,7 @@ class SocraticCounselorAgent(Agent):
 
     def _build_question_prompt(
         self,
-        project: ProjectContext,
+        project: "ProjectContext",
         context: str,
         recent_conversation: str,
         relevant_knowledge: str,
@@ -503,7 +503,7 @@ Push the conversation forward by exploring new aspects not yet discussed.
 
 Return only the question, no additional text or explanation."""
 
-    def _generate_static_question(self, project: ProjectContext, question_count: int) -> str:
+    def _generate_static_question(self, project: "ProjectContext", question_count: int) -> str:
         """Generate questions from static predefined lists"""
         questions = self.static_questions.get(project.phase, [])
 
@@ -559,7 +559,7 @@ Return only the question, no additional text or explanation."""
                 return fallbacks[(question_count - len(questions)) % len(fallbacks)]
             return "What would you like to explore further?"
 
-    def _check_phase_completion(self, project: ProjectContext, logger) -> Dict[str, Any]:
+    def _check_phase_completion(self, project: "ProjectContext", logger) -> Dict[str, Any]:
         """
         Check if current phase is now complete (maturity >= 100%) and generate
         a Socratic question asking if user wants to advance or enrich further.
@@ -738,7 +738,7 @@ What would be most helpful for you?"""
 
     def _extract_insights_only(self, request: Dict) -> Dict:
         """Extract insights from response without processing (for direct mode confirmation)"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -766,7 +766,7 @@ What would be most helpful for you?"""
 
     def _process_response(self, request: Dict) -> Dict:
         """Process user response and extract insights"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -1042,7 +1042,7 @@ What would be most helpful for you?"""
         logger.info(f"Extracted {spec_summary}")
         logger.debug(f"Full insights: {insights}")
 
-    def _remove_from_project_context(self, project: ProjectContext, value: str, context_type: str):
+    def _remove_from_project_context(self, project: "ProjectContext", value: str, context_type: str):
         """Remove a value from project context"""
         if context_type == "tech_stack" and value in project.tech_stack:
             project.tech_stack.remove(value)
@@ -1053,7 +1053,7 @@ What would be most helpful for you?"""
         elif context_type == "goals":
             project.goals = ""
 
-    def _manual_resolution(self, conflict: ConflictInfo) -> str:
+    def _manual_resolution(self, conflict: "ConflictInfo") -> str:
         """Allow user to manually resolve conflict"""
         print(f"\n{Fore.CYAN}Manual Resolution:")
         print(f"Current options: '{conflict.old_value}' vs '{conflict.new_value}'")
@@ -1066,7 +1066,7 @@ What would be most helpful for you?"""
     def _handle_conflicts_realtime(
         self,
         conflicts: List[ConflictInfo],
-        project: ProjectContext,
+        project: "ProjectContext",
         insights: Dict = None,
         user_auth_method: str = "api_key",
         current_user: str = None,
@@ -1138,7 +1138,7 @@ What would be most helpful for you?"""
 
         Generates comprehensive summaries and analysis of documents in the knowledge base.
         """
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -1248,7 +1248,7 @@ What would be most helpful for you?"""
 
     def _advance_phase(self, request: Dict) -> Dict:
         """Advance project to the next phase with maturity verification"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -1331,7 +1331,7 @@ What would be most helpful for you?"""
 
     def _rollback_phase(self, request: Dict) -> Dict:
         """Roll back project to the previous phase"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -1387,7 +1387,7 @@ What would be most helpful for you?"""
             if item and item not in current_list:
                 current_list.append(item)
 
-    def _update_project_context(self, project: ProjectContext, insights: Dict):
+    def _update_project_context(self, project: "ProjectContext", insights: Dict):
         """Update project context based on extracted insights"""
         if not insights or not isinstance(insights, dict):
             return
@@ -1444,7 +1444,7 @@ What would be most helpful for you?"""
             insight_type: Type of insight (goals, requirements, tech_stack, constraints)
             insights: Mutable insights dict to modify
         """
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
         logger.info(f"Conflict resolution: Rejected {insight_type} - '{value}'")
@@ -1474,7 +1474,7 @@ What would be most helpful for you?"""
             insight_type: Type of insight (goals, requirements, tech_stack, constraints)
             insights: Mutable insights dict to modify
         """
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
         logger.info(
@@ -1498,7 +1498,7 @@ What would be most helpful for you?"""
 
     def _generate_hint(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate a context-aware hint for the user based on project state"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
         project = request.get("project")
@@ -1641,7 +1641,7 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
 
     def _get_fallback_suggestions(self, project, current_question: str) -> List[str]:
         """Generate context-aware fallback suggestions based on phase and question"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
 
@@ -1685,7 +1685,7 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
 
     def _generate_answer_suggestions(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate answer suggestions for the current question"""
-        from socratic_system.utils.logger import get_logger
+        # from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
         logger = get_logger("socratic_counselor")
         project = request.get("project")
@@ -1784,7 +1784,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
     # Workflow Optimization Methods (Phase 5)
     # ========================================================================
 
-    def _should_use_workflow_optimization(self, project: ProjectContext) -> bool:
+    def _should_use_workflow_optimization(self, project: "ProjectContext") -> bool:
         """
         Check if workflow optimization is enabled for this project.
 
@@ -1798,7 +1798,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             project.metadata.get("use_workflow_optimization", False) if project.metadata else False
         )
 
-    def _generate_question_with_workflow(self, project: ProjectContext, current_user: str) -> Dict:
+    def _generate_question_with_workflow(self, project: "ProjectContext", current_user: str) -> Dict:
         """
         Generate question constrained by approved workflow path.
 
@@ -1807,7 +1807,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
         dynamically.
 
         Args:
-            project: ProjectContext with active workflow execution
+            project: "ProjectContext" with active workflow execution
             current_user: User requesting the question
 
         Returns:
@@ -1842,7 +1842,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             )
 
             # Import here to avoid circular dependency
-            from socratic_system.core.question_selector import QuestionSelector
+            # from socratic_system.core.question_selector import QuestionSelector  # removed monolith dependency
 
             selector = QuestionSelector()
             questions = selector.select_next_questions(
@@ -1904,7 +1904,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             )
             return {"status": "error", "message": str(e)}
 
-    def _initiate_workflow_approval(self, project: ProjectContext, current_user: str) -> Dict:
+    def _initiate_workflow_approval(self, project: "ProjectContext", current_user: str) -> Dict:
         """
         Request workflow approval - BLOCKING POINT.
 
@@ -1956,7 +1956,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             logging.error(f"Unexpected error initiating workflow approval: {type(e).__name__}: {e}")
             return {"status": "error", "message": str(e)}
 
-    def _create_workflow_for_phase(self, project: ProjectContext) -> "WorkflowDefinition":
+    def _create_workflow_for_phase(self, project: "ProjectContext") -> "WorkflowDefinition":
         """
         Create workflow definition for current phase.
 
@@ -1969,7 +1969,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
         Returns:
             WorkflowDefinition for current phase
         """
-        from socratic_system.core.workflow_builder import (
+        # from socratic_system.core.workflow_builder import (  # removed monolith dependency
             create_discovery_workflow_comprehensive,
             create_legacy_compatible_workflow,
         )
@@ -1988,7 +1988,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
 
     def _advance_workflow_node(
         self,
-        project: ProjectContext,
+        project: "ProjectContext",
         execution: "WorkflowExecutionState",
         workflow: "WorkflowDefinition",
     ) -> Dict:
@@ -2005,7 +2005,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
         Returns:
             Dict with next question or completion status
         """
-        from socratic_system.core.question_selector import QuestionSelector
+        # from socratic_system.core.question_selector import QuestionSelector  # removed monolith dependency
 
         logging.debug(
             f"Advancing workflow execution {execution.execution_id} from node {execution.current_node_id}"
