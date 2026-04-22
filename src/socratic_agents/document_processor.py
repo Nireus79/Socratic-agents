@@ -9,8 +9,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
-from socratic_system.parsers import CodeParser
-from socratic_system.utils.logger import get_logger
+# from socratic_system.parsers import CodeParser  # removed monolith dependency
+# from socratic_system.utils.logger import get_logger  # removed monolith dependency
 
 from .base import Agent
 

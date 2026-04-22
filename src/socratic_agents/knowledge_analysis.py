@@ -12,8 +12,8 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict
 
-from socratic_system.agents.base import Agent
-from socratic_system.events import EventType
+# from socratic_system.agents.base import Agent  # removed monolith dependency
+# from socratic_system.events import EventType  # removed monolith dependency
 
 if TYPE_CHECKING:
     from socratic_system.orchestration.orchestrator import AgentOrchestrator

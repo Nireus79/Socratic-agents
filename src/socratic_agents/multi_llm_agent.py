@@ -14,8 +14,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from socratic_system.agents.base import Agent
-from socratic_system.models import (
+# from socratic_system.agents.base import Agent  # removed monolith dependency
+# from socratic_system.models import (  # removed monolith dependency
     LLMProviderConfig,
     LLMUsageRecord,
     get_provider_metadata,

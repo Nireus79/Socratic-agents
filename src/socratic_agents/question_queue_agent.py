@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List
 
-from socratic_system.agents.base import Agent
+# from socratic_system.agents.base import Agent  # removed monolith dependency
 
 
 class QuestionQueueAgent(Agent):

@@ -7,12 +7,12 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-from socratic_system.core.analytics_calculator import AnalyticsCalculator
-from socratic_system.core.maturity_calculator import MaturityCalculator
-from socratic_system.core.workflow_optimizer import WorkflowOptimizer
-from socratic_system.events import EventType
-from socratic_system.models import ProjectContext
-from socratic_system.models.workflow import WorkflowApprovalRequest
+# from socratic_system.core.analytics_calculator import AnalyticsCalculator  # removed monolith dependency
+# from socratic_system.core.maturity_calculator import MaturityCalculator  # removed monolith dependency
+# from socratic_system.core.workflow_optimizer import WorkflowOptimizer  # removed monolith dependency
+# from socratic_system.events import EventType  # removed monolith dependency
+# from socratic_system.models import ProjectContext  # removed monolith dependency
+# from socratic_system.models.workflow import WorkflowApprovalRequest  # removed monolith dependency
 
 from .base import Agent
 
