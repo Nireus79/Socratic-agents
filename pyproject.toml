@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-agents"
-version = "0.3.0"
+version = "0.4.0"
 description = "Multi-agent orchestration system with 18 specialized agents for AI workflows. Built-in integrations with Openclaw and LangChain."
 readme = "README.md"
 license = {text = "MIT"}
@@ -44,7 +44,7 @@ dependencies = [
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
-nexus = ["socrates-nexus>=0.3.1"]
+nexus = ["socrates-nexus>=0.4.0"]
 
 # Socratic ecosystem integrations
 conflict = ["socratic-conflict>=0.1.0"]
@@ -54,7 +54,7 @@ core = ["socratic-core>=0.2.0"]
 # All features (maturity is now a core dependency)
 all = [
     "langchain>=0.1.0",
-    "socrates-nexus>=0.3.1",
+    "socrates-nexus>=0.4.0",
     "socratic-conflict>=0.1.0",
     "socratic-learning>=0.1.0",
     "socratic-core>=0.2.0",
