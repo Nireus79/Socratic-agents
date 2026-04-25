@@ -14,6 +14,7 @@ try:
         RequirementsConflictChecker,
         TechStackConflictChecker,
     )
+
     CONFLICT_CHECKERS_AVAILABLE = True
 except ImportError:
     CONFLICT_CHECKERS_AVAILABLE = False
@@ -37,7 +38,9 @@ class ConflictDetectorAgent(Agent):
             ]
         else:
             self.checkers = []
-            self.log("Warning: socratic-conflict not installed. Conflict detection disabled.", "WARNING")
+            self.log(
+                "Warning: socratic-conflict not installed. Conflict detection disabled.", "WARNING"
+            )
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process conflict detection requests"""

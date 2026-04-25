@@ -13,6 +13,7 @@ from typing import Any, Dict, Optional
 # Stub implementations (will be replaced by actual implementations from socratic-maturity)
 class MaturityCalculator:
     """Stub for maturity calculation"""
+
     def __init__(self, context_type, claude_client=None):
         self.context_type = context_type
         self.claude_client = claude_client
@@ -21,13 +22,18 @@ class MaturityCalculator:
         self.COMPLETE_THRESHOLD = 0.9
         self.WARNING_THRESHOLD = 0.5
 
+
 class AnalyticsCalculator:
     """Stub for analytics calculation"""
+
     pass
+
 
 class WorkflowOptimizer:
     """Stub for workflow optimization"""
+
     pass
+
 
 from .base import Agent
 from .events import EventType
@@ -264,7 +270,9 @@ class QualityControllerAgent(Agent):
 
         # Notify user if phase just reached 100% completion
         if score_before < self.COMPLETE_THRESHOLD and score_after >= self.COMPLETE_THRESHOLD:
-            logging.info(f"Phase {project.phase} reached 100% completion during response processing!")
+            logging.info(
+                f"Phase {project.phase} reached 100% completion during response processing!"
+            )
             self.emit_event(
                 EventType.PHASE_READY_TO_ADVANCE,
                 {

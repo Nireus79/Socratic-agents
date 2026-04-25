@@ -336,7 +336,7 @@ class TestConcreteAgentBehavior:
 
         assert agent.name == "Knowledge Manager"
         assert agent.orchestrator == orchestrator
-        assert hasattr(agent, 'process')
+        assert hasattr(agent, "process")
 
     def test_multi_llm_agent_initialization(self):
         """Test multi-LLM agent setup."""

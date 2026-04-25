@@ -62,7 +62,9 @@ class EventEmitter:
                 try:
                     callback(data)
                 except Exception as e:
-                    self.logger.error(f"Error in event listener for {event_type.value}: {e}", exc_info=True)
+                    self.logger.error(
+                        f"Error in event listener for {event_type.value}: {e}", exc_info=True
+                    )
 
     def emit_async(self, event_type: EventType, data: Optional[Dict[str, Any]] = None) -> None:
         """

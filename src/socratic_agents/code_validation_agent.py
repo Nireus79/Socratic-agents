@@ -21,21 +21,28 @@ from .events import EventType
 #     TestExecutor,
 # )
 
+
 # Stub implementations for validators (will be replaced by actual implementations)
 class SyntaxValidator:
     """Stub for syntax validation"""
+
     def validate(self, code):
         return {"valid": True, "errors": []}
 
+
 class DependencyValidator:
     """Stub for dependency validation"""
+
     def validate(self, dependencies):
         return {"valid": True, "issues": []}
 
+
 class TestExecutor:
     """Stub for test execution"""
+
     def execute(self, test_dir):
         return {"passed": 0, "failed": 0, "skipped": 0}
+
 
 logger = logging.getLogger("socrates.agents.code_validation_agent")
 

@@ -13,9 +13,7 @@ Handles:
 import logging
 import random
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List
-
-if TYPE_CHECKING:
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple
 
 logger = logging.getLogger("socrates.agents.project_file_loader")
 
@@ -147,7 +145,7 @@ class ProjectFileLoader:
         files: List[Dict],
         project_id: str,
         show_progress: bool,
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         """Process files through DocumentProcessor and return counts"""
         loaded_count = 0
         total_chunks = 0
