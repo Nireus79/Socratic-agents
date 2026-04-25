@@ -44,7 +44,7 @@ dependencies = [
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
-nexus = ["socrates-nexus>=0.3.6"]
+nexus = ["socratic-nexus>=0.3.6"]
 
 # Socratic ecosystem integrations
 conflict = ["socratic-conflict>=0.1.0"]
@@ -53,7 +53,7 @@ learning = ["socratic-learning>=0.1.0"]
 # All features (maturity is now a core dependency)
 all = [
     "langchain>=0.1.0",
-    "socrates-nexus>=0.3.6",
+    "socratic-nexus>=0.3.6",
     "socratic-conflict>=0.1.0",
     "socratic-learning>=0.1.0",
 ]

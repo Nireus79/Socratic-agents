@@ -7,12 +7,16 @@ Conflict detection and resolution agent for Socrates AI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict
 
-# from socratic_system.conflict_resolution import (  # removed monolith dependency
-#     ConstraintsConflictChecker,
-#     GoalsConflictChecker,
-#     RequirementsConflictChecker,
-#     TechStackConflictChecker,
-# )
+try:
+    from socratic_conflict import (
+        ConstraintsConflictChecker,
+        GoalsConflictChecker,
+        RequirementsConflictChecker,
+        TechStackConflictChecker,
+    )
+    CONFLICT_CHECKERS_AVAILABLE = True
+except ImportError:
+    CONFLICT_CHECKERS_AVAILABLE = False
 
 from .base import Agent
 
@@ -23,13 +27,17 @@ class ConflictDetectorAgent(Agent):
     def __init__(self, orchestrator):
         super().__init__("ConflictDetector", orchestrator)
 
-        # Initialize pluggable conflict checkers
-        self.checkers = [
-            TechStackConflictChecker(orchestrator),
-            RequirementsConflictChecker(orchestrator),
-            GoalsConflictChecker(orchestrator),
-            ConstraintsConflictChecker(orchestrator),
-        ]
+        # Initialize pluggable conflict checkers if socratic-conflict is available
+        if CONFLICT_CHECKERS_AVAILABLE:
+            self.checkers = [
+                TechStackConflictChecker(orchestrator),
+                RequirementsConflictChecker(orchestrator),
+                GoalsConflictChecker(orchestrator),
+                ConstraintsConflictChecker(orchestrator),
+            ]
+        else:
+            self.checkers = []
+            self.log("Warning: socratic-conflict not installed. Conflict detection disabled.", "WARNING")
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process conflict detection requests"""
