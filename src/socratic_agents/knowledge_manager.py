@@ -14,12 +14,11 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List
 
-# from socratic_system.agents.base import Agent  # removed monolith dependency
-# from socratic_system.events import EventType  # removed monolith dependency
-# from socratic_system.models.knowledge import KnowledgeEntry  # removed monolith dependency
+from .base import Agent
+from .events import EventType
 
 if TYPE_CHECKING:
-    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
+    from .orchestrator import AgentOrchestrator
 
 
 class KnowledgeManagerAgent(Agent):

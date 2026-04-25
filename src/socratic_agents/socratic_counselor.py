@@ -11,16 +11,11 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from colorama import Fore
 
 # from socratic_system.agents.document_context_analyzer import DocumentContextAnalyzer  # removed monolith dependency
-# from socratic_system.events import EventType  # removed monolith dependency
-# from socratic_system.models import ROLE_FOCUS_AREAS, ConflictInfo, ProjectContext  # removed monolith dependency
-# from socratic_system.services import DocumentUnderstandingService  # removed monolith dependency
-# from socratic_system.utils.orchestrator_helper import safe_orchestrator_call  # removed monolith dependency
-
 from .base import Agent
+from .events import EventType
 
 if TYPE_CHECKING:
-    # from socratic_system.models.workflow import WorkflowDefinition, WorkflowExecutionState  # removed monolith dependency
-    # from socratic_system.orchestration import AgentOrchestrator  # removed monolith dependency
+    from .orchestrator import AgentOrchestrator
 
 
 class SocraticCounselorAgent(Agent):

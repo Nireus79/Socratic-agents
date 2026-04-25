@@ -19,11 +19,24 @@ Architecture:
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-# from socratic_system.agents.base import Agent  # removed monolith dependency
-# from socratic_system.core.learning_engine import LearningEngine  # removed monolith dependency
-# from socratic_system.models import KnowledgeBaseDocument, QuestionEffectiveness, UserBehaviorPattern  # removed monolith dependency
+from .base import Agent
+
+# Optional: Try to import LearningEngine from socratic-learning package
+try:
+    from socratic_learning import LearningEngine
+except ImportError:
+    # If not available, provide a stub for testing
+    class LearningEngine:  # type: ignore
+        """Stub LearningEngine when socratic-learning not installed."""
+
+        def __init__(self, logger):
+            """Initialize stub learning engine."""
+            self.logger = logger
+            self.logger.warning(
+                "LearningEngine stub: Install socratic-learning for full functionality"
+            )
 
 
 class UserLearningAgent(Agent):

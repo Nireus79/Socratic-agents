@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict
 
-# from socratic_system.agents.base import Agent  # removed monolith dependency
-# from socratic_system.models import ProjectNote  # removed monolith dependency
+from .base import Agent
+from .events import EventType
 
 if TYPE_CHECKING:
-    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
+    from .orchestrator import AgentOrchestrator
 
 
 class NoteManagerAgent(Agent):

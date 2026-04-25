@@ -12,10 +12,8 @@ from typing import Any, Dict, Optional
 # from socratic_system.core.analytics_calculator import AnalyticsCalculator  # removed monolith dependency
 # from socratic_system.core.maturity_calculator import MaturityCalculator  # removed monolith dependency
 # from socratic_system.core.workflow_optimizer import WorkflowOptimizer  # removed monolith dependency
-# from socratic_system.events import EventType  # removed monolith dependency
-# from socratic_system.models import ProjectContext  # removed monolith dependency
-# from socratic_system.models.workflow import WorkflowApprovalRequest  # removed monolith dependency
 from .base import Agent
+from .events import EventType
 
 
 class QualityControllerAgent(Agent):

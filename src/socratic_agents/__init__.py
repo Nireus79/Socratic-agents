@@ -1,8 +1,17 @@
 from __future__ import annotations
 
-"""Agent implementations for Socrates AI"""
+"""Agent implementations for Socratic Agents"""
 
 from .base import Agent
+from .events import EventType
+from .models import (
+    LLMProviderConfig,
+    LLMUsageRecord,
+    ProviderMetadata,
+    get_provider_metadata,
+    list_available_providers,
+)
+from .orchestrator import AgentOrchestrator, EventEmitter
 from .code_generator import CodeGeneratorAgent
 from .code_validation_agent import CodeValidationAgent
 from .conflict_detector import ConflictDetectorAgent
@@ -21,7 +30,18 @@ from .system_monitor import SystemMonitorAgent
 from .user_manager import UserManagerAgent
 
 __all__ = [
+    # Core classes
     "Agent",
+    "EventType",
+    "AgentOrchestrator",
+    "EventEmitter",
+    # Models
+    "LLMProviderConfig",
+    "LLMUsageRecord",
+    "ProviderMetadata",
+    "get_provider_metadata",
+    "list_available_providers",
+    # Agent implementations
     "ProjectManagerAgent",
     "UserManagerAgent",
     "SocraticCounselorAgent",
