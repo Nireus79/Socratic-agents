@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any, Dict
 from .base import Agent
 
 if TYPE_CHECKING:
-    # from socratic_system.orchestration import AgentOrchestrator  # removed monolith dependency
+    from .orchestrator import AgentOrchestrator
 
 
 class ProjectManagerAgent(Agent):

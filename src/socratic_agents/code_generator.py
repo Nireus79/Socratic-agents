@@ -11,9 +11,9 @@ from typing import Any, Dict
 # from socratic_system.utils.artifact_saver import ArtifactSaver  # removed monolith dependency
 # from socratic_system.utils.code_structure_analyzer import CodeStructureAnalyzer  # removed monolith dependency
 # from socratic_system.utils.multi_file_splitter import (  # removed monolith dependency
-    MultiFileCodeSplitter,
-    ProjectStructureGenerator,
-)
+#     MultiFileCodeSplitter,
+#     ProjectStructureGenerator,
+# )
 
 from .base import Agent
 

@@ -12,6 +12,26 @@ from typing import Any, Dict, Optional
 # from socratic_system.core.analytics_calculator import AnalyticsCalculator  # removed monolith dependency
 # from socratic_system.core.maturity_calculator import MaturityCalculator  # removed monolith dependency
 # from socratic_system.core.workflow_optimizer import WorkflowOptimizer  # removed monolith dependency
+
+# Stub implementations (will be replaced by actual implementations from socratic-maturity)
+class MaturityCalculator:
+    """Stub for maturity calculation"""
+    def __init__(self, context_type, claude_client=None):
+        self.context_type = context_type
+        self.claude_client = claude_client
+        self.phase_categories = {}
+        self.READY_THRESHOLD = 0.7
+        self.COMPLETE_THRESHOLD = 0.9
+        self.WARNING_THRESHOLD = 0.5
+
+class AnalyticsCalculator:
+    """Stub for analytics calculation"""
+    pass
+
+class WorkflowOptimizer:
+    """Stub for workflow optimization"""
+    pass
+
 from .base import Agent
 from .events import EventType
 

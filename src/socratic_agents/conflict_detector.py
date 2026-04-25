@@ -8,11 +8,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict
 
 # from socratic_system.conflict_resolution import (  # removed monolith dependency
-    ConstraintsConflictChecker,
-    GoalsConflictChecker,
-    RequirementsConflictChecker,
-    TechStackConflictChecker,
-)
+#     ConstraintsConflictChecker,
+#     GoalsConflictChecker,
+#     RequirementsConflictChecker,
+#     TechStackConflictChecker,
+# )
 
 from .base import Agent
 

@@ -26,7 +26,8 @@ class SocraticCounselorAgent(Agent):
         self.use_dynamic_questions = True  # Toggle for dynamic vs static questions
         self.max_questions_per_phase = 5
         self.phase_docs_cache = {}  # Cache document context per phase to reduce vector DB calls
-        self.database = orchestrator.database  # Database for persisting changes
+        # Database for persisting changes (optional if not provided by orchestrator)
+        self.database = getattr(orchestrator, "database", None)
 
         # Fallback static questions if Claude is unavailable
         self.static_questions = {
@@ -1967,9 +1968,9 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             WorkflowDefinition for current phase
         """
         # from socratic_system.core.workflow_builder import (  # removed monolith dependency
-            create_discovery_workflow_comprehensive,
-            create_legacy_compatible_workflow,
-        )
+#             create_discovery_workflow_comprehensive,
+#             create_legacy_compatible_workflow,
+#         )
 
         logging.debug(
             f"Creating workflow for phase: {project.phase}, project_type: {project.project_type}"
