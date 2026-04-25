@@ -16,7 +16,6 @@ from typing import Any, Dict, List
 from .base import Agent
 from .events import EventType
 
-# from socratic_system.utils.validators import (  # removed monolith dependency
 #     DependencyValidator,
 #     SyntaxValidator,
 #     TestExecutor,

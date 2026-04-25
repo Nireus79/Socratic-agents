@@ -9,9 +9,6 @@ import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict
 
-# from socratic_system.models import VALID_ROLES, ProjectContext, TeamMemberRole  # removed monolith dependency
-# from socratic_system.utils.id_generator import ProjectIDGenerator  # removed monolith dependency
-# from socratic_system.utils.orchestrator_helper import safe_orchestrator_call  # removed monolith dependency
 
 from .base import Agent
 

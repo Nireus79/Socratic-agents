@@ -9,9 +9,6 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-# from socratic_system.core.analytics_calculator import AnalyticsCalculator  # removed monolith dependency
-# from socratic_system.core.maturity_calculator import MaturityCalculator  # removed monolith dependency
-# from socratic_system.core.workflow_optimizer import WorkflowOptimizer  # removed monolith dependency
 
 # Stub implementations (will be replaced by actual implementations from socratic-maturity)
 class MaturityCalculator:

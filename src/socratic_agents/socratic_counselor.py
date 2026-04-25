@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from colorama import Fore
 
-# from socratic_system.agents.document_context_analyzer import DocumentContextAnalyzer  # removed monolith dependency
 from .base import Agent
 from .events import EventType
 
