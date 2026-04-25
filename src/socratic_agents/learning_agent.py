@@ -19,7 +19,7 @@ Architecture:
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from .base import Agent
 

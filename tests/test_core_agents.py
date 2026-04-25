@@ -1,6 +1,7 @@
 """Comprehensive tests for core Socratic Agents."""
 
 import pytest
+
 from socratic_agents import (
     Agent,
     AgentOrchestrator,
@@ -12,12 +13,11 @@ from socratic_agents import (
     get_provider_metadata,
     list_available_providers,
 )
-from socratic_agents.base import Agent as BaseAgent
 from socratic_agents.code_generator import CodeGeneratorAgent
 from socratic_agents.code_validation_agent import CodeValidationAgent
 from socratic_agents.knowledge_manager import KnowledgeManagerAgent
-from socratic_agents.multi_llm_agent import MultiLLMAgent
 from socratic_agents.learning_agent import UserLearningAgent
+from socratic_agents.multi_llm_agent import MultiLLMAgent
 from socratic_agents.quality_controller import QualityControllerAgent
 from socratic_agents.socratic_counselor import SocraticCounselorAgent
 

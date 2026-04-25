@@ -13,7 +13,7 @@ Handles:
 import logging
 import random
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 logger = logging.getLogger("socrates.agents.project_file_loader")
 

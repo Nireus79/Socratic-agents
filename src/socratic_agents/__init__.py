@@ -3,7 +3,15 @@ from __future__ import annotations
 """Agent implementations for Socratic Agents"""
 
 from .base import Agent
+from .code_generator import CodeGeneratorAgent
+from .code_validation_agent import CodeValidationAgent
+from .conflict_detector import ConflictDetectorAgent
+from .context_analyzer import ContextAnalyzerAgent
+from .document_processor import DocumentProcessorAgent
 from .events import EventType
+from .knowledge_analysis import KnowledgeAnalysisAgent
+from .knowledge_manager import KnowledgeManagerAgent
+from .learning_agent import UserLearningAgent
 from .models import (
     LLMProviderConfig,
     LLMUsageRecord,
@@ -11,17 +19,9 @@ from .models import (
     get_provider_metadata,
     list_available_providers,
 )
-from .orchestrator import AgentOrchestrator, EventEmitter
-from .code_generator import CodeGeneratorAgent
-from .code_validation_agent import CodeValidationAgent
-from .conflict_detector import ConflictDetectorAgent
-from .context_analyzer import ContextAnalyzerAgent
-from .document_processor import DocumentProcessorAgent
-from .knowledge_analysis import KnowledgeAnalysisAgent
-from .knowledge_manager import KnowledgeManagerAgent
-from .learning_agent import UserLearningAgent
 from .multi_llm_agent import MultiLLMAgent
 from .note_manager import NoteManagerAgent
+from .orchestrator import AgentOrchestrator, EventEmitter
 from .project_manager import ProjectManagerAgent
 from .quality_controller import QualityControllerAgent
 from .question_queue_agent import QuestionQueueAgent

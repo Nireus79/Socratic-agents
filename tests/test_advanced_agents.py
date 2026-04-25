@@ -1,6 +1,5 @@
 """Advanced comprehensive tests for Socratic Agents."""
 
-import pytest
 from socratic_agents import (
     Agent,
     AgentOrchestrator,
@@ -8,12 +7,12 @@ from socratic_agents import (
     EventType,
     LLMProviderConfig,
     LLMUsageRecord,
-    list_available_providers,
     get_provider_metadata,
+    list_available_providers,
 )
 from socratic_agents.knowledge_manager import KnowledgeManagerAgent
-from socratic_agents.multi_llm_agent import MultiLLMAgent
 from socratic_agents.learning_agent import UserLearningAgent
+from socratic_agents.multi_llm_agent import MultiLLMAgent
 
 
 # ===== Advanced EventEmitter Tests =====
