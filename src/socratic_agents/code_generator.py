@@ -113,7 +113,6 @@ class CodeGeneratorAgent(Agent):
                     # NEW: Also save files to database for knowledge base integration
                     self.log("Saving generated files to database...")
                     try:
-                        # from socratic_system.database.project_file_manager import ProjectFileManager  # removed monolith dependency
 
                         file_manager = ProjectFileManager(self.orchestrator.database.db_path)
 

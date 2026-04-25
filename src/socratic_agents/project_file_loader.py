@@ -16,8 +16,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List
 
 if TYPE_CHECKING:
-    # from socratic_system.models import ProjectContext  # removed monolith dependency
-    # from socratic_system.orchestration import AgentOrchestrator  # removed monolith dependency
 
 logger = logging.getLogger("socrates.agents.project_file_loader")
 
@@ -46,7 +44,6 @@ class ProjectFileLoader:
             True if project has files to load, False otherwise
         """
         try:
-            # from socratic_system.database.project_file_manager import ProjectFileManager  # removed monolith dependency
 
             file_manager = ProjectFileManager(self.orchestrator.database.db_path)
             file_count = file_manager.get_file_count(project.project_id)
@@ -64,7 +61,6 @@ class ProjectFileLoader:
     ) -> Dict[str, Any]:
         """Load project files into vector DB based on strategy"""
         try:
-            # from socratic_system.database.project_file_manager import ProjectFileManager  # removed monolith dependency
 
             file_manager = ProjectFileManager(self.orchestrator.database.db_path)
 

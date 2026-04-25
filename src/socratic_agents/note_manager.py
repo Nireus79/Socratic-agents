@@ -127,7 +127,6 @@ class NoteManagerAgent(Agent):
 
                         # Emit DOCUMENT_IMPORTED event for knowledge base
                         try:
-                            # from socratic_system.events import EventType  # removed monolith dependency
 
                             if self.orchestrator.event_emitter:
                                 self.orchestrator.event_emitter.emit(
