@@ -44,6 +44,7 @@ dependencies = [
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
+langraph = ["langgraph>=0.0.1"]
 nexus = ["socratic-nexus>=0.3.6"]
 
 # Socratic ecosystem integrations
