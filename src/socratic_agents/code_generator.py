@@ -7,10 +7,18 @@ Code generation agent for Socrates AI
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict
 
+from socratic_system.database.project_file_manager import ProjectFileManager
+from socratic_system.utils.artifact_saver import ArtifactSaver
+from socratic_system.utils.code_structure_analyzer import CodeStructureAnalyzer
+from socratic_system.utils.multi_file_splitter import (
+    MultiFileCodeSplitter,
+    ProjectStructureGenerator,
+)
+
 from .base import Agent
 
 if TYPE_CHECKING:
-    from typing import Any
+    from socratic_system.models import ProjectContext
 
 
 class CodeGeneratorAgent(Agent):
