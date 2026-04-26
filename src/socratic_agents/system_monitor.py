@@ -7,6 +7,8 @@ System monitoring agent for Socrates AI
 import datetime
 from typing import Any, Dict
 
+from socratic_system.models import TokenUsage
+
 from .base import Agent
 
 

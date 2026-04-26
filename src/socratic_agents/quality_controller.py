@@ -7,7 +7,12 @@ Quality Controller Agent - Orchestrates maturity tracking and prevents greedy al
 import logging
 from dataclasses import asdict
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
+
+from socratic_system.models import WorkflowApprovalRequest
+
+if TYPE_CHECKING:
+    from socratic_system.models import ProjectContext
 
 
 # Stub implementations (will be replaced by actual implementations from socratic-maturity)

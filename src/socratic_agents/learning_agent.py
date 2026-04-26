@@ -21,6 +21,12 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict
 
+from socratic_system.models import (
+    KnowledgeBaseDocument,
+    QuestionEffectiveness,
+    UserBehaviorPattern,
+)
+
 from .base import Agent
 
 # Optional: Try to import LearningEngine from socratic-learning package

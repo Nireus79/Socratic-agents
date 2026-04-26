@@ -14,6 +14,8 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List
 
+from socratic_system.models import KnowledgeEntry
+
 from .base import Agent
 from .events import EventType
 
