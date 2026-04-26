@@ -1,424 +1,209 @@
 # Socratic Agents
 
-Production-grade multi-agent orchestration system with 19 specialized agents for AI workflows. Extracted from the Socrates AI platform and optimized for standalone use. Includes adaptive skill generation for intelligent agent optimization.
+⚠️ **SOCRATES-ONLY LIBRARY** - This library is designed exclusively for use within the Socrates monolith and is NOT suitable for standalone use.
 
-[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![PyPI Status](https://img.shields.io/badge/PyPI-Coming%20Soon-blue.svg)](https://pypi.org/)
-
-## Why Socratic Agents?
-
-Building specialized agents takes months. Socratic Agents gives you 19 production-ready agents:
-
-- **Pre-built Agents** - 19 specialized agents covering learning, code generation, analysis, coordination, and more
-- **Adaptive Skill Generation** - Automatically generate and optimize skills based on maturity and learning patterns
-- **Framework Integration** - Works seamlessly with Openclaw and LangChain for easy deployment
-- **Multi-Provider Support** - Built on Socrates Nexus for Claude, GPT-4, Gemini, and other models
-- **Production Ready** - Full async support, comprehensive testing, type hints, and error handling
+---
 
 ## Overview
 
-Socratic Agents provides a comprehensive agent orchestration framework with 19 pre-built agents designed to handle complex AI workflows. Each agent specializes in a specific capability (code generation, analysis, learning, coordination, skill generation, etc.) and can work independently or be orchestrated together.
+**Socratic Agents** is a collection of 19+ specialized agents that power the Socrates AI platform. These agents handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
 
-### The 19 Agents
+**Key Point**: All agents in this library require the Socrates monolith to be installed locally. They depend on `socratic_system` internals and cannot function independently.
 
-**Core Agents**:
-1. **Socratic Counselor** - Complete Socratic dialogue orchestration engine with full question generation, answer processing, insight extraction, conflict detection, maturity tracking, and automatic next question generation. Provides complete dialogue flow: Q -> A -> Next Q
-2. **Code Generator** - Intelligent code generation and completion
-3. **Code Validator** - Validation and testing of generated code
-4. **Knowledge Manager** - Knowledge base management and RAG integration
-5. **Learning Agent** - Continuous improvement and pattern learning
-6. **Skill Generator** - Adaptive skill generation for agent optimization
+## Requirements
 
-**Coordination Agents**:
-7. **Multi-LLM Coordinator** - Provider switching and model orchestration
-8. **Project Manager** - Project scope and timeline management
-9. **Quality Controller** - Quality assurance and testing orchestration
-10. **Context Analyzer** - Context understanding and management
+- **Socrates Monolith** - Must be installed locally
+- **socratic_system** - Must be available in Python path
+- **Python 3.9+**
 
-**Data Agents**:
-11. **Document Processor** - Document parsing and processing
-12. **GitHub Sync Handler** - GitHub integration and synchronization
-13. **System Monitor** - System health and performance monitoring
-14. **User Manager** - User context and preferences management
+### Why Socrates-Only?
 
-**Analysis Agents**:
-15. **Conflict Detector** - Conflict detection and resolution
-16. **Knowledge Analyzer** - Knowledge analysis and insights
-17. **Document Context Analyzer** - Document semantic analysis
-18. **Note Manager** - Notes and memory management
-19. **Question Queue Agent** - Question queuing and prioritization
+The agents in this library are tightly integrated with Socrates internals:
+- Access to centralized database
+- Vector database integration
+- Unified LLM client orchestration
+- Shared user and project context
+- Maturity tracking and workflow optimization
 
-## Key Features
+**After the Socrates architecture redesign**, many of these agents will be refactored for independence.
 
-- **19 Pre-built Agents** - Specialized agents for different tasks including adaptive skill generation
-- **Agent Orchestration** - Coordinate multiple agents for complex workflows
-- **Async Support** - Full async/await support for non-blocking operations
-- **Extensible Design** - Create custom agents by extending BaseAgent
-- **Framework Integration** - Openclaw skills and LangChain tools
-- **Socrates Nexus Integration** - Multi-provider LLM support
-- **Production Ready** - Type hints, comprehensive testing, documentation
-- **Part of Socrates Ecosystem** - Works with RAG, Analyzer, and other packages
-
-## Part of the Socrates Ecosystem
-
-**Socratic Agents** is a core component of the [Socrates Ecosystem](https://github.com/Nireus79/Socrates-nexus/blob/main/ECOSYSTEM.md) - a collection of production-grade AI packages that work together.
-
-### How It Uses Socrates Nexus
-- LLM calls within agents use Socrates Nexus for multi-provider support
-- Works with any Socrates Nexus provider (Claude, GPT-4, Gemini, Ollama)
-- Automatic provider switching for cost optimization and reliability
-
-### Related Packages in the Ecosystem
-- **[Socrates Nexus](https://github.com/Nireus79/Socrates-nexus)** (Dependency) - Universal LLM client
-- **[Socratic RAG](https://github.com/Nireus79/Socratic-rag)** - Knowledge retrieval and management
-- **[Socratic Analyzer](https://github.com/Nireus79/Socratic-analyzer)** - Code analysis
-- **[Socratic Workflow](https://github.com/Nireus79/Socratic-workflow)** (Coming Q4 2026) - Workflow optimization
-- **[Socratic Knowledge](https://github.com/Nireus79/Socratic-knowledge)** (Coming Q1 2027) - Enterprise knowledge
-
-👉 **Full ecosystem guide**: See [Socrates Nexus ECOSYSTEM.md](https://github.com/Nireus79/Socrates-nexus/blob/main/ECOSYSTEM.md)
-
-📊 **Track development**: View the [Socrates Ecosystem Roadmap](https://github.com/users/Nireus79/projects/3) to see progress across all packages
+---
 
 ## Installation
 
-### Basic Installation (Rule-Based Agents)
+### Within Socrates Monolith
 
-Agents work standalone with template-based behavior:
-
-```bash
-pip install socratic-agents
-```
-
-No external dependencies required. Agents use internal templates and heuristics.
-
-### With LLM Enhancement (Recommended)
-
-Adds Socrates Nexus for intelligent, context-aware agent behavior:
+If you're working within the Socrates monolith, Socratic-agents is already available:
 
 ```bash
-pip install socratic-agents[nexus]
+cd Socrates
+pip install -e Socratic-agents
 ```
 
-### With Framework Integration
+### As External Package (Future)
 
-```bash
-# Openclaw integration
-pip install socratic-agents[openclaw]
+Currently, this package is NOT published to PyPI because it requires local Socrates installation.
 
-# LangChain integration
-pip install socratic-agents[langchain]
+---
 
-# All features
-pip install socratic-agents[all]
+## The 19+ Agents
 
-# Development
-pip install socratic-agents[dev]
-```
+### Core Dialogue Agents
+- **SocraticCounselorAgent** - Guides users through Socratic questioning with full dialogue orchestration
+- **QuestionQueueAgent** - Manages and prioritizes question queues
 
-## Quick Start
+### Project & Workflow Agents
+- **ProjectManagerAgent** - Manages project lifecycle (creation, loading, collaboration)
+- **QualityControllerAgent** - Orchestrates maturity tracking and quality assurance
+- **WorkflowOptimizationAgent** - Optimizes workflow paths and decision strategies
 
-### Standalone Usage (No LLM Required)
+### Code & Technical Agents
+- **CodeGeneratorAgent** - Generates code based on project context
+- **CodeValidationAgent** - Validates and tests code
+- **DocumentProcessorAgent** - Processes and imports project documents
+- **GitHubSyncHandler** - Handles GitHub repository synchronization
 
-Agents work independently using rule-based behavior and templates:
+### Learning & Knowledge Agents
+- **UserLearningAgent** - Tracks user behavior and learning patterns
+- **KnowledgeManagerAgent** - Manages knowledge base enrichment
+- **KnowledgeAnalysisAgent** - Analyzes and extracts knowledge insights
+- **ConflictDetectorAgent** - Detects and resolves conflicts in specifications
 
-```python
-from socratic_agents import SocraticCounselor, CodeGenerator, CodeValidator
+### User & System Agents
+- **UserManagerAgent** - Manages user accounts and preferences
+- **SystemMonitorAgent** - Monitors system health and token usage
+- **ContextAnalyzerAgent** - Analyzes and manages project context
+- **MultiLLMAgent** - Coordinates multiple LLM providers
 
-# Socratic Counselor - uses question templates
-counselor = SocraticCounselor()
-result = counselor.process({
-    "action": "guide",
-    "topic": "Python recursion",
-    "level": "beginner"
-})
-print("Questions:", result["questions"])
+### Note & Data Agents
+- **NoteManagerAgent** - Manages project notes and documentation
+- **DocumentContextAnalyzer** - Analyzes semantic content of documents
 
-# Code Generator - returns template code
-generator = CodeGenerator()
-code_result = generator.process({
-    "prompt": "Create a fibonacci function",
-    "language": "python"
-})
-print("Code:", code_result["code"])
-
-# Code Validator - basic syntax/quality checks
-validator = CodeValidator()
-val_result = validator.process({
-    "code": "def hello(): print('world')",
-    "language": "python"
-})
-print("Valid:", val_result["valid"])
-```
-
-See `examples/01_standalone_usage.py` for full example.
-
-### With LLM Enhancement (Using Socrates Nexus)
-
-Pass an LLM client for intelligent, context-aware behavior:
-
-```python
-from socratic_agents import SocraticCounselor, CodeGenerator
-from socrates_nexus import LLMClient
-
-# Create LLM client
-llm = LLMClient(provider="anthropic", model="claude-sonnet")
-
-# Agents now use LLM for enhanced responses
-counselor = SocraticCounselor(llm_client=llm)
-result = counselor.process({
-    "topic": "machine learning gradient descent",
-    "level": "intermediate"
-})
-print("Enhanced guidance:", result)
-
-# Code generator creates real code with LLM
-generator = CodeGenerator(llm_client=llm)
-code_result = generator.process({
-    "prompt": "Binary search algorithm",
-    "language": "python"
-})
-print("Generated code:", code_result["code"])
-```
-
-See `examples/02_with_nexus.py` for full example.
-
-### Knowledge Base-Aware Socratic Counselor
-
-Generate context-specific questions grounded in project documentation and knowledge gaps:
-
-```python
-from socratic_agents import SocraticCounselor
-from socrates_nexus import LLMClient
-
-llm = LLMClient(provider="anthropic", model="claude-sonnet")
-counselor = SocraticCounselor(llm_client=llm)
-
-# Generate KB-aware question using project context
-result = counselor.process({
-    "topic": "user authentication system",
-    "phase": "design",
-    "level": "intermediate",
-    "knowledge_base": {
-        "chunks": [
-            {"content": "The system uses JWT tokens for stateless authentication"},
-            {"content": "OAuth2 integration with GitHub and Google providers"},
-            {"content": "Password hashing uses bcrypt with 12 rounds"}
-        ],
-        "gaps": [
-            {"topic": "session management", "severity": "high"},
-            {"topic": "token refresh strategy", "severity": "medium"}
-        ],
-        "coverage": 65
-    },
-    "document_understanding": {
-        "key_topics": ["authentication", "security", "tokens"],
-        "alignment_score": 0.8
-    },
-    "context": "User just completed requirement analysis for the auth system",
-    "recently_asked": [
-        "What authentication methods should we support?",
-        "How do we handle password security?"
-    ]
-})
-
-print("Question:", result["question"])
-print("KB Coverage:", result["kb_coverage"])
-```
-
-The counselor will generate a question like: "Given that we're using JWT tokens with OAuth2 providers, how should we handle session management and token refresh in a stateless architecture?" instead of generic questions.
-
-See `examples/03_kb_aware_counselor.py` for full example.
-
-### LLM-Powered Agent Wrappers
-
-Use enhanced wrappers for advanced features:
-
-```python
-from socratic_agents import LLMPoweredCounselor, LLMPoweredCodeGenerator
-from socrates_nexus import LLMClient
-
-llm = LLMClient(provider="anthropic", model="claude-sonnet")
-
-# Enhanced counselor with context awareness
-counselor = LLMPoweredCounselor(llm_client=llm)
-result = counselor.guide_with_context(
-    topic="algorithms",
-    level="advanced",
-    context="for a technical interview"
-)
-print("Context-aware guidance:", result["llm_enhanced_questions"])
-
-# Enhanced generator with tests and docs
-generator = LLMPoweredCodeGenerator(llm_client=llm)
-result = generator.generate_with_tests(
-    specification="Quicksort implementation",
-    language="python",
-    include_docs=True,
-    include_error_handling=True
-)
-print("Production-ready code with tests:", result["code"])
-```
-
-### Multi-Agent Workflow
-
-```python
-from socratic_agents import AgentOrchestrator
-from socrates_nexus import LLMClient
-
-# Create orchestrator
-orchestrator = AgentOrchestrator(
-    llm_client=LLMClient(provider="anthropic"),
-    agents=["counselor", "code_generator", "validator"]
-)
-
-# Execute workflow
-result = orchestrator.execute_workflow(
-    task="Generate and test a Python function for fibonacci",
-    agents=["code_generator", "validator"]
-)
-
-print(result)
-```
-
-### Adaptive Skill Generation
-
-Generate and apply adaptive skills to optimize agent behavior based on maturity and learning patterns:
-
-```python
-from socratic_agents import SkillGeneratorAgent
-
-# Create skill generator
-skill_gen = SkillGeneratorAgent()
-
-# Generate skills based on maturity and learning data
-result = skill_gen.process({
-    "action": "generate",
-    "maturity_data": {
-        "current_phase": "discovery",
-        "completion_percent": 35,
-        "weak_categories": ["problem_definition"],
-        "category_scores": {
-            "problem_definition": 0.3,
-            "scope": 0.8
-        }
-    },
-    "learning_data": {
-        "learning_velocity": "medium",
-        "engagement_score": 0.75
-    }
-})
-
-# Get recommended skills
-for rec in result["recommendations"]:
-    skill = rec["skill"]
-    print(f"Skill: {skill['id']}")
-    print(f"Priority: {rec['priority']}")
-    print(f"Expected Impact: {rec['expected_impact']:.0%}")
-```
-
-### Openclaw Integration
-
-```python
-from socratic_agents.integrations.openclaw import SocraticAgentsSkill
-
-# Use in Openclaw
-skill = SocraticAgentsSkill()
-result = skill.generate_code("Create a sorting algorithm")
-```
-
-### LangChain Integration
-
-```python
-from socratic_agents.integrations.langchain import SocraticAgentsTool
-from langchain.agents import AgentType, initialize_agent
-from langchain.llms import OpenAI
-
-# Create tool
-agents_tool = SocraticAgentsTool()
-
-# Use in agent
-tools = [agents_tool]
-agent = initialize_agent(
-    tools,
-    OpenAI(temperature=0),
-    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True
-)
-```
+---
 
 ## Architecture
 
-### Core Components
+### Socrates-Integrated Design
 
-**BaseAgent** - Abstract base class for all agents with:
-- LLM integration via Socrates Nexus
-- Async support
-- Error handling
-- Logging and monitoring
+All agents are designed to work within the Socrates orchestration framework:
 
-**Agent Categories**:
-- **Execution Agents** - Execute specific tasks (CodeGenerator, Validator)
-- **Coordination Agents** - Orchestrate other agents (MultiLLMCoordinator, ProjectManager)
-- **Analysis Agents** - Analyze information (ConflictDetector, KnowledgeAnalyzer)
-- **Management Agents** - Manage resources (UserManager, SystemMonitor)
-- **Optimization Agents** - Optimize agent behavior (SkillGenerator)
+```
+┌─────────────────────────────────────┐
+│     Socrates Monolith               │
+├─────────────────────────────────────┤
+│  AgentOrchestrator                  │
+│  ├─ Database Connection             │
+│  ├─ Vector Database                 │
+│  ├─ LLM Client (Multi-provider)     │
+│  └─ Event System                    │
+├─────────────────────────────────────┤
+│  Socratic Agents (19+)              │
+│  ├─ Dialogue Agents                 │
+│  ├─ Project Agents                  │
+│  ├─ Code Agents                     │
+│  ├─ Learning Agents                 │
+│  └─ System Agents                   │
+└─────────────────────────────────────┘
+```
 
-**AgentOrchestrator** - Coordinates multiple agents:
-- Dependency resolution
-- Workflow execution
-- Context passing between agents
-- Error handling and recovery
+### Key Features
 
-## Documentation
+- **Agent Orchestration** - Coordinated agent workflows through AgentOrchestrator
+- **Async Support** - Full async/await support for non-blocking operations
+- **Event System** - Real-time event emission for status tracking
+- **Database Integration** - Direct access to Socrates database
+- **Vector DB Access** - Knowledge and context retrieval
+- **Multi-Provider LLM** - Via Socratic Nexus integration
+- **Type Hints** - Full Python type annotations
+- **Comprehensive Logging** - Detailed operation logging
 
-- **[Skill Generator Agent Overview](docs/SKILL_GENERATOR_OVERVIEW.md)** - Complete guide to the adaptive skill generation system with integration architecture, implementation phases, and design principles
-- **[Skill Generator Analysis](docs/SKILL_GENERATOR_ANALYSIS.md)** - Technical feasibility analysis and implementation options
-- **[Skill Generator Standalone Design](docs/SKILL_GENERATOR_STANDALONE_ANALYSIS.md)** - Standalone vs. integrated design patterns and reusability architecture
+---
+
+## Quick Reference
+
+### Initialize Agents Within Socrates
+
+```python
+from socratic_agents import AgentOrchestrator, SocraticCounselorAgent
+
+# Create orchestrator (within Socrates context)
+orchestrator = AgentOrchestrator(
+    database=socrates_db,
+    vector_db=socrates_vector_db,
+    claude_client=socrates_llm_client
+)
+
+# Create and use specific agent
+counselor = SocraticCounselorAgent(orchestrator)
+result = counselor.process({
+    "action": "generate_question",
+    "project": project_context,
+    "current_user": user_id
+})
+```
+
+### Available Actions Vary by Agent
+
+Each agent has specific actions. See individual agent documentation for details.
+
+---
 
 ## Testing
 
 ```bash
-# Run all tests
-pytest
+cd Socratic-agents
+
+# Run all tests (requires Socrates environment)
+pytest tests/ -v
 
 # Run with coverage
-pytest --cov=src/socratic_agents
+pytest tests/ --cov=src/socratic_agents --cov-report=html
 
 # Run specific test category
 pytest -m unit
 pytest -m integration
-
-# Run without slow tests
-pytest -m "not slow"
 ```
+
+---
+
+## Future: Post-Architecture Redesign
+
+After the Socrates architecture is redesigned and optimized, the following changes are planned:
+
+1. **Independent Agents** - Some agents will be refactored as independent packages
+2. **Decoupled Dependencies** - Reduced reliance on Socrates internals
+3. **Modular Publishing** - Agent libraries published separately to PyPI
+4. **Standalone Mode** - Core agents usable without full Socrates installation
+
+Current independent Socratic libraries:
+- **socratic-analyzer** - Code analysis (standalone)
+- **socratic-learning** - Learning algorithms (standalone)
+- **Socratic-workflow** - Workflow definitions (standalone)
+- **Socratic-maturity** - Maturity tracking (standalone)
+- And 4+ others...
+
+---
+
+## Architecture Documentation
+
+**Status**: Currently in integration phase within Socrates monolith.
+
+For detailed agent documentation, see the `docs/` directory (available after Socrates publication).
+
+---
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+This library is maintained as part of the Socrates monolith. Contributions should follow Socrates contribution guidelines.
+
+---
 
 ## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
-## Support Development
-
-If you find this package useful, consider supporting development:
-
-- [Become a Sponsor](https://github.com/sponsors/Nireus79) - Get early access to new features
-- [Star on GitHub](https://github.com/Nireus79/Socratic-agents) - Shows your appreciation
-- [Report Issues](https://github.com/Nireus79/Socratic-agents/issues) - Help improve the package
-
-Your support helps fund development of the entire Socratic ecosystem.
-
-## Support
-
-- GitHub Issues: https://github.com/Nireus79/Socratic-agents/issues
-- Documentation: https://github.com/Nireus79/Socratic-agents/tree/main/docs
-- Socrates Ecosystem: https://github.com/Nireus79/Socrates-nexus/blob/main/ECOSYSTEM.md
-
 ---
 
-**Built with ❤️ as part of the Socrates ecosystem**
+**This library is part of the Socrates AI platform**
 
 Made by [@Nireus79](https://github.com/Nireus79)

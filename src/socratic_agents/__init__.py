@@ -1,6 +1,40 @@
 from __future__ import annotations
 
-"""Agent implementations for Socratic Agents"""
+"""
+Socratic Agents - Socrates-Integrated Agent Library
+
+⚠️  **IMPORTANT: SOCRATES-ONLY LIBRARY**
+
+This library is designed exclusively for use within the Socrates monolith.
+It is NOT designed for standalone or independent use.
+
+Requirements:
+- Socrates monolith must be installed locally
+- socratic_system module must be available
+- Agents require full Socrates context to function
+
+Agents in this library (Socrates-integrated):
+- SocraticCounselorAgent: Guides users through Socratic questioning
+- ProjectManagerAgent: Manages project lifecycle
+- QualityControllerAgent: Orchestrates maturity tracking
+- CodeGeneratorAgent: Generates code based on project context
+- LearningAgent: Tracks user behavior and effectiveness
+- DocumentProcessorAgent: Processes and imports documents
+- ConflictDetectorAgent: Identifies and resolves conflicts
+- NoteManagerAgent: Manages project notes
+- UserManagerAgent: Manages user accounts
+- And 10+ more specialized agents
+
+Future:
+After Socrates architecture redesign, some agents will be refactored for
+independence and modularity. This library will be updated accordingly.
+
+For independent Socratic libraries, see:
+- socratic-analyzer: Code analysis (standalone)
+- socratic-learning: Learning algorithms (standalone)
+- Socratic-workflow: Workflow definitions (standalone)
+- Socratic-maturity: Maturity tracking (standalone)
+"""
 
 from .base import Agent
 from .code_generator import CodeGeneratorAgent
