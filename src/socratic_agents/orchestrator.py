@@ -88,12 +88,32 @@ class AgentOrchestrator:
     - Task coordination
     """
 
-    def __init__(self):
-        """Initialize the orchestrator."""
+    def __init__(
+        self,
+        database: Any = None,
+        vector_db: Any = None,
+        claude_client: Any = None,
+        config: Any = None,
+    ) -> None:
+        """
+        Initialize the orchestrator.
+
+        Args:
+            database: Database connection (Socrates context)
+            vector_db: Vector database connection (Socrates context)
+            claude_client: Claude LLM client (Socrates context)
+            config: Configuration object (Socrates context)
+        """
         self.logger = logging.getLogger("socratic_agents.orchestrator")
         self.event_emitter = EventEmitter()
         self._agents: Dict[str, Any] = {}
         self._state: Dict[str, Any] = {}
+        # Socrates-specific attributes
+        self.database = database
+        self.vector_db = vector_db
+        self.claude_client = claude_client
+        self.config = config
+        self.context_analyzer: Any = None
 
     def register_agent(self, name: str, agent: Any) -> None:
         """

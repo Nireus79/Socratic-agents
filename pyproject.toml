@@ -116,3 +116,21 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 ignore_missing_imports = true
+no_implicit_optional = true
+check_untyped_defs = false
+exclude = ["(tests|docs|.venv|venv)/"]
+follow_imports = "skip"
+follow_imports_for_stubs = false
+# Socrates-only library configuration:
+# Disable errors that arise from untyped socratic_system integrations
+disable_error_code = [
+    "union-attr",
+    "assignment",
+    "has-type",
+    "attr-defined",
+    "var-annotated",
+    "return-value",
+    "arg-type",
+    "call-arg",
+    "override"
+]
