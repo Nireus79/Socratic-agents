@@ -42,6 +42,9 @@ dependencies = [
 
 [project.optional-dependencies]
 
+# REST Client Library (Phase 5 - Library Export)
+client = ["httpx>=0.24.0"]
+
 # Framework integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
@@ -54,6 +57,7 @@ learning = ["socratic-learning>=0.1.0"]
 
 # All features (maturity is now a core dependency)
 all = [
+    "httpx>=0.24.0",
     "langchain>=0.1.0",
     "socratic-nexus>=0.3.6",
     "socratic-conflict>=0.1.0",
