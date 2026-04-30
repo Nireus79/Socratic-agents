@@ -93,3 +93,22 @@ __all__ = [
     "MultiLLMAgent",
     "QuestionQueueAgent",
 ]
+
+# Phase 4 - REST API Client (New)
+from .client import (
+    SocratesAgentClient,
+    SocratesAgentClientSync,
+    SocratesAgentClientError,
+    AgentNotFoundError,
+    AgentTimeoutError,
+    JobNotFoundError,
+)
+
+__all__ = __all__ + [
+    "SocratesAgentClient",
+    "SocratesAgentClientSync",
+    "SocratesAgentClientError",
+    "AgentNotFoundError",
+    "AgentTimeoutError",
+    "JobNotFoundError",
+]
