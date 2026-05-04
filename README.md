@@ -12,9 +12,9 @@
 
 ## Requirements
 
-- **Socrates Monolith** - Must be installed locally
-- **socratic_system** - Must be available in Python path
-- **Python 3.9+**
+- **Socrates Monolith** - Must be installed locally (REQUIRED)
+- **socratic_system** - Must be available in Python path (REQUIRED)
+- **Python 3.10+** (minimum, recommended 3.11+)
 
 ### Why Socrates-Only?
 
@@ -164,19 +164,30 @@ Each agent has specific actions. See individual agent documentation for details.
 
 ## Testing
 
+⚠️ **IMPORTANT TESTING NOTES:**
+
+- Socratic-agents is a **Socrates-only library**
+- Pytest tests **require the Socrates monolith to be installed**
+- Tests can **only be run within the Socrates development environment**
+- Tests will fail in isolation without the `socratic_system` module
+
+### Running Tests
+
 ```bash
 cd Socratic-agents
 
 # Run all tests (requires Socrates environment)
-pytest tests/ -v
+pytest tests/ -v --cov=src/socratic_agents
 
-# Run with coverage
+# Run with coverage report
 pytest tests/ --cov=src/socratic_agents --cov-report=html
 
 # Run specific test category
 pytest -m unit
 pytest -m integration
 ```
+
+**Note:** If running tests outside the full Socrates environment, you'll see import errors related to missing `socratic_system` module. This is expected and indicates the tests require the full Socrates monolith.
 
 ---
 
