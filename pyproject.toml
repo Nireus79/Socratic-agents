@@ -4,64 +4,55 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-agents"
-version = "0.1.0"
-description = "Socrates-integrated multi-agent orchestration system. Part of the Socrates monolith - requires Socrates installation."
+version = "1.0.0-alpha"
+description = "Multi-agent orchestration system with constitutional AI governance. Provides agents with built-in ethical reasoning via socratic-morality framework."
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Socratic Agents Contributors"}
+    {name = "Anthropic", email = "support@anthropic.com"}
 ]
 keywords = [
     "agents",
     "ai",
     "orchestration",
     "multi-agent",
-    "langchain",
-    "openclaw",
+    "constitutional-ai",
+    "governance",
+    "ethics",
     "production",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 dependencies = [
+    "socratic-morality>=0.0.3",
     "pydantic>=2.0.0",
-    "loguru>=0.7.0",
-    "colorama>=0.4.0",
-    "socratic-maturity>=0.1.0",
+    "anthropic>=0.40.0",
 ]
 
 [project.optional-dependencies]
 
-# REST Client Library (Phase 5 - Library Export)
-client = ["httpx>=0.24.0"]
+# REST API Server
+api = ["fastapi>=0.100", "uvicorn>=0.23"]
 
 # Framework integrations
-openclaw = []
 langchain = ["langchain>=0.1.0"]
-langraph = ["langgraph>=0.0.1"]
-nexus = ["socratic-nexus>=0.3.6"]
+langgraph = ["langgraph>=0.0.1"]
 
-# Socratic ecosystem integrations
-conflict = ["socratic-conflict>=0.1.0"]
-learning = ["socratic-learning>=0.1.0"]
-
-# All features (maturity is now a core dependency)
+# All features
 all = [
-    "httpx>=0.24.0",
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
     "langchain>=0.1.0",
-    "socratic-nexus>=0.3.6",
-    "socratic-conflict>=0.1.0",
-    "socratic-learning>=0.1.0",
 ]
 
 # Development
@@ -69,18 +60,16 @@ dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0",
-    "pytest-benchmark>=4.0",
     "black>=23.0",
     "ruff>=0.1.0",
     "mypy>=1.0",
-    "types-requests>=2.28.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/Nireus79/Socratic-agents"
-Repository = "https://github.com/Nireus79/Socratic-agents"
-Documentation = "https://github.com/Nireus79/Socratic-agents#readme"
-Issues = "https://github.com/Nireus79/Socratic-agents/issues"
+Homepage = "https://github.com/Nireus79/socratic-agents"
+Repository = "https://github.com/Nireus79/socratic-agents.git"
+Documentation = "https://github.com/Nireus79/socratic-agents#readme"
+Issues = "https://github.com/Nireus79/socratic-agents/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -91,52 +80,31 @@ find = {where = ["src"]}
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
-markers = [
-    "unit: Unit tests",
-    "integration: Integration tests",
-    "slow: Slow tests",
-    "benchmark: Performance benchmark tests",
-    "memory: Memory usage tests",
+addopts = "-v --cov=socratic_agents --cov-report=html --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src/socratic_agents"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
 ]
-addopts = "-v --strict-markers"
 
 [tool.black]
 line-length = 100
-target-version = ["py38"]
+target-version = ["py310"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
-
-[tool.ruff.lint]
+target-version = "py310"
 select = ["E", "F", "W", "I"]
-ignore = ["E402", "E501"]
 
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = false
+python_version = "3.10"
+warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
-ignore_missing_imports = true
+check_untyped_defs = true
 no_implicit_optional = true
-check_untyped_defs = false
-exclude = ["(tests|docs|.venv|venv)/"]
-follow_imports = "skip"
-follow_imports_for_stubs = false
-# Socrates-only library configuration:
-# Disable errors that arise from untyped socratic_system integrations
-disable_error_code = [
-    "union-attr",
-    "assignment",
-    "has-type",
-    "attr-defined",
-    "var-annotated",
-    "return-value",
-    "arg-type",
-    "call-arg",
-    "override",
-    "import-untyped"
-]
+strict_optional = true
