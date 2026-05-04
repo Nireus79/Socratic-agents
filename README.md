@@ -1,6 +1,6 @@
 # Socratic Agents
 
-⚠️ **SOCRATES-ONLY LIBRARY** - This library is designed exclusively for use within the Socrates monolith and is NOT suitable for standalone use.
+⚠️ **REQUIRES SOCRATES MONOLITH** - While this library is published on PyPI, all agents require the Socrates monolith to be installed and functioning. Standalone use is not supported.
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Socratic Agents** is a collection of 19+ specialized agents that power the Socrates AI platform. These agents handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
 
-**Key Point**: All agents in this library require the Socrates monolith to be installed locally. They depend on `socratic_system` internals and cannot function independently.
+**Key Point**: This library is published on PyPI for use with Socrates v2.0.0+, but all agents require the Socrates monolith to be installed locally. They depend on `socratic_system` internals and cannot function independently.
 
 ## Requirements
 
@@ -89,9 +89,9 @@ pip install -e .
 
 ## Architecture
 
-### Socrates-Integrated Design
+### Socrates-Dependent Design
 
-All agents are designed to work within the Socrates orchestration framework:
+All agents are designed to work within the Socrates orchestration framework and require Socrates v2.0.0+ to function:
 
 ```
 ┌─────────────────────────────────────┐
@@ -166,10 +166,10 @@ Each agent has specific actions. See individual agent documentation for details.
 
 ⚠️ **IMPORTANT TESTING NOTES:**
 
-- Socratic-agents is a **Socrates-only library**
 - Pytest tests **require the Socrates monolith to be installed**
 - Tests can **only be run within the Socrates development environment**
 - Tests will fail in isolation without the `socratic_system` module
+- This library requires Socrates v2.0.0+ to function
 
 ### Running Tests
 
