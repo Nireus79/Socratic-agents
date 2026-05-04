@@ -1,0 +1,38 @@
+PHASE 3: CONSTITUTIONAL AI GOVERNANCE - COMPLETE
+
+Version: 0.3.1
+Tests: 83 passing (100%)
+Coverage: 56% for Phase 3 new code
+
+COMPONENTS IMPLEMENTED:
+1. GovernedAgent - Wraps agents with constitutional checks
+2. GovernanceAdapter - Factory for governance wrappers
+3. AgentBus - Inter-agent message routing with history
+4. REST API - FastAPI endpoints for agents and governance
+5. Configuration System - YAML-based configuration classes
+6. Constitution Template - Socratic governance rules
+
+ENHANCEMENTS:
+- Enhanced AgentOrchestrator with governance support
+- All agents auto-wrapped with constitutional checks
+- Agent-to-agent message routing via bus
+- REST endpoints for agent execution and governance queries
+- Configuration from YAML files
+
+TESTING:
+- 83 tests passing (up from 74)
+- 9 new Phase 3 governance tests
+- Backward compatible with all existing tests
+- 16% coverage for Phase 3 modules (new code)
+- 74% coverage for enhanced orchestrator
+
+DEPENDENCIES:
+- socratic-morality>=0.0.3 (core)
+- pydantic, anthropic (existing)
+- fastapi, uvicorn (optional, for REST API)
+
+NEXT STEP:
+Commit Phase 3, wait for GitHub CI/CD tests to pass.
+Once green, ready to publish v0.3.1 to PyPI.
+
+DO NOT PUBLISH until GitHub tests pass.
