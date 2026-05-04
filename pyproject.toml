@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-agents"
-version = "0.3.1"
+version = "0.3.2"
 description = "Constitutional AI Agents - Reference Implementation with Governance"
 readme = "README.md"
 requires-python = ">=3.10"
