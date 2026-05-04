@@ -41,6 +41,7 @@ from .code_generator import CodeGeneratorAgent
 from .code_validation_agent import CodeValidationAgent
 from .conflict_detector import ConflictDetectorAgent
 from .context_analyzer import ContextAnalyzerAgent
+from .document_context_analyzer import DocumentContextAnalyzer
 from .document_processor import DocumentProcessorAgent
 from .events import EventType
 from .knowledge_analysis import KnowledgeAnalysisAgent
@@ -84,6 +85,7 @@ __all__ = [
     "CodeValidationAgent",
     "SystemMonitorAgent",
     "ConflictDetectorAgent",
+    "DocumentContextAnalyzer",
     "DocumentProcessorAgent",
     "NoteManagerAgent",
     "QualityControllerAgent",
