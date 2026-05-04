@@ -31,18 +31,24 @@ The agents in this library are tightly integrated with Socrates internals:
 
 ## Installation
 
-### Within Socrates Monolith
+### Via PyPI (Recommended)
 
-If you're working within the Socrates monolith, Socratic-agents is already available:
+Socratic-agents v0.3.1 is published to PyPI for use with Socrates v2.0.0+:
 
 ```bash
-cd Socrates
-pip install -e Socratic-agents
+pip install socratic-agents==0.3.1
 ```
 
-### As External Package (Future)
+This requires Socrates v2.0.0+ to be installed, as the library depends on the Socrates monolith.
 
-Currently, this package is NOT published to PyPI because it requires local Socrates installation.
+### Within Socrates Monolith (Development)
+
+For development work within the Socrates monolith:
+
+```bash
+cd Socratic-agents
+pip install -e .
+```
 
 ---
 
@@ -116,6 +122,14 @@ All agents are designed to work within the Socrates orchestration framework:
 - **Multi-Provider LLM** - Via Socratic Nexus integration
 - **Type Hints** - Full Python type annotations
 - **Comprehensive Logging** - Detailed operation logging
+
+### Phase 3 Features - Constitutional AI & Governance
+
+- **GovernedAgent** - Wraps agents with constitutional governance checks
+- **Agent Bus** - Inter-agent message routing with history tracking (1000 message buffer)
+- **Governance Integration** - Uses socratic-morality for ethical decision making
+- **REST API** - FastAPI endpoints for governance, agents, and precedent lookup
+- **YAML Configuration** - Constitutional governance rules and agent configuration
 
 ---
 
