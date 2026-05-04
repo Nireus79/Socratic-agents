@@ -149,3 +149,26 @@ __all__ = __all__ + [
     "AgentConfig",
     "OrchestratorConfig",
 ]
+
+# GitHub sync utilities
+from .github_sync_handler import (
+    GitHubSyncHandler,
+    create_github_sync_handler,
+    ConflictResolutionError,
+    TokenExpiredError,
+    PermissionDeniedError,
+    RepositoryNotFoundError,
+    NetworkSyncFailedError,
+    FileSizeExceededError,
+)
+
+__all__ += [
+    "GitHubSyncHandler",
+    "create_github_sync_handler",
+    "ConflictResolutionError",
+    "TokenExpiredError",
+    "PermissionDeniedError",
+    "RepositoryNotFoundError",
+    "NetworkSyncFailedError",
+    "FileSizeExceededError",
+]
