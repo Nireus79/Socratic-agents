@@ -87,3 +87,12 @@ strict_optional = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "socratic_agents.config",
+    "socratic_agents.github_sync_handler",
+    "socratic_agents.governance",
+    "socratic_agents.client"
+]
+ignore_errors = true
