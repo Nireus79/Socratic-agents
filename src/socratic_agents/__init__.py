@@ -141,28 +141,22 @@ __all__ = __all__ + [
     "MessageType",
 ]
 
+# GitHub sync utilities
 # Phase 3 - Configuration
 from .config import AgentConfig, GovernanceConfig, OrchestratorConfig
-
-__all__ = __all__ + [
-    "GovernanceConfig",
-    "AgentConfig",
-    "OrchestratorConfig",
-]
-
-# GitHub sync utilities
 from .github_sync_handler import (
-    GitHubSyncHandler,
-    create_github_sync_handler,
     ConflictResolutionError,
-    TokenExpiredError,
+    FileSizeExceededError,
+    GitHubSyncHandler,
+    NetworkSyncFailedError,
     PermissionDeniedError,
     RepositoryNotFoundError,
-    NetworkSyncFailedError,
-    FileSizeExceededError,
+    TokenExpiredError,
+    create_github_sync_handler,
 )
 
 __all__ += [
+    # GitHub sync utilities
     "GitHubSyncHandler",
     "create_github_sync_handler",
     "ConflictResolutionError",
@@ -171,4 +165,8 @@ __all__ += [
     "RepositoryNotFoundError",
     "NetworkSyncFailedError",
     "FileSizeExceededError",
+    # Configuration
+    "GovernanceConfig",
+    "AgentConfig",
+    "OrchestratorConfig",
 ]
