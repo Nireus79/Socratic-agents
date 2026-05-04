@@ -116,9 +116,11 @@ __all__ = __all__ + [
 # Phase 3 - Governance Integration (New)
 from .governance import GovernedAgent, GovernanceAdapter
 from .agent_bus import AgentBus, AgentMessage, MessageType
+
 try:
     from .api_app import create_app, run_api_server
     from .api_routes import create_agent_router, create_governance_router, create_precedent_router
+
     __all__ = __all__ + [
         "create_app",
         "run_api_server",

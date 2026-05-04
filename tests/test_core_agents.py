@@ -418,6 +418,8 @@ class TestAgentIntegration:
 
 
 from socratic_agents.agent_bus import AgentBus, AgentMessage
+
+
 # Phase 3 Governance Tests
 class TestPhase3Governance:
     """Tests for Phase 3 governance integration."""
@@ -446,11 +448,11 @@ class TestPhase3Governance:
         """Test that orchestrator has governance support."""
         orchestrator = AgentOrchestrator()
 
-        assert hasattr(orchestrator, 'governor')
-        assert hasattr(orchestrator, 'governance_adapter')
-        assert hasattr(orchestrator, 'agent_bus')
-        assert hasattr(orchestrator, 'get_governance_status')
-        assert hasattr(orchestrator, 'get_agent_bus_stats')
+        assert hasattr(orchestrator, "governor")
+        assert hasattr(orchestrator, "governance_adapter")
+        assert hasattr(orchestrator, "agent_bus")
+        assert hasattr(orchestrator, "get_governance_status")
+        assert hasattr(orchestrator, "get_agent_bus_stats")
 
     def test_orchestrator_governance_status_without_governor(self):
         """Test governance status when no governor is provided."""

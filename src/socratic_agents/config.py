@@ -114,8 +114,7 @@ class OrchestratorConfig:
 
         if "agents" in data and isinstance(data["agents"], list):
             data["agents"] = [
-                AgentConfig.from_dict(a) if isinstance(a, dict) else a
-                for a in data["agents"]
+                AgentConfig.from_dict(a) if isinstance(a, dict) else a for a in data["agents"]
             ]
 
         return cls(**data)
@@ -128,9 +127,7 @@ class OrchestratorConfig:
                 if isinstance(self.governance, GovernanceConfig)
                 else self.governance
             ),
-            "agents": [
-                a.to_dict() if isinstance(a, AgentConfig) else a for a in self.agents
-            ],
+            "agents": [a.to_dict() if isinstance(a, AgentConfig) else a for a in self.agents],
             "enable_agent_bus": self.enable_agent_bus,
             "enable_api": self.enable_api,
             "api_host": self.api_host,

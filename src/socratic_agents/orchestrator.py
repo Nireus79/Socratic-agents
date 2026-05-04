@@ -212,6 +212,7 @@ class AgentOrchestrator:
 
         return agent.process(request)
 
+
 # Phase 3 governance enhancements
 from .agent_bus import AgentBus, AgentMessage, MessageType
 from .governance import GovernanceAdapter
@@ -226,6 +227,7 @@ except ImportError:
 AgentOrchestrator.governor = None
 AgentOrchestrator.governance_adapter = None
 AgentOrchestrator.agent_bus = None
+
 
 # Add governance methods
 def __init_with_governance(
@@ -243,13 +245,13 @@ def __init_with_governance(
     self.event_emitter = EventEmitter()
     self._agents: Dict[str, Any] = {}
     self._state: Dict[str, Any] = {}
-    
+
     self.database = database
     self.vector_db = vector_db
     self.claude_client = claude_client
     self.config = config
     self.context_analyzer: Any = None
-    
+
     # Add governance support
     self.governor = governor
     self.governance_adapter = None
@@ -264,7 +266,7 @@ def __init_with_governance(
 
 def get_governance_status(self) -> Dict[str, Any]:
     """Get governance system status."""
-    if not hasattr(self, 'governor') or self.governor is None:
+    if not hasattr(self, "governor") or self.governor is None:
         return {"enabled": False}
 
     return {
@@ -277,7 +279,7 @@ def get_governance_status(self) -> Dict[str, Any]:
 
 def get_agent_bus_stats(self) -> Dict[str, Any]:
     """Get agent bus statistics."""
-    if not hasattr(self, 'agent_bus') or self.agent_bus is None:
+    if not hasattr(self, "agent_bus") or self.agent_bus is None:
         return {"enabled": False}
 
     return {
@@ -294,7 +296,16 @@ AgentOrchestrator.get_agent_bus_stats = get_agent_bus_stats
 # Store original __init__
 _original_init = AgentOrchestrator.__init__
 
-def __new_init__(self, database=None, vector_db=None, claude_client=None, config=None, governor=None, enable_agent_bus=True):
+
+def __new_init__(
+    self,
+    database=None,
+    vector_db=None,
+    claude_client=None,
+    config=None,
+    governor=None,
+    enable_agent_bus=True,
+):
     """Enhanced __init__ with governance."""
     _original_init(self, database, vector_db, claude_client, config)
     self.governor = governor
@@ -302,9 +313,10 @@ def __new_init__(self, database=None, vector_db=None, claude_client=None, config
     if governor:
         self.governance_adapter = GovernanceAdapter(governor)
         self.logger.info("Governor integration enabled")
-    
+
     self.agent_bus = AgentBus(enable_persistence=True) if enable_agent_bus else None
     if enable_agent_bus:
         self.logger.info("Agent bus enabled")
+
 
 AgentOrchestrator.__init__ = __new_init__

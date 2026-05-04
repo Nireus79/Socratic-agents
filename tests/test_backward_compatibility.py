@@ -15,13 +15,8 @@ class TestAPIResponseFormat:
 
     def test_response_structure(self):
         """Test response has required fields"""
-        response = {
-            "success": True,
-            "status": "success",
-            "data": {},
-            "message": "OK"
-        }
-        
+        response = {"success": True, "status": "success", "data": {}, "message": "OK"}
+
         assert "success" in response
         assert "status" in response
         assert "data" in response
@@ -33,9 +28,9 @@ class TestAPIResponseFormat:
             "success": False,
             "status": "error",
             "data": {"error": "Test error"},
-            "message": "Error occurred"
+            "message": "Error occurred",
         }
-        
+
         assert error_response["success"] is False
         assert "error" in error_response["data"]
 
@@ -46,7 +41,7 @@ class TestJobStatusValues:
     def test_valid_status_values(self):
         """Test valid job status values"""
         valid_statuses = ["pending", "completed", "failed", "timeout"]
-        
+
         for status in valid_statuses:
             assert status in valid_statuses
 
@@ -57,27 +52,27 @@ class TestClientMethods:
     def test_async_client_methods(self):
         """Test all async client methods exist"""
         from socratic_agents import SocratesAgentClient
-        
+
         client = SocratesAgentClient()
-        assert hasattr(client, 'list_agents')
-        assert hasattr(client, 'invoke_agent_sync')
-        assert hasattr(client, 'invoke_agent_async')
-        assert hasattr(client, 'get_job_status')
-        assert hasattr(client, 'wait_for_result')
-        assert hasattr(client, 'get_batch_job_status')
-        assert hasattr(client, 'close')
+        assert hasattr(client, "list_agents")
+        assert hasattr(client, "invoke_agent_sync")
+        assert hasattr(client, "invoke_agent_async")
+        assert hasattr(client, "get_job_status")
+        assert hasattr(client, "wait_for_result")
+        assert hasattr(client, "get_batch_job_status")
+        assert hasattr(client, "close")
 
     def test_sync_client_methods(self):
         """Test all sync client methods exist"""
         from socratic_agents import SocratesAgentClientSync
-        
+
         client = SocratesAgentClientSync()
-        assert hasattr(client, 'list_agents')
-        assert hasattr(client, 'invoke_agent')
-        assert hasattr(client, 'submit_job')
-        assert hasattr(client, 'get_job_status')
-        assert hasattr(client, 'wait_for_result')
-        assert hasattr(client, 'close')
+        assert hasattr(client, "list_agents")
+        assert hasattr(client, "invoke_agent")
+        assert hasattr(client, "submit_job")
+        assert hasattr(client, "get_job_status")
+        assert hasattr(client, "wait_for_result")
+        assert hasattr(client, "close")
 
 
 class TestExportedAPIs:
@@ -86,18 +81,18 @@ class TestExportedAPIs:
     def test_client_exports(self):
         """Test client classes are exported"""
         import socratic_agents
-        
-        assert hasattr(socratic_agents, 'SocratesAgentClient')
-        assert hasattr(socratic_agents, 'SocratesAgentClientSync')
+
+        assert hasattr(socratic_agents, "SocratesAgentClient")
+        assert hasattr(socratic_agents, "SocratesAgentClientSync")
 
     def test_exception_exports(self):
         """Test exception classes are exported"""
         import socratic_agents
-        
-        assert hasattr(socratic_agents, 'SocratesAgentClientError')
-        assert hasattr(socratic_agents, 'AgentNotFoundError')
-        assert hasattr(socratic_agents, 'AgentTimeoutError')
-        assert hasattr(socratic_agents, 'JobNotFoundError')
+
+        assert hasattr(socratic_agents, "SocratesAgentClientError")
+        assert hasattr(socratic_agents, "AgentNotFoundError")
+        assert hasattr(socratic_agents, "AgentTimeoutError")
+        assert hasattr(socratic_agents, "JobNotFoundError")
 
 
 if __name__ == "__main__":

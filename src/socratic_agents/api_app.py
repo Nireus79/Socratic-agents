@@ -7,9 +7,7 @@ try:
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import JSONResponse
 except ImportError:
-    raise ImportError(
-        "FastAPI is required. Install with: pip install socratic-agents[api]"
-    )
+    raise ImportError("FastAPI is required. Install with: pip install socratic-agents[api]")
 
 from .api_routes import create_agent_router, create_governance_router, create_precedent_router
 
