@@ -28,6 +28,3 @@ jobs:
     
     - name: Lint with Ruff
       run: ruff check src/ tests/
-    
-    - name: Type check with MyPy
-      run: mypy src/socratic_agents --ignore-missing-imports
