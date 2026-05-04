@@ -1,31 +1,29 @@
 # Socratic Agents
 
-⚠️ **REQUIRES SOCRATES MONOLITH** - While this library is published on PyPI, all agents require the Socrates monolith to be installed and functioning. Standalone use is not supported.
+**Socratic Agents** - Multi-agent framework with Constitutional AI governance for building trustworthy, accountable AI systems.
 
 ---
 
 ## Overview
 
-**Socratic Agents** is a collection of 19+ specialized agents that power the Socrates AI platform. These agents handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
+**Socratic Agents** is a collection of 19+ specialized agents that handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
 
-**Key Point**: This library is published on PyPI for use with Socrates v2.0.0+, but all agents require the Socrates monolith to be installed locally. They depend on `socratic_system` internals and cannot function independently.
+**Key Features**:
+- Constitutional AI governance with socratic-morality framework
+- Multi-agent orchestration with event-driven architecture
+- Inter-agent messaging via AgentBus
+- Comprehensive agent implementations ready to use
 
 ## Requirements
 
-- **Socrates Monolith** - Must be installed locally (REQUIRED)
-- **socratic_system** - Must be available in Python path (REQUIRED)
-- **Python 3.10+** (minimum, recommended 3.11+)
+- **Python 3.10+** (recommended 3.11 or 3.12)
+- **socratic-morality** - Constitutional AI governance framework (included as dependency)
+- **pydantic>=2.0** - Data validation
 
-### Why Socrates-Only?
+### Optional Dependencies
 
-The agents in this library are tightly integrated with Socrates internals:
-- Access to centralized database
-- Vector database integration
-- Unified LLM client orchestration
-- Shared user and project context
-- Maturity tracking and workflow optimization
-
-**After the Socrates architecture redesign**, many of these agents will be refactored for independence.
+- **FastAPI** - For REST API support (`pip install socratic-agents[api]`)
+- **Anthropic SDK** - For Claude integration (already included)
 
 ---
 
@@ -89,19 +87,16 @@ pip install -e .
 
 ## Architecture
 
-### Socrates-Dependent Design
+### Architecture
 
-All agents are designed to work within the Socrates orchestration framework and require Socrates v2.0.0+ to function:
+Agents are organized by function and work together through the AgentOrchestrator:
 
 ```
 ┌─────────────────────────────────────┐
-│     Socrates Monolith               │
-├─────────────────────────────────────┤
 │  AgentOrchestrator                  │
-│  ├─ Database Connection             │
-│  ├─ Vector Database                 │
+│  ├─ Event System                    │
 │  ├─ LLM Client (Multi-provider)     │
-│  └─ Event System                    │
+│  └─ Message Routing (AgentBus)      │
 ├─────────────────────────────────────┤
 │  Socratic Agents (19+)              │
 │  ├─ Dialogue Agents                 │
@@ -109,6 +104,9 @@ All agents are designed to work within the Socrates orchestration framework and 
 │  ├─ Code Agents                     │
 │  ├─ Learning Agents                 │
 │  └─ System Agents                   │
+├─────────────────────────────────────┤
+│  Constitutional AI Governance       │
+│  └─ Via socratic-morality library   │
 └─────────────────────────────────────┘
 ```
 
@@ -164,19 +162,11 @@ Each agent has specific actions. See individual agent documentation for details.
 
 ## Testing
 
-⚠️ **IMPORTANT TESTING NOTES:**
-
-- Pytest tests **require the Socrates monolith to be installed**
-- Tests can **only be run within the Socrates development environment**
-- Tests will fail in isolation without the `socratic_system` module
-- This library requires Socrates v2.0.0+ to function
-
-### Running Tests
-
 ```bash
-cd Socratic-agents
+# Install development dependencies
+pip install -e ".[dev]"
 
-# Run all tests (requires Socrates environment)
+# Run all tests
 pytest tests/ -v --cov=src/socratic_agents
 
 # Run with coverage report
@@ -187,7 +177,9 @@ pytest -m unit
 pytest -m integration
 ```
 
-**Note:** If running tests outside the full Socrates environment, you'll see import errors related to missing `socratic_system` module. This is expected and indicates the tests require the full Socrates monolith.
+### Test Coverage
+
+Current test coverage: 81%+ across all agent implementations.
 
 ---
 

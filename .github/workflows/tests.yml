@@ -27,11 +27,5 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
     
-    - name: Note about testing
-      run: |
-        echo "⚠️  Testing Note: Socratic-agents requires Socrates monolith"
-        echo "This library is published on PyPI but requires Socrates v2.0.0+ at runtime."
-        echo "Pytest tests require the Socrates monolith to be installed locally."
-        echo "Tests can only be run within the Socrates development environment."
-        echo "For unit tests, run: pytest tests/ -v --cov=src/socratic_agents"
-        echo "Note: This will fail in isolation without socratic_system module."
+    - name: Run tests
+      run: pytest tests/ -v --cov=src/socratic_agents --cov-report=term-missing

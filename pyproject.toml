@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-agents"
-version = "0.3.3"
-description = "Constitutional AI Agents for Socrates - Published library requiring Socrates v2.0.0+ runtime"
+version = "0.3.4"
+description = "Constitutional AI Agents - Multi-agent platform with governance and ethical decision-making"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
