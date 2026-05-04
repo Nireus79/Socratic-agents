@@ -1,6 +1,6 @@
 # Socratic Agents
 
-**Socratic Agents** - Multi-agent framework with Constitutional AI governance for building trustworthy, accountable AI systems.
+**Socratic Agents** - Independent multi-agent framework designed for standalone use with optional Constitutional AI governance integration.
 
 ---
 
@@ -8,11 +8,15 @@
 
 **Socratic Agents** is a collection of 19+ specialized agents that handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
 
+The library is being **refactored for complete independence** - agents use dependency injection instead of tight coupling to a monolith, enabling use in diverse deployment scenarios.
+
 **Key Features**:
-- Constitutional AI governance with socratic-morality framework
-- Multi-agent orchestration with event-driven architecture
-- Inter-agent messaging via AgentBus
+- Service-based architecture with dependency injection
+- Multi-agent orchestration with event-driven messaging via AgentBus
+- Optional Constitutional AI governance (socratic-morality integration)
 - Comprehensive agent implementations ready to use
+- REST API for external access
+- Clean service interfaces for custom implementations
 
 ## Requirements
 
