@@ -4,28 +4,36 @@ from __future__ import annotations
 Code generation agent for Socrates AI
 """
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict
-
-from socratic_system.database.project_file_manager import ProjectFileManager
-from socratic_system.utils.artifact_saver import ArtifactSaver
-from socratic_system.utils.code_structure_analyzer import CodeStructureAnalyzer
-from socratic_system.utils.multi_file_splitter import (
-    MultiFileCodeSplitter,
-    ProjectStructureGenerator,
-)
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from .base import Agent
+from .interfaces import DatabaseService, LLMService
 
 if TYPE_CHECKING:
-    from socratic_system.models import ProjectContext
+    pass  # Models will be passed as data, not imported
 
 
 class CodeGeneratorAgent(Agent):
     """Generates code and documentation based on project context"""
 
-    def __init__(self, orchestrator):
-        super().__init__("CodeGenerator", orchestrator)
+    def __init__(
+        self,
+        name: str = "CodeGenerator",
+        llm_service: Optional[LLMService] = None,
+        database_service: Optional[DatabaseService] = None,
+        agent_bus: Optional[Any] = None,
+    ):
+        """Initialize CodeGeneratorAgent with injected dependencies.
+
+        Args:
+            name: Agent name
+            llm_service: LLM service for code generation
+            database_service: Database service for persistence
+            agent_bus: Agent bus for inter-agent communication
+        """
+        super().__init__(name, agent_bus)
+        self.llm_service = llm_service
+        self.database_service = database_service
         self.current_user = None
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
@@ -44,22 +52,25 @@ class CodeGeneratorAgent(Agent):
 
     def _generate_artifact(self, request: Dict) -> Dict:
         """Generate project-type-appropriate artifact"""
+        if not self.llm_service:
+            return {"status": "error", "message": "LLM service not configured"}
+
         project = request.get("project")
-        current_user = request.get("current_user")  # Extract current_user from request
+        current_user = request.get("current_user")
 
         # Build comprehensive context
         context = self._build_generation_context(project)
 
         # Generate artifact based on project type
-        # Get user's auth method
-        user_auth_method = "api_key"
-        if current_user:
-            user_obj = self.orchestrator.database.load_user(current_user)
-            if user_obj and hasattr(user_obj, "claude_auth_method"):
-                user_auth_method = user_obj.claude_auth_method or "api_key"
-        artifact = self.orchestrator.claude_client.generate_artifact(
-            context, project.project_type, user_auth_method, user_id=current_user
-        )
+        try:
+            artifact = await self.llm_service.generate_code(
+                description=context.get("description", ""),
+                language=context.get("language", "python"),
+                context=context,
+            )
+        except Exception as e:
+            self.log(f"ERROR: Failed to generate artifact: {str(e)}")
+            return {"status": "error", "message": f"Generation failed: {str(e)}"}
 
         # Determine artifact type for documentation
         artifact_type_map = {
