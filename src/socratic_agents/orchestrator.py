@@ -214,7 +214,7 @@ class AgentOrchestrator:
 
 
 # Phase 3 governance enhancements
-from .agent_bus import AgentBus, AgentMessage, MessageType
+from .agent_bus import AgentBus
 from .governance import GovernanceAdapter
 
 try:

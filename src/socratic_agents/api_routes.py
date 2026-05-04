@@ -3,7 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 try:
-    from fastapi import APIRouter, HTTPException, Body, Query
+    from fastapi import APIRouter, Body, HTTPException, Query
     from pydantic import BaseModel, Field
 except ImportError:
     raise ImportError(

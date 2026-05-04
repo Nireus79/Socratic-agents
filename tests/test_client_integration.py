@@ -9,7 +9,6 @@ Test suite validating:
 """
 
 import pytest
-import asyncio
 
 
 class TestClientInitialization:
@@ -34,7 +33,7 @@ class TestClientInitialization:
         from socratic_agents import SocratesAgentClient
 
         client = SocratesAgentClient(auth_token="test_token")
-        # Auth is set in http_client; verified through connection
+        assert client is not None  # Auth is set in http_client
 
     def test_timeout_configuration(self):
         """Test timeout configuration"""
@@ -50,10 +49,10 @@ class TestExceptionTypes:
     def test_exception_hierarchy(self):
         """Test exception inheritance"""
         from socratic_agents import (
-            SocratesAgentClientError,
             AgentNotFoundError,
             AgentTimeoutError,
             JobNotFoundError,
+            SocratesAgentClientError,
         )
 
         assert issubclass(AgentNotFoundError, SocratesAgentClientError)

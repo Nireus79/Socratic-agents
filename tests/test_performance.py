@@ -8,8 +8,6 @@ Measure and validate:
 """
 
 import pytest
-import time
-import asyncio
 
 
 class TestAsyncPerformance:

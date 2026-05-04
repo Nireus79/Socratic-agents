@@ -417,9 +417,6 @@ class TestAgentIntegration:
         assert "code_analysis_complete" in event_log
 
 
-from socratic_agents.agent_bus import AgentBus, AgentMessage
-
-
 # Phase 3 Governance Tests
 class TestPhase3Governance:
     """Tests for Phase 3 governance integration."""
@@ -480,6 +477,7 @@ class TestPhase3Governance:
     async def test_orchestrator_with_mock_governor(self):
         """Test orchestrator with mock governor."""
         from unittest.mock import Mock
+
         from socratic_morality.governor.decision import DecisionType, GovernorDecision
 
         mock_governor = Mock()
@@ -503,6 +501,8 @@ class TestPhase3Governance:
     @pytest.mark.asyncio
     async def test_agent_bus_message_flow(self):
         """Test basic message flow through agent bus."""
+        from socratic_agents.agent_bus import AgentBus, AgentMessage
+
         bus = AgentBus()
 
         class TestAgent:
@@ -512,12 +512,8 @@ class TestPhase3Governance:
         bus.register_agent("agent1", TestAgent("agent1"))
         bus.register_agent("agent2", TestAgent("agent2"))
 
-        from socratic_agents.agent_bus import AgentMessage
-
         msg = AgentMessage(
             from_agent="agent1",
-            to_agent="agent2",
-            action="test",
             payload={"test": "data"},
         )
 

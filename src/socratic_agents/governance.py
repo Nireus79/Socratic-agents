@@ -6,7 +6,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from socratic_morality.governor import Governor
-from socratic_morality.governor.decision import DecisionType, GovernorDecision
+from socratic_morality.governor.decision import GovernorDecision
 
 
 class GovernedAgent:

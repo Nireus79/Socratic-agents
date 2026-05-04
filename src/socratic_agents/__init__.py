@@ -96,12 +96,12 @@ __all__ = [
 
 # Phase 4 - REST API Client (New)
 from .client import (
-    SocratesAgentClient,
-    SocratesAgentClientSync,
-    SocratesAgentClientError,
     AgentNotFoundError,
     AgentTimeoutError,
     JobNotFoundError,
+    SocratesAgentClient,
+    SocratesAgentClientError,
+    SocratesAgentClientSync,
 )
 
 __all__ = __all__ + [
@@ -114,8 +114,8 @@ __all__ = __all__ + [
 ]
 
 # Phase 3 - Governance Integration (New)
-from .governance import GovernedAgent, GovernanceAdapter
 from .agent_bus import AgentBus, AgentMessage, MessageType
+from .governance import GovernanceAdapter, GovernedAgent
 
 try:
     from .api_app import create_app, run_api_server
@@ -142,7 +142,7 @@ __all__ = __all__ + [
 ]
 
 # Phase 3 - Configuration
-from .config import GovernanceConfig, AgentConfig, OrchestratorConfig
+from .config import AgentConfig, GovernanceConfig, OrchestratorConfig
 
 __all__ = __all__ + [
     "GovernanceConfig",

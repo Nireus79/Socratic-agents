@@ -1,64 +1,45 @@
 [build-system]
-requires = ["setuptools>=65.0", "wheel"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-agents"
 version = "0.3.1"
-description = "Multi-agent orchestration system with constitutional AI governance. Provides agents with built-in ethical reasoning via socratic-morality framework."
+description = "Constitutional AI Agents - Reference Implementation with Governance"
 readme = "README.md"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
     {name = "Anthropic", email = "support@anthropic.com"}
 ]
 keywords = [
-    "agents",
-    "ai",
-    "orchestration",
-    "multi-agent",
     "constitutional-ai",
+    "agents",
     "governance",
-    "ethics",
-    "production",
+    "multi-agent",
+    "llm",
+    "socratic"
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-requires-python = ">=3.10"
 
 dependencies = [
+    "pydantic>=2.0",
     "socratic-morality>=0.0.3",
-    "pydantic>=2.0.0",
-    "anthropic>=0.40.0",
 ]
 
 [project.optional-dependencies]
-
-# REST API Server
 api = ["fastapi>=0.100", "uvicorn>=0.23"]
-
-# Framework integrations
-langchain = ["langchain>=0.1.0"]
-langgraph = ["langgraph>=0.0.1"]
-
-# All features
-all = [
-    "fastapi>=0.100",
-    "uvicorn>=0.23",
-    "langchain>=0.1.0",
-]
-
-# Development
 dev = [
     "pytest>=7.0",
-    "pytest-asyncio>=0.21.0",
+    "pytest-asyncio>=0.21",
     "pytest-cov>=4.0",
     "black>=23.0",
     "ruff>=0.1.0",
@@ -66,38 +47,32 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Nireus79/socratic-agents"
-Repository = "https://github.com/Nireus79/socratic-agents.git"
-Documentation = "https://github.com/Nireus79/socratic-agents#readme"
-Issues = "https://github.com/Nireus79/socratic-agents/issues"
+Homepage = "https://github.com/Nireus79/Socratic-agents"
+Documentation = "https://github.com/Nireus79/Socratic-agents#readme"
+Repository = "https://github.com/Nireus79/Socratic-agents.git"
+Issues = "https://github.com/Nireus79/Socratic-agents/issues"
 
 [tool.setuptools]
+packages = ["socratic_agents"]
 package-dir = {"" = "src"}
-
-[tool.setuptools.packages]
-find = {where = ["src"]}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
-addopts = "-v --cov=socratic_agents --cov-report=html --cov-report=term-missing"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --cov=socratic_agents --cov-report=html"
 asyncio_mode = "auto"
-
-[tool.coverage.run]
-source = ["src/socratic_agents"]
-omit = [
-    "*/tests/*",
-    "*/__init__.py",
-]
 
 [tool.black]
 line-length = 100
-target-version = ["py310"]
+target-version = ['py310', 'py311', 'py312']
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
 select = ["E", "F", "W", "I"]
+ignore = ["E501", "E402"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -108,3 +83,7 @@ disallow_incomplete_defs = false
 check_untyped_defs = true
 no_implicit_optional = true
 strict_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
