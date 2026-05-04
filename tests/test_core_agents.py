@@ -415,3 +415,112 @@ class TestAgentIntegration:
         assert len(event_log) == 2
         assert "code_generated" in event_log
         assert "code_analysis_complete" in event_log
+
+
+from socratic_agents.agent_bus import AgentBus, AgentMessage
+# Phase 3 Governance Tests
+class TestPhase3Governance:
+    """Tests for Phase 3 governance integration."""
+
+    def test_governed_agent_import(self):
+        """Test that GovernedAgent can be imported."""
+        from socratic_agents.governance import GovernedAgent
+
+        assert GovernedAgent is not None
+
+    def test_governance_adapter_import(self):
+        """Test that GovernanceAdapter can be imported."""
+        from socratic_agents.governance import GovernanceAdapter
+
+        assert GovernanceAdapter is not None
+
+    def test_agent_bus_import(self):
+        """Test that AgentBus can be imported."""
+        from socratic_agents.agent_bus import AgentBus, AgentMessage, MessageType
+
+        assert AgentBus is not None
+        assert AgentMessage is not None
+        assert MessageType is not None
+
+    def test_orchestrator_has_governance_support(self):
+        """Test that orchestrator has governance support."""
+        orchestrator = AgentOrchestrator()
+
+        assert hasattr(orchestrator, 'governor')
+        assert hasattr(orchestrator, 'governance_adapter')
+        assert hasattr(orchestrator, 'agent_bus')
+        assert hasattr(orchestrator, 'get_governance_status')
+        assert hasattr(orchestrator, 'get_agent_bus_stats')
+
+    def test_orchestrator_governance_status_without_governor(self):
+        """Test governance status when no governor is provided."""
+        orchestrator = AgentOrchestrator()
+
+        status = orchestrator.get_governance_status()
+        assert status["enabled"] is False
+
+    def test_orchestrator_bus_stats_disabled(self):
+        """Test bus stats when bus is disabled."""
+        orchestrator = AgentOrchestrator(enable_agent_bus=False)
+
+        stats = orchestrator.get_agent_bus_stats()
+        assert stats["enabled"] is False
+
+    def test_orchestrator_bus_stats_enabled(self):
+        """Test bus stats when bus is enabled."""
+        orchestrator = AgentOrchestrator(enable_agent_bus=True)
+
+        stats = orchestrator.get_agent_bus_stats()
+        assert stats["enabled"] is True
+        assert isinstance(stats["agents"], list)
+
+    @pytest.mark.asyncio
+    async def test_orchestrator_with_mock_governor(self):
+        """Test orchestrator with mock governor."""
+        from unittest.mock import Mock
+        from socratic_morality.governor.decision import DecisionType, GovernorDecision
+
+        mock_governor = Mock()
+
+        async def mock_evaluate(*args, **kwargs):
+            return GovernorDecision(
+                allowed=True,
+                decision_type=DecisionType.ALLOW,
+                action="test",
+                reasoning="Test",
+                violations=[],
+            )
+
+        mock_governor.evaluate = mock_evaluate
+
+        orchestrator = AgentOrchestrator(governor=mock_governor)
+        status = orchestrator.get_governance_status()
+
+        assert status["enabled"] is True
+
+    @pytest.mark.asyncio
+    async def test_agent_bus_message_flow(self):
+        """Test basic message flow through agent bus."""
+        bus = AgentBus()
+
+        class TestAgent:
+            def __init__(self, name):
+                self.name = name
+
+        bus.register_agent("agent1", TestAgent("agent1"))
+        bus.register_agent("agent2", TestAgent("agent2"))
+
+        from socratic_agents.agent_bus import AgentMessage
+
+        msg = AgentMessage(
+            from_agent="agent1",
+            to_agent="agent2",
+            action="test",
+            payload={"test": "data"},
+        )
+
+        await bus.send_message(msg)
+
+        history = bus.get_message_history()
+        assert len(history) > 0
+        assert history[0].action == "test"

@@ -138,3 +138,12 @@ __all__ = __all__ + [
     "AgentMessage",
     "MessageType",
 ]
+
+# Phase 3 - Configuration
+from .config import GovernanceConfig, AgentConfig, OrchestratorConfig
+
+__all__ = __all__ + [
+    "GovernanceConfig",
+    "AgentConfig",
+    "OrchestratorConfig",
+]
