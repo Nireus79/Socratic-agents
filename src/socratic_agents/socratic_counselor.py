@@ -15,7 +15,6 @@ from colorama import Fore
 # workflow_builder functions are injected via orchestrator
 # create_discovery_workflow_comprehensive and create_legacy_compatible_workflow
 # are obtained from orchestrator, not imported
-
 from socratic_agents.models import (
     ROLE_FOCUS_AREAS,
     User,

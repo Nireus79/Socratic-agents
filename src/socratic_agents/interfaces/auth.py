@@ -1,7 +1,7 @@
 """Authentication service interface - abstraction for user/auth operations."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class AuthService(ABC):

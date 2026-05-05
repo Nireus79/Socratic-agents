@@ -1,6 +1,6 @@
 """Learning-related data models for user behavior tracking"""
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional

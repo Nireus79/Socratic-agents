@@ -1,7 +1,6 @@
 """Simple logger wrapper for Socratic Agents"""
 
 import logging
-from typing import Optional
 
 
 def get_logger(name: str) -> logging.Logger:

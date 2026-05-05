@@ -14,6 +14,7 @@ from socratic_agents.models import WorkflowApprovalRequest
 
 if TYPE_CHECKING:
     from socratic_agents.models import ProjectContext
+
     from .agent_bus import AgentBus
 
 

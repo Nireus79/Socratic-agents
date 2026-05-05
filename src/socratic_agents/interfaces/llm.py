@@ -1,7 +1,7 @@
 """LLM service interface - abstraction for language model interactions."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 
 class LLMService(ABC):
