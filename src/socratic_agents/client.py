@@ -5,6 +5,8 @@ Provides convenient interface for external applications to call agents hosted
 in a Socrates API instance.
 """
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import time

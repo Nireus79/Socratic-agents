@@ -64,7 +64,13 @@ __all__ = [
     "EventType",
     "AgentOrchestrator",
     "EventEmitter",
-    # Models
+    # Models - LLM Provider
+    "LLMProviderConfig",
+    "LLMUsageRecord",
+    "ProviderMetadata",
+    "get_provider_metadata",
+    "list_available_providers",
+    # Models - Project
     "ProjectContext",
     "ProjectNote",
     "User",
