@@ -1,6 +1,5 @@
 """Comprehensive tests for core Socratic Agents."""
 
-
 from socratic_agents import (
     Agent,
     AgentOrchestrator,
