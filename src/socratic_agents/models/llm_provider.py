@@ -223,6 +223,6 @@ def get_provider_metadata(provider: str) -> Optional[ProviderMetadata]:
     return PROVIDER_METADATA.get(provider.lower())
 
 
-def list_available_providers() -> List[ProviderMetadata]:
-    """Get all available providers."""
-    return list(PROVIDER_METADATA.values())
+def list_available_providers() -> List[str]:
+    """Get all available provider names."""
+    return list(PROVIDER_METADATA.keys())
