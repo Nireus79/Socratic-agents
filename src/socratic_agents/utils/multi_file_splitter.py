@@ -53,7 +53,7 @@ class MultiFileCodeSplitter:
             logger.error(f"Syntax error splitting code: {e}")
 
             # Check if the code appears to be in markdown format
-            from socratic_system.utils.extractors.registry import LanguageExtractorRegistry
+            from socratic_agents.utils.extractors.registry import LanguageExtractorRegistry
 
             # Get Python extractor from registry
             extractor = LanguageExtractorRegistry.get_extractor("python")
@@ -371,7 +371,7 @@ class ProjectStructureGenerator:
         Returns:
             Complete file structure with paths and contents
         """
-        from socratic_system.utils.project_templates import ProjectTemplateGenerator
+        from socratic_agents.utils.project_templates import ProjectTemplateGenerator
 
         if dependencies is None:
             dependencies = []

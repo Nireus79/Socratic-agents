@@ -133,7 +133,7 @@ class ArtifactSaver:
             # Validate content if it's supposed to be code
             actual_artifact_type = artifact_type
             if artifact_type == "code":
-                from socratic_system.utils.extractors.registry import LanguageExtractorRegistry
+                from socratic_agents.utils.extractors.registry import LanguageExtractorRegistry
 
                 # Get Python extractor from registry
                 extractor = LanguageExtractorRegistry.get_extractor("python")

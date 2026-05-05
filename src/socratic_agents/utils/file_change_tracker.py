@@ -214,7 +214,7 @@ class FileChangeTracker:
             return results
 
         try:
-            from socratic_system.database.project_file_manager import ProjectFileManager
+            from socratic_agents.database.project_file_manager import ProjectFileManager
 
             file_manager = ProjectFileManager(database.db_path)
 

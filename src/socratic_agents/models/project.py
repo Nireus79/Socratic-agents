@@ -6,7 +6,7 @@ import datetime
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from socratic_system.models.role import TeamMemberRole
+from socratic_agents.models.role import TeamMemberRole
 
 
 @dataclass
