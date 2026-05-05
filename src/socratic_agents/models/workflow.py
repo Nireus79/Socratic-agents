@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 
 class WorkflowNodeType(Enum):
     """Types of nodes in a workflow graph"""
+
     PHASE_START = "phase_start"
     QUESTION_SET = "question_set"
     ANALYSIS = "analysis"
@@ -17,6 +18,7 @@ class WorkflowNodeType(Enum):
 
 class PathDecisionStrategy(Enum):
     """Strategies for selecting optimal workflow path"""
+
     MINIMIZE_COST = "minimize_cost"
     MINIMIZE_RISK = "minimize_risk"
     BALANCED = "balanced"
@@ -27,6 +29,7 @@ class PathDecisionStrategy(Enum):
 @dataclass
 class WorkflowNode:
     """Represents a step/node in a workflow graph"""
+
     node_id: str
     node_type: WorkflowNodeType
     label: str
@@ -38,6 +41,7 @@ class WorkflowNode:
 @dataclass
 class WorkflowEdge:
     """Represents a transition/edge between workflow nodes"""
+
     from_node: str
     to_node: str
     probability: float = 1.0
@@ -48,6 +52,7 @@ class WorkflowEdge:
 @dataclass
 class WorkflowPath:
     """Complete path through workflow with calculated metrics"""
+
     path_id: str
     nodes: List[str]
     edges: List[str]
@@ -67,6 +72,7 @@ class WorkflowPath:
 @dataclass
 class WorkflowDefinition:
     """Complete workflow graph definition"""
+
     workflow_id: str
     name: str
     phase: str
@@ -81,6 +87,7 @@ class WorkflowDefinition:
 @dataclass
 class WorkflowApprovalRequest:
     """Request for user/system approval of a workflow path"""
+
     request_id: str
     project_id: str
     phase: str
@@ -98,6 +105,7 @@ class WorkflowApprovalRequest:
 @dataclass
 class WorkflowExecutionState:
     """Tracks current execution state within an approved workflow path"""
+
     execution_id: str
     workflow_id: str
     approved_path_id: str

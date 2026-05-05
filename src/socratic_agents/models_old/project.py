@@ -111,7 +111,12 @@ class ProjectContext:
 
     def _initialize_maturity_fields(self) -> None:
         if self.phase_maturity_scores is None:
-            self.phase_maturity_scores = {"discovery": 0.0, "analysis": 0.0, "design": 0.0, "implementation": 0.0}
+            self.phase_maturity_scores = {
+                "discovery": 0.0,
+                "analysis": 0.0,
+                "design": 0.0,
+                "implementation": 0.0,
+            }
         if self.category_scores is None:
             self.category_scores = {}
         if self.categorized_specs is None:

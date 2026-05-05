@@ -20,7 +20,15 @@ class ProjectNote:
     tags: List[str] = field(default_factory=list)
 
     @classmethod
-    def create(cls, project_id: str, note_type: str, title: str, content: str, created_by: str, tags: Optional[List[str]] = None) -> "ProjectNote":
+    def create(
+        cls,
+        project_id: str,
+        note_type: str,
+        title: str,
+        content: str,
+        created_by: str,
+        tags: Optional[List[str]] = None,
+    ) -> "ProjectNote":
         return cls(
             note_id=str(uuid.uuid4()),
             project_id=project_id,

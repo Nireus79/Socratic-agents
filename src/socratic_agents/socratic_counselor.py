@@ -10,16 +10,17 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from colorama import Fore
-# QuestionSelector is injected
-# workflow_builder functions are injected
-# from socratic_system.core.workflow_builder import (
-    create_discovery_workflow_comprehensive,
-    create_legacy_compatible_workflow,
-)
+
+# QuestionSelector is injected via orchestrator
+# workflow_builder functions are injected via orchestrator
+# create_discovery_workflow_comprehensive and create_legacy_compatible_workflow
+# are obtained from orchestrator, not imported
+
 from socratic_agents.models import (
     ROLE_FOCUS_AREAS,
     User,
 )
+
 # DocumentUnderstandingService is injected
 # SubscriptionChecker is injected
 from socratic_agents.utils.logger import get_logger
@@ -250,6 +251,7 @@ class SocraticCounselorAgent(Agent):
         )
 
         import uuid
+
         project.pending_questions.append(
             {
                 "id": f"q_{uuid.uuid4().hex[:8]}",
@@ -410,7 +412,11 @@ class SocraticCounselorAgent(Agent):
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
+                user = (
+                    self.database_service.load_user
+                    if self.database_service
+                    else None and self.database_service.load_user(current_user)
+                )
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
                     logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -923,7 +929,11 @@ What would be most helpful for you?"""
         # Get user's auth method for API calls
         user_auth_method = "api_key"  # default
         if current_user:
-            user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
+            user = (
+                self.database_service.load_user
+                if self.database_service
+                else None and self.database_service.load_user(current_user)
+            )
             if user and hasattr(user, "claude_auth_method"):
                 user_auth_method = user.claude_auth_method or "api_key"
                 logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -1024,7 +1034,11 @@ What would be most helpful for you?"""
         # Load user auth method for API calls
         user_auth_method = "api_key"
         if current_user:
-            user_obj = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
+            user_obj = (
+                self.database_service.load_user
+                if self.database_service
+                else None and self.database_service.load_user(current_user)
+            )
             if user_obj and hasattr(user_obj, "claude_auth_method"):
                 user_auth_method = user_obj.claude_auth_method or "api_key"
         conflicts_resolved = self._handle_conflicts_realtime(
@@ -1796,7 +1810,11 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
+                user = (
+                    self.database_service.load_user
+                    if self.database_service
+                    else None and self.database_service.load_user(current_user)
+                )
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
                     logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -2083,7 +2101,11 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
+                user = (
+                    self.database_service.load_user
+                    if self.database_service
+                    else None and self.database_service.load_user(current_user)
+                )
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
 

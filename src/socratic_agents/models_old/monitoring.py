@@ -7,6 +7,7 @@ from dataclasses import dataclass
 @dataclass
 class TokenUsage:
     """Tracks API token usage and costs"""
+
     input_tokens: int
     output_tokens: int
     total_tokens: int

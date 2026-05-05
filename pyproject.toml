@@ -32,11 +32,11 @@ classifiers = [
 
 dependencies = [
     "pydantic>=2.0",
-    "socratic-morality>=0.0.3",
 ]
 
 [project.optional-dependencies]
 api = ["fastapi>=0.100", "uvicorn>=0.23"]
+governance = ["socratic-morality>=0.0.3"]
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",

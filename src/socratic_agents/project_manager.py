@@ -16,6 +16,7 @@ from socratic_agents.models import (
     TeamMemberRole,
     User,
 )
+
 # SubscriptionChecker is injected via orchestrator
 from socratic_agents.utils.id_generator import ProjectIDGenerator
 
@@ -235,7 +236,10 @@ class ProjectManagerAgent(Agent):
                 insights = {}
                 if self.llm_service:
                     insights = await self.llm_service.extract_insights(
-                        context_to_analyze, project, user_auth_method=user_auth_method, user_id=owner
+                        context_to_analyze,
+                        project,
+                        user_auth_method=user_auth_method,
+                        user_id=owner,
                     )
 
                 if insights:
@@ -543,7 +547,9 @@ class ProjectManagerAgent(Agent):
                     return {"status": "error", "message": "Project not found"}
 
                 if project.team_members:
-                    project.team_members = [m for m in project.team_members if m.username != username]
+                    project.team_members = [
+                        m for m in project.team_members if m.username != username
+                    ]
 
                 await self.database_service.save_project(project)
                 return {"status": "success", "message": f"Removed {username}"}
@@ -624,7 +630,10 @@ class ProjectManagerAgent(Agent):
             return {"status": "error", "message": "project_id is required"}
 
         if confirmation != "DELETE":
-            return {"status": "error", "message": 'Must type "DELETE" to confirm permanent deletion'}
+            return {
+                "status": "error",
+                "message": 'Must type "DELETE" to confirm permanent deletion',
+            }
 
         if self.database_service:
             try:

@@ -45,17 +45,32 @@ ROLE_FOCUS_AREAS = {
 }
 
 VALID_ROLES = [
-    "lead", "creator", "specialist", "analyst", "coordinator", "tester",
-    "owner", "editor", "viewer",
+    "lead",
+    "creator",
+    "specialist",
+    "analyst",
+    "coordinator",
+    "tester",
+    "owner",
+    "editor",
+    "viewer",
 ]
 
 ROLE_EXAMPLES = {
     "software": {
-        "lead": "Architect", "creator": "Developer", "specialist": "Security Expert",
-        "analyst": "Business Analyst", "coordinator": "Project Manager", "tester": "QA Engineer",
+        "lead": "Architect",
+        "creator": "Developer",
+        "specialist": "Security Expert",
+        "analyst": "Business Analyst",
+        "coordinator": "Project Manager",
+        "tester": "QA Engineer",
     },
     "business": {
-        "lead": "CEO/Owner", "creator": "Strategist", "specialist": "Financial Expert",
-        "analyst": "Market Researcher", "coordinator": "Operations Manager", "tester": "Quality Auditor",
+        "lead": "CEO/Owner",
+        "creator": "Strategist",
+        "specialist": "Financial Expert",
+        "analyst": "Market Researcher",
+        "coordinator": "Operations Manager",
+        "tester": "Quality Auditor",
     },
 }

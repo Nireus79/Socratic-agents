@@ -1,39 +1,32 @@
 from __future__ import annotations
 
 """
-Socratic Agents - Socrates-Integrated Agent Library
+Socratic Agents - Distributed Agent Library
 
-⚠️  **IMPORTANT: SOCRATES-ONLY LIBRARY**
+A comprehensive multi-agent platform providing 19+ specialized agents for
+task automation, analysis, and orchestration.
 
-This library is designed exclusively for use within the Socrates monolith.
-It is NOT designed for standalone or independent use.
-
-Requirements:
-- Socrates monolith must be installed locally
-- socratic_system module must be available
-- Agents require full Socrates context to function
-
-Agents in this library (Socrates-integrated):
-- SocraticCounselorAgent: Guides users through Socratic questioning
+Core Agents:
+- SocraticCounselorAgent: Guides through Socratic questioning
 - ProjectManagerAgent: Manages project lifecycle
-- QualityControllerAgent: Orchestrates maturity tracking
-- CodeGeneratorAgent: Generates code based on project context
-- LearningAgent: Tracks user behavior and effectiveness
-- DocumentProcessorAgent: Processes and imports documents
+- QualityControllerAgent: Orchestrates quality and maturity tracking
+- CodeGeneratorAgent: Generates code and documentation
+- UserLearningAgent: Tracks user behavior and learning
+- DocumentProcessorAgent: Processes and analyzes documents
 - ConflictDetectorAgent: Identifies and resolves conflicts
 - NoteManagerAgent: Manages project notes
 - UserManagerAgent: Manages user accounts
 - And 10+ more specialized agents
 
-Future:
-After Socrates architecture redesign, some agents will be refactored for
-independence and modularity. This library will be updated accordingly.
+Dependencies:
+- pydantic>=2.0: Data validation
+- Optional: socratic-morality (for governance features)
 
-For independent Socratic libraries, see:
-- socratic-analyzer: Code analysis (standalone)
-- socratic-learning: Learning algorithms (standalone)
-- Socratic-workflow: Workflow definitions (standalone)
-- Socratic-maturity: Maturity tracking (standalone)
+Architecture:
+- Service-based dependency injection
+- Agent bus for inter-agent communication
+- Optional governance integration
+- REST API support via FastAPI
 """
 
 from .base import Agent
@@ -115,10 +108,34 @@ __all__ = __all__ + [
     "JobNotFoundError",
 ]
 
-# Phase 3 - Governance Integration (New)
+# Agent bus for inter-agent communication
 from .agent_bus import AgentBus, AgentMessage, MessageType
-from .governance import GovernanceAdapter, GovernedAgent
 
+# Governance integration (optional - requires socratic-morality)
+try:
+    from .governance import GovernanceAdapter, GovernedAgent
+
+    _GOVERNANCE_AVAILABLE = True
+except ImportError:
+    _GOVERNANCE_AVAILABLE = False
+    GovernanceAdapter = None  # type: ignore
+    GovernedAgent = None  # type: ignore
+
+__all__ = __all__ + [
+    # Agent bus
+    "AgentBus",
+    "AgentMessage",
+    "MessageType",
+]
+
+# Add governance to exports if available
+if _GOVERNANCE_AVAILABLE:
+    __all__ = __all__ + [
+        "GovernedAgent",
+        "GovernanceAdapter",
+    ]
+
+# REST API support (optional - requires FastAPI)
 try:
     from .api_app import create_app, run_api_server
     from .api_routes import create_agent_router, create_governance_router, create_precedent_router
@@ -132,16 +149,6 @@ try:
     ]
 except ImportError:
     pass  # FastAPI not installed
-
-__all__ = __all__ + [
-    # Governance
-    "GovernedAgent",
-    "GovernanceAdapter",
-    # Agent bus
-    "AgentBus",
-    "AgentMessage",
-    "MessageType",
-]
 
 # GitHub sync utilities
 # Phase 3 - Configuration

@@ -51,6 +51,22 @@ class CodeGeneratorAgent(Agent):
         return {"status": "error", "message": "Unknown action"}
 
     def _generate_artifact(self, request: Dict) -> Dict:
+        """Generate project-type-appropriate artifact (sync wrapper)"""
+        import asyncio
+
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {
+                    "status": "error",
+                    "message": "Use process_async() instead of process() in async context",
+                }
+        except RuntimeError:
+            pass
+
+        return asyncio.run(self._generate_artifact_async(request))
+
+    async def _generate_artifact_async(self, request: Dict) -> Dict:
         """Generate project-type-appropriate artifact"""
         if not self.llm_service:
             return {"status": "error", "message": "LLM service not configured"}

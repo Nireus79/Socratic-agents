@@ -213,68 +213,29 @@ class AgentOrchestrator:
         return agent.process(request)
 
 
-# Phase 3 governance enhancements
+# Agent bus for inter-agent communication
 from .agent_bus import AgentBus
-from .governance import GovernanceAdapter
 
-try:
-    from socratic_morality.governor import Governor
-except ImportError:
-    Governor = None
-
-
-# Add governance attributes to AgentOrchestrator
-AgentOrchestrator.governor = None
-AgentOrchestrator.governance_adapter = None
+# Add agent_bus attribute to AgentOrchestrator
 AgentOrchestrator.agent_bus = None
 
+# Store original __init__
+_original_init = AgentOrchestrator.__init__
 
-# Add governance methods
-def __init_with_governance(
+
+def __new_init__(
     self,
-    database: Any = None,
-    vector_db: Any = None,
-    claude_client: Any = None,
-    config: Any = None,
-    governor: Optional[Governor] = None,
-    enable_agent_bus: bool = True,
-) -> None:
-    """Initialize orchestrator with governance support."""
-    # Call original __init__
-    self.logger = logging.getLogger("socratic_agents.orchestrator")
-    self.event_emitter = EventEmitter()
-    self._agents: Dict[str, Any] = {}
-    self._state: Dict[str, Any] = {}
-
-    self.database = database
-    self.vector_db = vector_db
-    self.claude_client = claude_client
-    self.config = config
-    self.context_analyzer: Any = None
-
-    # Add governance support
-    self.governor = governor
-    self.governance_adapter = None
-    if governor:
-        self.governance_adapter = GovernanceAdapter(governor)
-        self.logger.info("Governor integration enabled")
-
+    database=None,
+    vector_db=None,
+    claude_client=None,
+    config=None,
+    enable_agent_bus=True,
+):
+    """Enhanced __init__ with agent bus support."""
+    _original_init(self, database, vector_db, claude_client, config)
     self.agent_bus = AgentBus(enable_persistence=True) if enable_agent_bus else None
     if enable_agent_bus:
         self.logger.info("Agent bus enabled")
-
-
-def get_governance_status(self) -> Dict[str, Any]:
-    """Get governance system status."""
-    if not hasattr(self, "governor") or self.governor is None:
-        return {"enabled": False}
-
-    return {
-        "enabled": True,
-        "governor_type": self.governor.__class__.__name__,
-        "has_constitution": hasattr(self.governor, "constitution"),
-        "has_precedent_engine": hasattr(self.governor, "precedent_engine"),
-    }
 
 
 def get_agent_bus_stats(self) -> Dict[str, Any]:
@@ -290,33 +251,5 @@ def get_agent_bus_stats(self) -> Dict[str, Any]:
 
 
 # Monkey-patch methods
-AgentOrchestrator.get_governance_status = get_governance_status
 AgentOrchestrator.get_agent_bus_stats = get_agent_bus_stats
-
-# Store original __init__
-_original_init = AgentOrchestrator.__init__
-
-
-def __new_init__(
-    self,
-    database=None,
-    vector_db=None,
-    claude_client=None,
-    config=None,
-    governor=None,
-    enable_agent_bus=True,
-):
-    """Enhanced __init__ with governance."""
-    _original_init(self, database, vector_db, claude_client, config)
-    self.governor = governor
-    self.governance_adapter = None
-    if governor:
-        self.governance_adapter = GovernanceAdapter(governor)
-        self.logger.info("Governor integration enabled")
-
-    self.agent_bus = AgentBus(enable_persistence=True) if enable_agent_bus else None
-    if enable_agent_bus:
-        self.logger.info("Agent bus enabled")
-
-
 AgentOrchestrator.__init__ = __new_init__

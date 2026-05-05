@@ -1,12 +1,24 @@
-"""Constitutional AI governance integration for agents."""
+"""Constitutional AI governance integration for agents.
+
+NOTE: Governance features require socratic-morality library to be installed separately.
+This is optional and not a core dependency of socratic-agents.
+"""
 
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
-from socratic_morality.governor import Governor
-from socratic_morality.governor.decision import GovernorDecision
+if TYPE_CHECKING:
+    try:
+        from socratic_morality.governor import Governor
+        from socratic_morality.governor.decision import GovernorDecision
+    except ImportError:
+        Governor = None  # type: ignore
+        GovernorDecision = None  # type: ignore
+else:
+    Governor = None  # type: ignore
+    GovernorDecision = None  # type: ignore
 
 
 class GovernedAgent:

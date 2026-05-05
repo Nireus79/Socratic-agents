@@ -80,9 +80,7 @@ class QualityControllerAgent(Agent):
         logging.debug("Initializing QualityControllerAgent")
 
         # Initialize the pure calculation engine with Claude client for intelligent categorization
-        logging.debug(
-            f"Creating MaturityCalculator with LLM service: {llm_service is not None}"
-        )
+        logging.debug(f"Creating MaturityCalculator with LLM service: {llm_service is not None}")
         self.calculator = MaturityCalculator("software", claude_client=llm_service)
 
         # Expose calculator's phase categories and thresholds for reference

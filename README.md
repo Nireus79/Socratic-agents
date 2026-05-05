@@ -21,13 +21,13 @@ The library is being **refactored for complete independence** - agents use depen
 ## Requirements
 
 - **Python 3.10+** (recommended 3.11 or 3.12)
-- **socratic-morality** - Constitutional AI governance framework (included as dependency)
-- **pydantic>=2.0** - Data validation
+- **pydantic>=2.0** - Data validation and modeling
 
 ### Optional Dependencies
 
 - **FastAPI** - For REST API support (`pip install socratic-agents[api]`)
-- **Anthropic SDK** - For Claude integration (already included)
+- **socratic-morality** - For Constitutional AI governance features (governance module)
+- **Anthropic SDK** - For Claude LLM integration
 
 ---
 
@@ -35,21 +35,31 @@ The library is being **refactored for complete independence** - agents use depen
 
 ### Via PyPI (Recommended)
 
-Socratic-agents v0.3.1 is published to PyPI for use with Socrates v2.0.0+:
+Install the latest version from PyPI:
 
 ```bash
-pip install socratic-agents==0.3.1
+pip install socratic-agents
 ```
 
-This requires Socrates v2.0.0+ to be installed, as the library depends on the Socrates monolith.
+For REST API support, install with the api extra:
 
-### Within Socrates Monolith (Development)
+```bash
+pip install socratic-agents[api]
+```
 
-For development work within the Socrates monolith:
+For governance features, install with the governance extra:
+
+```bash
+pip install socratic-agents[governance]
+```
+
+### Development Installation
+
+For development or local testing:
 
 ```bash
 cd Socratic-agents
-pip install -e .
+pip install -e ".[dev]"  # Includes all dev dependencies
 ```
 
 ---
