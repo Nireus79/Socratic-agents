@@ -8,7 +8,7 @@ import asyncio
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from socratic_system.models import TokenUsage
+from socratic_agents.models import TokenUsage
 
 from .base import Agent
 

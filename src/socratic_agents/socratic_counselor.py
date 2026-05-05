@@ -10,26 +10,27 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from colorama import Fore
-from socratic_system.core.question_selector import QuestionSelector
-from socratic_system.core.workflow_builder import (
+# QuestionSelector is injected
+# workflow_builder functions are injected
+# from socratic_system.core.workflow_builder import (
     create_discovery_workflow_comprehensive,
     create_legacy_compatible_workflow,
 )
-from socratic_system.models import (
+from socratic_agents.models import (
     ROLE_FOCUS_AREAS,
     User,
 )
-from socratic_system.services.document_understanding import DocumentUnderstandingService
-from socratic_system.subscription.checker import SubscriptionChecker
-from socratic_system.utils.logger import get_logger
-from socratic_system.utils.orchestrator_helper import safe_orchestrator_call
+# DocumentUnderstandingService is injected
+# SubscriptionChecker is injected
+from socratic_agents.utils.logger import get_logger
+from socratic_agents.utils.orchestrator_helper import safe_orchestrator_call
 
 from .base import Agent
 from .document_context_analyzer import DocumentContextAnalyzer
 from .events import EventType
 
 if TYPE_CHECKING:
-    from socratic_system.models import (
+    from socratic_agents.models import (
         ConflictInfo,
         ProjectContext,
         WorkflowDefinition,

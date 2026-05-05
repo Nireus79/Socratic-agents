@@ -10,10 +10,10 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from socratic_system.models import WorkflowApprovalRequest
+from socratic_agents.models import WorkflowApprovalRequest
 
 if TYPE_CHECKING:
-    from socratic_system.models import ProjectContext
+    from socratic_agents.models import ProjectContext
     from .agent_bus import AgentBus
 
 

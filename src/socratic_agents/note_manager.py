@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict
 
-from socratic_system.models import ProjectNote
+from socratic_agents.models import ProjectNote
 
 from .base import Agent
 from .events import EventType

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from .base import Agent
 
 if TYPE_CHECKING:
-    from socratic_system.models import ProjectContext
+    from socratic_agents.models import ProjectContext
 
 
 class ContextAnalyzerAgent(Agent):

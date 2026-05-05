@@ -10,17 +10,14 @@ import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from socratic_system.database.project_file_manager import ProjectFileManager
-from socratic_system.models import (
+from socratic_agents.models import (
     VALID_ROLES,
     ProjectContext,
     TeamMemberRole,
     User,
 )
-from socratic_system.subscription.checker import SubscriptionChecker
-from socratic_system.utils.git_repository_manager import GitRepositoryManager
-from socratic_system.utils.id_generator import ProjectIDGenerator
-from socratic_system.utils.orchestrator_helper import safe_orchestrator_call
+# SubscriptionChecker is injected via orchestrator
+from socratic_agents.utils.id_generator import ProjectIDGenerator
 
 from .base import Agent
 

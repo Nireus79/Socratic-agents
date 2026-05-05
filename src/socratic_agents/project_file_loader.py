@@ -15,8 +15,8 @@ import random
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Tuple
 
-from socratic_system.database.project_file_manager import ProjectFileManager
-from socratic_system.models import ProjectContext
+# ProjectFileManager is injected
+from socratic_agents.models import ProjectContext
 
 logger = logging.getLogger("socrates.agents.project_file_loader")
 
