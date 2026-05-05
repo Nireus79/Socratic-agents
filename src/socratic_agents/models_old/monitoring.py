@@ -1,6 +1,4 @@
-"""
-Monitoring and token usage models for Socrates AI
-"""
+"""Monitoring and token usage models"""
 
 import datetime
 from dataclasses import dataclass
@@ -9,7 +7,6 @@ from dataclasses import dataclass
 @dataclass
 class TokenUsage:
     """Tracks API token usage and costs"""
-
     input_tokens: int
     output_tokens: int
     total_tokens: int

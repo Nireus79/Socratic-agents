@@ -1,10 +1,12 @@
-"""Project context model for Socratic Agents"""
+"""
+Project context model for Socrates AI
+"""
 
 import datetime
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from .role import TeamMemberRole
+from socratic_agents.models.role import TeamMemberRole
 
 
 @dataclass
@@ -17,7 +19,9 @@ class ProjectContext:
     phase: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    collaborators: List[str] = None
+    collaborators: List[str] = (
+        None  # DEPRECATED: Kept for backward compatibility. Use team_members instead.
+    )
     description: str = ""
     goals: str = ""
     requirements: List[str] = None
@@ -28,60 +32,98 @@ class ProjectContext:
     deployment_target: str = "local"
     code_style: str = "standard"
     conversation_history: List[Dict] = None
-    chat_mode: str = "socratic"
+    chat_mode: str = "socratic"  # "socratic" or "direct" mode
     is_archived: bool = False
     archived_at: Optional[datetime.datetime] = None
-    progress: int = 0
-    status: str = "active"
-    project_type: str = "software"
-    is_system_project: bool = False
-    system_project_type: Optional[str] = None
-    team_members: Optional[List[TeamMemberRole]] = None
-    pending_questions: Optional[List[Dict]] = None
-    notes: Optional[List[Dict]] = None
-    code_history: Optional[List[Dict]] = None
-    phase_maturity_scores: Dict[str, float] = None
-    overall_maturity: float = 0.0
-    category_scores: Dict[str, Dict[str, float]] = None
-    categorized_specs: Dict[str, List[Dict]] = None
-    maturity_history: List[Dict] = None
-    analytics_metrics: Dict[str, any] = None
-    workflow_definitions: Dict[str, any] = None
-    workflow_approval_requests: Optional[List[Dict]] = None
-    active_workflow_execution: Optional[Dict[str, any]] = None
-    workflow_history: Optional[List[Dict]] = None
-    metadata: Optional[Dict[str, any]] = None
-    llm_configuration: Optional[Dict[str, any]] = None
-    repository_url: Optional[str] = None
-    repository_owner: Optional[str] = None
-    repository_name: Optional[str] = None
-    repository_description: Optional[str] = None
-    repository_language: Optional[str] = None
-    repository_imported_at: Optional[datetime.datetime] = None
-    repository_file_count: int = 0
-    repository_has_tests: bool = False
-    last_export_time: Optional[datetime.datetime] = None
-    last_export_format: Optional[str] = None
-    export_count: int = 0
-    is_published_to_github: bool = False
-    github_repo_url: Optional[str] = None
-    github_clone_url: Optional[str] = None
-    github_published_date: Optional[datetime.datetime] = None
-    github_repo_private: bool = True
-    github_username: Optional[str] = None
-    has_git_initialized: bool = False
-    git_branch: Optional[str] = None
-    git_remote_url: Optional[str] = None
-    uncommitted_changes: bool = False
+    progress: int = 0  # 0-100 percentage
+    status: str = "active"  # active, completed, on-hold
+    knowledge_base_content: str = ""  # Imported knowledge base content
+    project_type: str = (
+        "software"  # Type of project (software, business, creative, research, marketing, educational)
+    )
+
+    # System project tracking (for onboarding and special projects)
+    is_system_project: bool = False  # Not counted in subscription quotas
+    system_project_type: Optional[str] = None  # "onboarding", "sandbox", etc.
+
+    # Team management (NEW)
+    team_members: Optional[List[TeamMemberRole]] = (
+        None  # Team members with roles (supersedes collaborators)
+    )
+    pending_questions: Optional[List[Dict]] = None  # Question queue for team projects
+
+    # Notes tracking
+    notes: Optional[List[Dict]] = None  # Project notes list
+
+    # Code history tracking
+    code_history: Optional[List[Dict]] = None  # History of generated code with metadata
+
+    # Maturity tracking fields
+    phase_maturity_scores: Dict[str, float] = None  # Per-phase maturity (0-100)
+    overall_maturity: float = 0.0  # Overall project maturity (0-100)
+    category_scores: Dict[str, Dict[str, float]] = None  # Category scores by phase
+    categorized_specs: Dict[str, List[Dict[str, any]]] = (
+        None  # Specs organized by phase and category
+    )
+    maturity_history: List[Dict[str, any]] = None  # Historical maturity events
+
+    # Analytics tracking fields (real-time metrics updated after each Q&A)
+    analytics_metrics: Dict[str, any] = None  # Real-time analytics metrics
+
+    # Workflow optimization fields (NEW)
+    workflow_definitions: Dict[str, any] = None  # Workflow definitions by phase
+    workflow_approval_requests: Optional[List[Dict[str, any]]] = (
+        None  # History of approval requests
+    )
+    active_workflow_execution: Optional[Dict[str, any]] = None  # Current workflow execution state
+    workflow_history: Optional[List[Dict[str, any]]] = None  # Completed workflows with metrics
+    metadata: Optional[Dict[str, any]] = (
+        None  # Project metadata (use_workflow_optimization flag, etc.)
+    )
+
+    # LLM Provider configuration
+    llm_configuration: Optional[Dict[str, any]] = (
+        None  # LLM provider config (provider, model, temperature, etc.)
+    )
+
+    # GitHub repository tracking (for imported projects)
+    repository_url: Optional[str] = None  # GitHub repository URL
+    repository_owner: Optional[str] = None  # Repository owner username
+    repository_name: Optional[str] = None  # Repository name
+    repository_description: Optional[str] = None  # Repository description
+    repository_language: Optional[str] = None  # Primary programming language
+    repository_imported_at: Optional[datetime.datetime] = None  # When repo was imported
+    repository_file_count: int = 0  # Number of files in repository
+    repository_has_tests: bool = False  # Whether repository has tests
+
+    # Export & GitHub Publishing Tracking (NEW)
+    last_export_time: Optional[datetime.datetime] = None  # When project was last exported
+    last_export_format: Optional[str] = None  # Last export format used (zip, tar, tar.gz, tar.bz2)
+    export_count: int = 0  # Total number of exports
+
+    # GitHub Publishing Status (NEW)
+    is_published_to_github: bool = False  # Whether project has been published to GitHub
+    github_repo_url: Optional[str] = None  # URL of GitHub repository created from this project
+    github_clone_url: Optional[str] = None  # Git clone URL (https or ssh)
+    github_published_date: Optional[datetime.datetime] = None  # When published to GitHub
+    github_repo_private: bool = True  # Whether GitHub repo is private
+    github_username: Optional[str] = None  # GitHub username that owns the published repo
+
+    # Git Repository Status (NEW)
+    has_git_initialized: bool = False  # Whether git repo has been initialized locally
+    git_branch: Optional[str] = None  # Current git branch name
+    git_remote_url: Optional[str] = None  # Git remote URL
+    uncommitted_changes: bool = False  # Whether there are uncommitted changes
 
     def __post_init__(self):
-        """Initialize default values"""
+        """Initialize default values and migrate legacy collaborators to team_members"""
         self._initialize_list_fields()
         self._initialize_team_members()
         self._initialize_maturity_fields()
         self._initialize_workflow_fields()
 
     def _initialize_list_fields(self) -> None:
+        """Initialize all list fields with empty defaults"""
         if self.collaborators is None:
             self.collaborators = []
         if self.requirements is None:
@@ -98,8 +140,43 @@ class ProjectContext:
             self.pending_questions = []
 
     def _initialize_team_members(self) -> None:
+        """Initialize team members, migrating from legacy collaborators if needed"""
         if self.team_members is None:
-            self.team_members = []
+            self._initialize_team_members_from_collaborators()
+            self._ensure_owner_in_team_members()
+
+    def _initialize_team_members_from_collaborators(self) -> None:
+        """Migrate legacy collaborators to team_members format"""
+        self.team_members = []
+        if self.collaborators:
+            self._add_owner_to_team_members()
+            self._migrate_collaborators_to_team_members()
+
+    def _add_owner_to_team_members(self) -> None:
+        """Add project owner to team_members list"""
+        if self.owner:
+            owner_member = TeamMemberRole(
+                username=self.owner,
+                role="owner",
+                skills=[],
+                joined_at=self.created_at,
+            )
+            self.team_members.append(owner_member)
+
+    def _migrate_collaborators_to_team_members(self) -> None:
+        """Convert legacy collaborators list to team members"""
+        for collab_username in self.collaborators:
+            member = TeamMemberRole(
+                username=collab_username,
+                role="editor",
+                skills=[],
+                joined_at=datetime.datetime.now(),
+            )
+            self.team_members.append(member)
+
+    def _ensure_owner_in_team_members(self) -> None:
+        """Ensure owner is in team_members (for new projects without collaborators)"""
+        if self.team_members is not None and not self._owner_in_team_members():
             if self.owner:
                 owner_member = TeamMemberRole(
                     username=self.owner,
@@ -109,9 +186,21 @@ class ProjectContext:
                 )
                 self.team_members.append(owner_member)
 
+    def _owner_in_team_members(self) -> bool:
+        """Check if owner is already in team_members"""
+        if not self.team_members:
+            return False
+        return any(member.username == self.owner for member in self.team_members)
+
     def _initialize_maturity_fields(self) -> None:
+        """Initialize maturity tracking and analytics fields"""
         if self.phase_maturity_scores is None:
-            self.phase_maturity_scores = {"discovery": 0.0, "analysis": 0.0, "design": 0.0, "implementation": 0.0}
+            self.phase_maturity_scores = {
+                "discovery": 0.0,
+                "analysis": 0.0,
+                "design": 0.0,
+                "implementation": 0.0,
+            }
         if self.category_scores is None:
             self.category_scores = {}
         if self.categorized_specs is None:
@@ -119,16 +208,46 @@ class ProjectContext:
         if self.maturity_history is None:
             self.maturity_history = []
         if self.analytics_metrics is None:
-            self.analytics_metrics = {"velocity": 0.0, "total_qa_sessions": 0}
+            self.analytics_metrics = {
+                "velocity": 0.0,
+                "total_qa_sessions": 0,
+                "avg_confidence": 0.0,
+                "weak_categories": [],
+                "strong_categories": [],
+                "last_updated": None,
+            }
+        # Calculate overall maturity from phase scores
         self.overall_maturity = self._calculate_overall_maturity()
 
     def _calculate_overall_maturity(self) -> float:
+        """
+        Calculate overall project maturity using weighted phase contributions.
+
+        Instead of averaging (which penalizes starting new phases), this uses:
+        - All completed phases (with scores) contribute equally
+        - Current/active phase (even if just started) contributes its current score
+        - Result: advancing to new phases doesn't decrease overall maturity
+
+        Example:
+        - Discovery: 100% → overall = 100%
+        - Discovery: 100%, Analysis: 0% → overall = 100% (not 50%)
+        - Discovery: 100%, Analysis: 30% → overall = (100 + 30) / 2 = 65%
+        """
         if not self.phase_maturity_scores:
             return 0.0
+
+        # Get all phases with non-zero scores (these are the ones being worked on)
         scored_phases = [s for s in self.phase_maturity_scores.values() if s > 0]
-        return sum(scored_phases) / len(scored_phases) if scored_phases else 0.0
+
+        if not scored_phases:
+            return 0.0
+
+        # Use average of active/completed phases
+        # This avoids penalizing users for advancing to new phases
+        return sum(scored_phases) / len(scored_phases)
 
     def _initialize_workflow_fields(self) -> None:
+        """Initialize workflow optimization fields"""
         if self.workflow_definitions is None:
             self.workflow_definitions = {}
         if self.workflow_approval_requests is None:
@@ -137,14 +256,17 @@ class ProjectContext:
             self.workflow_history = []
         if self.metadata is None:
             self.metadata = {}
+        # Ensure metadata has default optimization flag
         if "use_workflow_optimization" not in self.metadata:
             self.metadata["use_workflow_optimization"] = False
 
     def get_member_role(self, username: str) -> Optional[str]:
+        """Get role for a specific team member."""
         for member in self.team_members or []:
             if member.username == username:
                 return member.role
         return None
 
     def is_solo_project(self) -> bool:
+        """Check if this is a solo project (only owner, no other team members)."""
         return len(self.team_members or []) <= 1

@@ -1,4 +1,4 @@
-"""Project note model for Socrates AI"""
+"""Project note model for Socratic Agents"""
 
 import datetime
 import uuid
@@ -14,22 +14,13 @@ class ProjectNote:
     project_id: str
     title: str
     content: str
-    note_type: str = "general"  # 'design', 'bug', 'idea', 'task', 'general'
+    note_type: str = "general"
     created_at: datetime.datetime = field(default_factory=datetime.datetime.now)
     created_by: str = "system"
     tags: List[str] = field(default_factory=list)
 
     @classmethod
-    def create(
-        cls,
-        project_id: str,
-        note_type: str,
-        title: str,
-        content: str,
-        created_by: str,
-        tags: Optional[List[str]] = None,
-    ) -> "ProjectNote":
-        """Create a new project note with auto-generated ID"""
+    def create(cls, project_id: str, note_type: str, title: str, content: str, created_by: str, tags: Optional[List[str]] = None) -> "ProjectNote":
         return cls(
             note_id=str(uuid.uuid4()),
             project_id=project_id,
@@ -42,7 +33,6 @@ class ProjectNote:
         )
 
     def matches_query(self, query: str) -> bool:
-        """Check if note matches a search query"""
         query_lower = query.lower()
         return (
             query_lower in self.title.lower()
