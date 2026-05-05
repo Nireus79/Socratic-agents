@@ -4,6 +4,7 @@ from __future__ import annotations
 Quality Controller Agent - Orchestrates maturity tracking and prevents greedy algorithm practices
 """
 
+import asyncio
 import logging
 from dataclasses import asdict
 from datetime import datetime
@@ -13,6 +14,7 @@ from socratic_system.models import WorkflowApprovalRequest
 
 if TYPE_CHECKING:
     from socratic_system.models import ProjectContext
+    from .agent_bus import AgentBus
 
 
 # Stub implementations (will be replaced by actual implementations from socratic-maturity)
@@ -55,18 +57,33 @@ class QualityControllerAgent(Agent):
     - Managing project context updates
     """
 
-    def __init__(self, orchestrator):
-        super().__init__("QualityController", orchestrator)
+    def __init__(
+        self,
+        database_service: Optional[Any] = None,
+        llm_service: Optional[Any] = None,
+        vector_db_service: Optional[Any] = None,
+        file_service: Optional[Any] = None,
+        auth_service: Optional[Any] = None,
+        event_emitter_service: Optional[Any] = None,
+        agent_bus: Optional["AgentBus"] = None,
+    ):
+        super().__init__(
+            "QualityController",
+            database_service=database_service,
+            llm_service=llm_service,
+            vector_db_service=vector_db_service,
+            file_service=file_service,
+            auth_service=auth_service,
+            event_emitter_service=event_emitter_service,
+            agent_bus=agent_bus,
+        )
         logging.debug("Initializing QualityControllerAgent")
 
         # Initialize the pure calculation engine with Claude client for intelligent categorization
-        claude_client = (
-            orchestrator.claude_client if hasattr(orchestrator, "claude_client") else None
-        )
         logging.debug(
-            f"Creating MaturityCalculator with Claude client: {claude_client is not None}"
+            f"Creating MaturityCalculator with LLM service: {llm_service is not None}"
         )
-        self.calculator = MaturityCalculator("software", claude_client=claude_client)
+        self.calculator = MaturityCalculator("software", claude_client=llm_service)
 
         # Expose calculator's phase categories and thresholds for reference
         self.phase_categories = self.calculator.phase_categories
@@ -87,50 +104,66 @@ class QualityControllerAgent(Agent):
         )
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process quality control requests"""
-        logging.debug(f"QualityController processing request: {list(request.keys())}")
+        """Process quality control requests (synchronous wrapper)"""
         action = request.get("action")
-        logging.debug(f"Action: {action}")
 
-        if action == "calculate_maturity":
-            logging.debug("Routing to _calculate_phase_maturity")
-            return self._calculate_phase_maturity(request)
-        elif action == "get_phase_maturity":
-            logging.debug("Routing to _calculate_phase_maturity (get_phase_maturity)")
-            return self._calculate_phase_maturity(request)
-        elif action == "get_readiness":
-            logging.debug("Routing to _get_phase_readiness")
-            return self._get_phase_readiness(request)
-        elif action == "update_after_response":
-            logging.debug("Routing to _update_maturity_after_response")
-            return self._update_maturity_after_response(request)
-        elif action == "get_maturity_summary":
-            logging.debug("Routing to _get_maturity_summary")
-            return self._get_maturity_summary(request)
-        elif action == "verify_advancement":
-            logging.debug("Routing to _verify_advancement")
-            return self._verify_advancement(request)
-        elif action == "get_history":
-            logging.debug("Routing to _get_maturity_history")
-            return self._get_maturity_history(request)
-        # Workflow optimization actions
-        elif action == "request_workflow_approval":
-            logging.debug("Routing to _request_workflow_approval")
-            return self._request_workflow_approval(request)
-        elif action == "approve_workflow":
-            logging.debug("Routing to _approve_workflow")
-            return self._approve_workflow(request)
-        elif action == "reject_workflow":
-            logging.debug("Routing to _reject_workflow")
-            return self._reject_workflow(request)
-        elif action == "get_pending_approvals":
-            logging.debug("Routing to _get_pending_approvals")
-            return self._get_pending_approvals(request)
+        action_map = {
+            "calculate_maturity": self._calculate_phase_maturity_sync,
+            "get_phase_maturity": self._calculate_phase_maturity_sync,
+            "get_readiness": self._get_phase_readiness_sync,
+            "update_after_response": self._update_maturity_after_response_sync,
+            "get_maturity_summary": self._get_maturity_summary_sync,
+            "verify_advancement": self._verify_advancement_sync,
+            "get_history": self._get_maturity_history_sync,
+            "request_workflow_approval": self._request_workflow_approval_sync,
+            "approve_workflow": self._approve_workflow_sync,
+            "reject_workflow": self._reject_workflow_sync,
+            "get_pending_approvals": self._get_pending_approvals_sync,
+        }
+
+        handler = action_map.get(action)
+        if handler:
+            return handler(request)
 
         logging.error(f"Unknown action: {action}")
         return {"status": "error", "message": f"Unknown action: {action}"}
 
-    def _calculate_phase_maturity(self, request: Dict) -> Dict:
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process quality control requests asynchronously"""
+        action = request.get("action")
+
+        action_map = {
+            "calculate_maturity": self._calculate_phase_maturity_async,
+            "get_phase_maturity": self._calculate_phase_maturity_async,
+            "get_readiness": self._get_phase_readiness_async,
+            "update_after_response": self._update_maturity_after_response_async,
+            "get_maturity_summary": self._get_maturity_summary_async,
+            "verify_advancement": self._verify_advancement_async,
+            "get_history": self._get_maturity_history_async,
+            "request_workflow_approval": self._request_workflow_approval_async,
+            "approve_workflow": self._approve_workflow_async,
+            "reject_workflow": self._reject_workflow_async,
+            "get_pending_approvals": self._get_pending_approvals_async,
+        }
+
+        handler = action_map.get(action)
+        if handler:
+            return await handler(request)
+
+        logging.error(f"Unknown action: {action}")
+        return {"status": "error", "message": f"Unknown action: {action}"}
+
+    def _calculate_phase_maturity_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._calculate_phase_maturity_async(request))
+
+    async def _calculate_phase_maturity_async(self, request: Dict) -> Dict:
         """
         Calculate maturity for current phase.
 
@@ -210,7 +243,17 @@ class QualityControllerAgent(Agent):
             logging.error(f"Unexpected error in maturity calculation: {type(e).__name__}: {e}")
             return {"status": "error", "message": str(e)}
 
-    def _update_maturity_after_response(self, request: Dict) -> Dict:
+    def _update_maturity_after_response_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._update_maturity_after_response_async(request))
+
+    async def _update_maturity_after_response_async(self, request: Dict) -> Dict:
         """Called after each question/response to update maturity
 
         IMPORTANT: Uses incremental scoring instead of full recalculation.
@@ -401,7 +444,17 @@ class QualityControllerAgent(Agent):
             f"Event recorded: {event_type} at {event['timestamp']}, score: {score_before:.1f}% → {score_after:.1f}% (delta: {delta:+.1f}%)"
         )
 
-    def _verify_advancement(self, request: Dict) -> Dict:
+    def _verify_advancement_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._verify_advancement_async(request))
+
+    async def _verify_advancement_async(self, request: Dict) -> Dict:
         """
         Verify phase readiness and generate warnings.
 
@@ -466,7 +519,17 @@ class QualityControllerAgent(Agent):
             },
         }
 
-    def _get_phase_readiness(self, request: Dict) -> Dict:
+    def _get_phase_readiness_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._get_phase_readiness_async(request))
+
+    async def _get_phase_readiness_async(self, request: Dict) -> Dict:
         """Get readiness assessment for a specific phase"""
         logging.debug("_get_phase_readiness called")
         project = request.get("project")
@@ -476,7 +539,17 @@ class QualityControllerAgent(Agent):
 
         return self._verify_advancement({"project": project, "from_phase": phase})
 
-    def _get_maturity_summary(self, request: Dict) -> Dict:
+    def _get_maturity_summary_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._get_maturity_summary_async(request))
+
+    async def _get_maturity_summary_async(self, request: Dict) -> Dict:
         """Get summary of maturity across all phases"""
         logging.debug("_get_maturity_summary called")
         project = request.get("project")
@@ -497,7 +570,17 @@ class QualityControllerAgent(Agent):
 
         return {"status": "success", "summary": summary}
 
-    def _get_maturity_history(self, request: Dict) -> Dict:
+    def _get_maturity_history_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._get_maturity_history_async(request))
+
+    async def _get_maturity_history_async(self, request: Dict) -> Dict:
         """Get maturity progression history"""
         logging.debug("_get_maturity_history called")
         project = request.get("project")
@@ -516,7 +599,17 @@ class QualityControllerAgent(Agent):
     # Workflow Approval Methods (Phase 4)
     # ========================================================================
 
-    def _request_workflow_approval(self, request: Dict) -> Dict:
+    def _request_workflow_approval_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._request_workflow_approval_async(request))
+
+    async def _request_workflow_approval_async(self, request: Dict) -> Dict:
         """
         Request workflow approval - BLOCKING POINT
 
@@ -595,7 +688,17 @@ class QualityControllerAgent(Agent):
             logging.error(f"Unexpected error in workflow approval request: {type(e).__name__}: {e}")
             return {"status": "error", "message": str(e)}
 
-    def _approve_workflow(self, request: Dict) -> Dict:
+    def _approve_workflow_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._approve_workflow_async(request))
+
+    async def _approve_workflow_async(self, request: Dict) -> Dict:
         """
         Approve a workflow path and unblock execution
 
@@ -668,7 +771,17 @@ class QualityControllerAgent(Agent):
             logging.error(f"Unexpected error approving workflow: {type(e).__name__}: {e}")
             return {"status": "error", "message": str(e)}
 
-    def _reject_workflow(self, request: Dict) -> Dict:
+    def _reject_workflow_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._reject_workflow_async(request))
+
+    async def _reject_workflow_async(self, request: Dict) -> Dict:
         """
         Reject a workflow and request alternatives
 
@@ -734,7 +847,17 @@ class QualityControllerAgent(Agent):
             logging.error(f"Unexpected error rejecting workflow: {type(e).__name__}: {e}")
             return {"status": "error", "message": str(e)}
 
-    def _get_pending_approvals(self, request: Dict) -> Dict:
+    def _get_pending_approvals_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._get_pending_approvals_async(request))
+
+    async def _get_pending_approvals_async(self, request: Dict) -> Dict:
         """
         Get list of pending workflow approval requests
 

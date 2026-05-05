@@ -4,6 +4,7 @@ from __future__ import annotations
 Socratic counselor agent for guided questioning and response processing
 """
 
+import asyncio
 import datetime
 import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
@@ -35,19 +36,39 @@ if TYPE_CHECKING:
         WorkflowExecutionState,
     )
 
-    from .orchestrator import AgentOrchestrator
+    from .agent_bus import AgentBus
 
 
 class SocraticCounselorAgent(Agent):
     """Core agent that guides users through Socratic questioning about their project"""
 
-    def __init__(self, orchestrator: "AgentOrchestrator") -> None:
-        super().__init__("SocraticCounselor", orchestrator)
+    def __init__(
+        self,
+        database_service: Optional[Any] = None,
+        llm_service: Optional[Any] = None,
+        vector_db_service: Optional[Any] = None,
+        file_service: Optional[Any] = None,
+        auth_service: Optional[Any] = None,
+        event_emitter_service: Optional[Any] = None,
+        agent_bus: Optional["AgentBus"] = None,
+    ) -> None:
+        super().__init__(
+            "SocraticCounselor",
+            database_service=database_service,
+            llm_service=llm_service,
+            vector_db_service=vector_db_service,
+            file_service=file_service,
+            auth_service=auth_service,
+            event_emitter_service=event_emitter_service,
+            agent_bus=agent_bus,
+        )
         self.use_dynamic_questions = True  # Toggle for dynamic vs static questions
         self.max_questions_per_phase = 5
         self.phase_docs_cache = {}  # Cache document context per phase to reduce vector DB calls
-        # Database for persisting changes (optional if not provided by orchestrator)
-        self.database = getattr(orchestrator, "database", None)
+        # Database for persisting changes (optional if not provided by services)
+        self.database = database_service
+        # Initialize context analyzer for document context
+        self.context_analyzer = DocumentContextAnalyzer() if vector_db_service else None
 
         # Fallback static questions if Claude is unavailable
         self.static_questions = {
@@ -82,88 +103,119 @@ class SocraticCounselorAgent(Agent):
         }
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process Socratic questioning requests"""
+        """Process Socratic questioning requests (synchronous wrapper)"""
         action = request.get("action")
 
         if action == "generate_question":
-            return self._generate_question(request)
+            return self._generate_question_sync(request)
         elif action == "process_response":
-            return self._process_response(request)
+            return self._process_response_sync(request)
         elif action == "extract_insights_only":
-            return self._extract_insights_only(request)
+            return self._extract_insights_only_sync(request)
         elif action == "advance_phase":
-            return self._advance_phase(request)
+            return self._advance_phase_sync(request)
         elif action == "rollback_phase":
-            return self._rollback_phase(request)
+            return self._rollback_phase_sync(request)
         elif action == "explain_document":
-            return self._explain_document(request)
+            return self._explain_document_sync(request)
         elif action == "generate_hint":
-            return self._generate_hint(request)
+            return self._generate_hint_sync(request)
         elif action == "toggle_dynamic_questions":
             self.use_dynamic_questions = not self.use_dynamic_questions
             return {"status": "success", "dynamic_mode": self.use_dynamic_questions}
         elif action == "answer_question":
-            return self._answer_question(request)
+            return self._answer_question_sync(request)
         elif action == "skip_question":
-            return self._skip_question(request)
+            return self._skip_question_sync(request)
         elif action == "reopen_question":
-            return self._reopen_question(request)
+            return self._reopen_question_sync(request)
         elif action == "generate_answer_suggestions":
-            return self._generate_answer_suggestions(request)
+            return self._generate_answer_suggestions_sync(request)
 
         return {"status": "error", "message": "Unknown action"}
 
-    def _generate_question(self, request: Dict) -> Dict:
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process Socratic questioning requests asynchronously"""
+        action = request.get("action")
+
+        if action == "generate_question":
+            return await self._generate_question_async(request)
+        elif action == "process_response":
+            return await self._process_response_async(request)
+        elif action == "extract_insights_only":
+            return await self._extract_insights_only_async(request)
+        elif action == "advance_phase":
+            return await self._advance_phase_async(request)
+        elif action == "rollback_phase":
+            return await self._rollback_phase_async(request)
+        elif action == "explain_document":
+            return await self._explain_document_async(request)
+        elif action == "generate_hint":
+            return await self._generate_hint_async(request)
+        elif action == "toggle_dynamic_questions":
+            self.use_dynamic_questions = not self.use_dynamic_questions
+            return {"status": "success", "dynamic_mode": self.use_dynamic_questions}
+        elif action == "answer_question":
+            return await self._answer_question_async(request)
+        elif action == "skip_question":
+            return await self._skip_question_async(request)
+        elif action == "reopen_question":
+            return await self._reopen_question_async(request)
+        elif action == "generate_answer_suggestions":
+            return await self._generate_answer_suggestions_async(request)
+
+        return {"status": "error", "message": "Unknown action"}
+
+    def _generate_question_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._generate_question_async(request))
+
+    async def _generate_question_async(self, request: Dict) -> Dict:
         """Generate the next Socratic question with usage tracking and workflow optimization"""
         project = request.get("project")
-        current_user = request.get("current_user")  # NEW: Accept current user for role context
-        force_refresh = request.get(
-            "force_refresh", False
-        )  # Force generation of new question after conflict resolution
+        current_user = request.get("current_user")
+        force_refresh = request.get("force_refresh", False)
 
-        # Validate that project exists
         if not project:
             return {
                 "status": "error",
                 "message": "Project context is required to generate questions",
             }
 
-        import datetime
-
-        # Check if workflow optimization is enabled for this project
         if self._should_use_workflow_optimization(project):
-            return self._generate_question_with_workflow(project, current_user)
+            return await self._generate_question_with_workflow_async(project, current_user)
 
-        # HYBRID APPROACH: Check for existing unanswered question before generating new one
-        # This prevents double question generation (unless force_refresh is set)
         if not force_refresh and project.pending_questions:
             unanswered = [q for q in project.pending_questions if q.get("status") == "unanswered"]
             if unanswered:
-                # Return the first unanswered question instead of generating new
                 return {
                     "status": "success",
                     "question": unanswered[0].get("question"),
                     "existing": True,
                 }
 
-        context = self.orchestrator.context_analyzer.get_context_summary(project)
+        context = self.context_analyzer.get_context_summary(project)
 
-        # NEW: Check question limit
-
-        # Get or create user (auto-create for CLI/local users)
-        user = self.orchestrator.database.load_user(current_user)
+        user = None
+        if self.database_service:
+            user = await self.database_service.load_user(current_user)
         if user is None:
-            # Auto-create user with pro tier for local/CLI use
-
             user = User(
                 username=current_user,
                 email=f"{current_user}@localhost",
                 passcode_hash="",
                 created_at=datetime.datetime.now(),
                 projects=[],
-                subscription_tier="pro",  # Unlimited for local use
+                subscription_tier="pro",
             )
-            self.orchestrator.database.save_user(user)
+            if self.database_service:
+                await self.database_service.save_user(user)
             logging.debug(f"Auto-created user: {current_user}")
 
         can_ask, error_message = SubscriptionChecker.check_question_limit(user)
@@ -173,7 +225,6 @@ class SocraticCounselorAgent(Agent):
                 "message": error_message,
             }
 
-        # Count questions already asked in this phase
         phase_questions = [
             msg
             for msg in project.conversation_history
@@ -187,7 +238,6 @@ class SocraticCounselorAgent(Agent):
         else:
             question = self._generate_static_question(project, len(phase_questions))
 
-        # Store the question in conversation history
         project.conversation_history.append(
             {
                 "timestamp": datetime.datetime.now().isoformat(),
@@ -198,9 +248,7 @@ class SocraticCounselorAgent(Agent):
             }
         )
 
-        # HYBRID APPROACH: Also store in pending_questions for unified tracking
         import uuid
-
         project.pending_questions.append(
             {
                 "id": f"q_{uuid.uuid4().hex[:8]}",
@@ -214,14 +262,18 @@ class SocraticCounselorAgent(Agent):
             }
         )
 
-        # NEW: Increment usage counter
         user.increment_question_usage()
-        self.orchestrator.database.save_user(user)
+        if self.database_service:
+            await self.database_service.save_user(user)
 
-        # Save project with new question added to conversation history and pending questions
-        self.database.save_project(project)
+        if self.database_service:
+            await self.database_service.save_project(project)
 
         return {"status": "success", "question": question}
+
+    def _generate_question(self, request: Dict) -> Dict:
+        """DEPRECATED: Use _generate_question_async instead. This is a legacy stub."""
+        return {"status": "error", "message": "Use process_async() for this action"}
 
     def _generate_dynamic_question(
         self, project: "ProjectContext", context: str, question_count: int, current_user: str = None
@@ -357,7 +409,7 @@ class SocraticCounselorAgent(Agent):
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.orchestrator.database.load_user(current_user)
+                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
                     logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -751,30 +803,92 @@ What would be most helpful for you?"""
 
         return grouped
 
-    def _extract_insights_only(self, request: Dict) -> Dict:
+    def _extract_insights_only_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._extract_insights_only_async(request))
+
+    async def _extract_insights_only_async(self, request: Dict) -> Dict:
         """Extract insights from response without processing (for direct mode confirmation)"""
-
-        logger = get_logger("socratic_counselor")
-
-        project = request.get("project")
         user_response = request.get("response")
+        project = request.get("project")
         current_user = request.get("current_user")
+        user_auth_method = request.get("user_auth_method", "cli")
 
-        logger.debug(f"Extracting insights only ({len(user_response)} chars)")
+        if not project or not user_response:
+            return {"status": "error", "message": "Project and response are required"}
 
-        # Get user's auth method for API calls
-        user_auth_method = "api_key"  # default
-        if current_user:
-            user = self.orchestrator.database.load_user(current_user)
-            if user and hasattr(user, "claude_auth_method"):
-                user_auth_method = user.claude_auth_method or "api_key"
+        if self.llm_service:
+            try:
+                insights = await self.llm_service.extract_insights(
+                    user_response, project, user_auth_method=user_auth_method, user_id=current_user
+                )
+            except Exception as e:
+                logging.error(f"Failed to extract insights: {e}")
+                insights = {}
+        else:
+            insights = {}
 
-        # Extract insights using Claude
-        logger.info("Extracting insights from user response (confirmation mode)...")
-        insights = self.orchestrator.claude_client.extract_insights(
-            user_response, project, user_auth_method=user_auth_method, user_id=current_user
+        return {"status": "success", "insights": insights}
+
+    def _extract_insights_only(self, request: Dict) -> Dict:
+        """DEPRECATED: Use _extract_insights_only_async instead. This is a legacy stub."""
+        return {"status": "error", "message": "Use process_async() for this action"}
+
+    def _process_response_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._process_response_async(request))
+
+    async def _process_response_async(self, request: Dict) -> Dict:
+        """Process user response and extract insights"""
+        user_response = request.get("response")
+        project = request.get("project")
+        current_user = request.get("current_user")
+        user_auth_method = request.get("user_auth_method", "cli")
+
+        if not project or not user_response:
+            return {"status": "error", "message": "Project and response are required"}
+
+        if user_response.lower() == "skip":
+            return {
+                "status": "success",
+                "action": "skip",
+                "message": "Question skipped by user",
+            }
+
+        project.conversation_history.append(
+            {
+                "timestamp": datetime.datetime.now().isoformat(),
+                "type": "user",
+                "content": user_response,
+                "phase": project.phase,
+            }
         )
-        self._log_extracted_insights(logger, insights)
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        if self.llm_service:
+            try:
+                insights = await self.llm_service.extract_insights(
+                    user_response, project, user_auth_method=user_auth_method, user_id=current_user
+                )
+            except Exception as e:
+                logging.error(f"Failed to extract insights: {e}")
+                insights = {}
+        else:
+            insights = {}
 
         return {"status": "success", "insights": insights}
 
@@ -808,7 +922,7 @@ What would be most helpful for you?"""
         # Get user's auth method for API calls
         user_auth_method = "api_key"  # default
         if current_user:
-            user = self.orchestrator.database.load_user(current_user)
+            user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
             if user and hasattr(user, "claude_auth_method"):
                 user_auth_method = user.claude_auth_method or "api_key"
                 logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -909,7 +1023,7 @@ What would be most helpful for you?"""
         # Load user auth method for API calls
         user_auth_method = "api_key"
         if current_user:
-            user_obj = self.orchestrator.database.load_user(current_user)
+            user_obj = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
             if user_obj and hasattr(user_obj, "claude_auth_method"):
                 user_auth_method = user_obj.claude_auth_method or "api_key"
         conflicts_resolved = self._handle_conflicts_realtime(
@@ -1147,6 +1261,37 @@ What would be most helpful for you?"""
 
         return True
 
+    def _explain_document_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._explain_document_async(request))
+
+    async def _explain_document_async(self, request: Dict) -> Dict:
+        """Provide explanation/summary of imported documents."""
+        project = request.get("project")
+        document_id = request.get("document_id")
+
+        if not project:
+            return {"status": "error", "message": "Project is required"}
+
+        if not document_id:
+            return {"status": "error", "message": "Document ID is required"}
+
+        if self.llm_service:
+            try:
+                explanation = await self.llm_service.explain_document(project, document_id)
+                return {"status": "success", "explanation": explanation}
+            except Exception as e:
+                logging.error(f"Failed to explain document: {e}")
+                return {"status": "error", "message": str(e)}
+        else:
+            return {"status": "error", "message": "LLM service not available"}
+
     def _explain_document(self, request: Dict) -> Dict:
         """
         Provide explanation/summary of imported documents.
@@ -1260,6 +1405,45 @@ What would be most helpful for you?"""
 
         return "\n".join(parts)
 
+    def _advance_phase_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._advance_phase_async(request))
+
+    async def _advance_phase_async(self, request: Dict) -> Dict:
+        """Advance project to the next phase with maturity verification"""
+        project = request.get("project")
+        current_user = request.get("current_user")
+
+        if not project:
+            return {"status": "error", "message": "Project is required"}
+
+        phases = ["discovery", "analysis", "design", "implementation"]
+        if project.phase not in phases:
+            return {"status": "error", "message": "Invalid project phase"}
+
+        current_index = phases.index(project.phase)
+        if current_index >= len(phases) - 1:
+            return {"status": "error", "message": "Already in final phase"}
+
+        next_phase = phases[current_index + 1]
+        project.phase = next_phase
+        project.phase_started_at = datetime.datetime.now().isoformat()
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {
+            "status": "success",
+            "message": f"Advanced to {next_phase} phase",
+            "new_phase": next_phase,
+        }
+
     def _advance_phase(self, request: Dict) -> Dict:
         """Advance project to the next phase with maturity verification"""
 
@@ -1341,6 +1525,43 @@ What would be most helpful for you?"""
         self.log(f"Advanced project to {new_phase} phase")
 
         return {"status": "success", "new_phase": new_phase}
+
+    def _rollback_phase_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._rollback_phase_async(request))
+
+    async def _rollback_phase_async(self, request: Dict) -> Dict:
+        """Roll back project to the previous phase"""
+        project = request.get("project")
+
+        if not project:
+            return {"status": "error", "message": "Project is required"}
+
+        phases = ["discovery", "analysis", "design", "implementation"]
+        if project.phase not in phases:
+            return {"status": "error", "message": "Invalid project phase"}
+
+        current_index = phases.index(project.phase)
+        if current_index <= 0:
+            return {"status": "error", "message": "Already in initial phase"}
+
+        prev_phase = phases[current_index - 1]
+        project.phase = prev_phase
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {
+            "status": "success",
+            "message": f"Rolled back to {prev_phase} phase",
+            "new_phase": prev_phase,
+        }
 
     def _rollback_phase(self, request: Dict) -> Dict:
         """Roll back project to the previous phase"""
@@ -1506,6 +1727,33 @@ What would be most helpful for you?"""
                 insight_list.append(new_value)
             insights[insight_type] = insight_list
 
+    def _generate_hint_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._generate_hint_async(request))
+
+    async def _generate_hint_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate a context-aware hint for the user based on project state"""
+        project = request.get("project")
+
+        if not project:
+            return {"status": "error", "message": "Project is required"}
+
+        if self.llm_service:
+            try:
+                hint = await self.llm_service.generate_hint(project)
+                return {"status": "success", "hint": hint}
+            except Exception as e:
+                logging.error(f"Failed to generate hint: {e}")
+                return {"status": "error", "message": str(e)}
+        else:
+            return {"status": "error", "message": "LLM service not available"}
+
     def _generate_hint(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate a context-aware hint for the user based on project state"""
 
@@ -1547,7 +1795,7 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.orchestrator.database.load_user(current_user)
+                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
                     logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
@@ -1583,6 +1831,37 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
                 "context": "",
             }
 
+    def _answer_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._answer_question_async(request))
+
+    async def _answer_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Mark a question as answered"""
+        project = request.get("project")
+        question_id = request.get("question_id")
+
+        if not project or not question_id:
+            return {"status": "error", "message": "Project and question_id are required"}
+
+        for question in project.pending_questions or []:
+            if question.get("id") == question_id:
+                question["status"] = "answered"
+                question["answered_at"] = datetime.datetime.now().isoformat()
+                break
+        else:
+            return {"status": "error", "message": "Question not found"}
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {"status": "success", "message": "Question marked as answered"}
+
     def _answer_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Mark a question as answered"""
         import datetime
@@ -1605,6 +1884,37 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
 
         return {"status": "error", "message": "Question not found"}
 
+    def _skip_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._skip_question_async(request))
+
+    async def _skip_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Mark a question as skipped"""
+        project = request.get("project")
+        question_id = request.get("question_id")
+
+        if not project or not question_id:
+            return {"status": "error", "message": "Project and question_id are required"}
+
+        for question in project.pending_questions or []:
+            if question.get("id") == question_id:
+                question["status"] = "skipped"
+                question["skipped_at"] = datetime.datetime.now().isoformat()
+                break
+        else:
+            return {"status": "error", "message": "Question not found"}
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {"status": "success", "message": "Question skipped"}
+
     def _skip_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Mark a question as skipped"""
         import datetime
@@ -1626,6 +1936,37 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
                 return {"status": "success", "message": "Question marked as skipped"}
 
         return {"status": "error", "message": "Question not found"}
+
+    def _reopen_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._reopen_question_async(request))
+
+    async def _reopen_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Reopen a skipped question (mark as unanswered)"""
+        project = request.get("project")
+        question_id = request.get("question_id")
+
+        if not project or not question_id:
+            return {"status": "error", "message": "Project and question_id are required"}
+
+        for question in project.pending_questions or []:
+            if question.get("id") == question_id:
+                question["status"] = "unanswered"
+                question["skipped_at"] = None
+                break
+        else:
+            return {"status": "error", "message": "Question not found"}
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {"status": "success", "message": "Question reopened"}
 
     def _reopen_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Reopen a skipped question (mark as unanswered)"""
@@ -1691,6 +2032,33 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
         logger.debug(f"Using {len(suggestions)} fallback suggestions for {phase} phase")
         return suggestions
 
+    def _generate_answer_suggestions_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._generate_answer_suggestions_async(request))
+
+    async def _generate_answer_suggestions_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate answer suggestions for the current question"""
+        project = request.get("project")
+
+        if not project:
+            return {"status": "error", "message": "Project is required"}
+
+        if self.llm_service:
+            try:
+                suggestions = await self.llm_service.generate_answer_suggestions(project)
+                return {"status": "success", "suggestions": suggestions}
+            except Exception as e:
+                logging.error(f"Failed to generate suggestions: {e}")
+                return {"status": "error", "message": str(e)}
+        else:
+            return {"status": "error", "message": "LLM service not available"}
+
     def _generate_answer_suggestions(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate answer suggestions for the current question"""
 
@@ -1714,7 +2082,7 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
             # Get user's auth method for API calls
             user_auth_method = "api_key"  # default
             if current_user:
-                user = self.orchestrator.database.load_user(current_user)
+                user = self.database_service.load_user if self.database_service else None and self.database_service.load_user(current_user)
                 if user and hasattr(user, "claude_auth_method"):
                     user_auth_method = user.claude_auth_method or "api_key"
 

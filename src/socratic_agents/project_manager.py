@@ -4,10 +4,11 @@ from __future__ import annotations
 Project management agent for Socrates AI
 """
 
+import asyncio
 import datetime
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from socratic_system.database.project_file_manager import ProjectFileManager
 from socratic_system.models import (
@@ -24,14 +25,32 @@ from socratic_system.utils.orchestrator_helper import safe_orchestrator_call
 from .base import Agent
 
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from .agent_bus import AgentBus
 
 
 class ProjectManagerAgent(Agent):
     """Manages project lifecycle including creation, loading, saving, and collaboration"""
 
-    def __init__(self, orchestrator: "AgentOrchestrator") -> None:
-        super().__init__("ProjectManager", orchestrator)
+    def __init__(
+        self,
+        database_service: Optional[Any] = None,
+        llm_service: Optional[Any] = None,
+        vector_db_service: Optional[Any] = None,
+        file_service: Optional[Any] = None,
+        auth_service: Optional[Any] = None,
+        event_emitter_service: Optional[Any] = None,
+        agent_bus: Optional["AgentBus"] = None,
+    ) -> None:
+        super().__init__(
+            "ProjectManager",
+            database_service=database_service,
+            llm_service=llm_service,
+            vector_db_service=vector_db_service,
+            file_service=file_service,
+            auth_service=auth_service,
+            event_emitter_service=event_emitter_service,
+            agent_bus=agent_bus,
+        )
 
     @staticmethod
     def _generate_auto_user_email(username: str) -> str:
@@ -42,23 +61,23 @@ class ProjectManagerAgent(Agent):
         return f"{username}+{uuid_suffix}@{domain}"
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process project management requests"""
+        """Process project management requests (synchronous wrapper)"""
         action = request.get("action")
 
         action_handlers = {
-            "create_project": self._create_project,
-            "create_from_github": self._create_from_github,
-            "load_project": self._load_project,
-            "save_project": self._save_project,
-            "add_collaborator": self._add_collaborator,
-            "update_member_role": self._update_member_role,
-            "list_projects": self._list_projects,
-            "list_collaborators": self._list_collaborators,
-            "remove_collaborator": self._remove_collaborator,
-            "archive_project": self._archive_project,
-            "restore_project": self._restore_project,
-            "delete_project_permanently": self._delete_project_permanently,
-            "get_archived_projects": self._get_archived_projects,
+            "create_project": self._create_project_sync,
+            "create_from_github": self._create_from_github_sync,
+            "load_project": self._load_project_sync,
+            "save_project": self._save_project_sync,
+            "add_collaborator": self._add_collaborator_sync,
+            "update_member_role": self._update_member_role_sync,
+            "list_projects": self._list_projects_sync,
+            "list_collaborators": self._list_collaborators_sync,
+            "remove_collaborator": self._remove_collaborator_sync,
+            "archive_project": self._archive_project_sync,
+            "restore_project": self._restore_project_sync,
+            "delete_project_permanently": self._delete_project_permanently_sync,
+            "get_archived_projects": self._get_archived_projects_sync,
         }
 
         handler = action_handlers.get(action)
@@ -67,7 +86,46 @@ class ProjectManagerAgent(Agent):
 
         return {"status": "error", "message": "Unknown action"}
 
-    def _create_project(self, request: Dict) -> Dict:
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Process project management requests asynchronously"""
+        action = request.get("action")
+
+        action_handlers = {
+            "create_project": self._create_project_async,
+            "create_from_github": self._create_from_github_async,
+            "load_project": self._load_project_async,
+            "save_project": self._save_project_async,
+            "add_collaborator": self._add_collaborator_async,
+            "update_member_role": self._update_member_role_async,
+            "list_projects": self._list_projects_async,
+            "list_collaborators": self._list_collaborators_async,
+            "remove_collaborator": self._remove_collaborator_async,
+            "archive_project": self._archive_project_async,
+            "restore_project": self._restore_project_async,
+            "delete_project_permanently": self._delete_project_permanently_async,
+            "get_archived_projects": self._get_archived_projects_async,
+        }
+
+        handler = action_handlers.get(action)
+        if handler:
+            return await handler(request)
+
+        return {"status": "error", "message": "Unknown action"}
+
+    def _create_project_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper for creating project"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {
+                    "status": "error",
+                    "message": "Use process_async() instead of process() in async context",
+                }
+        except RuntimeError:
+            pass
+        return asyncio.run(self._create_project_async(request))
+
+    async def _create_project_async(self, request: Dict) -> Dict:
         """Create a new project with quota checking"""
         project_name = request.get("project_name")
         owner = request.get("owner")
@@ -88,7 +146,9 @@ class ProjectManagerAgent(Agent):
 
         # NEW: Check project limit
 
-        user = self.orchestrator.database.load_user(owner)
+        user = None
+        if self.database_service:
+            user = await self.database_service.load_user(owner)
 
         # Create user if they don't exist (for automation/testing)
         if user is None:
@@ -104,10 +164,13 @@ class ProjectManagerAgent(Agent):
                 projects=[],
                 subscription_tier="free",  # Default to free tier for auto-created users (enforces project limits)
             )
-            self.orchestrator.database.save_user(user)
+            if self.database_service:
+                await self.database_service.save_user(user)
 
         # Count only OWNED projects for tier limit, not collaborated projects
-        all_projects = self.orchestrator.database.get_user_projects(owner)
+        all_projects = []
+        if self.database_service:
+            all_projects = await self.database_service.get_user_projects(owner) or []
         owned_projects = [p for p in all_projects if p.owner == owner and not p.is_archived]
         active_count = len(owned_projects)
 
@@ -166,14 +229,17 @@ class ProjectManagerAgent(Agent):
                 # Extract insights using same mechanism as conversation analysis
                 # Get user's auth method
                 user_auth_method = "api_key"
-                owner = request.get("owner")
-                if owner:
-                    user_obj = self.orchestrator.database.load_user(owner)
+                owner_val = request.get("owner")
+                if owner_val and self.database_service:
+                    user_obj = await self.database_service.load_user(owner_val)
                     if user_obj and hasattr(user_obj, "claude_auth_method"):
                         user_auth_method = user_obj.claude_auth_method or "api_key"
-                insights = self.orchestrator.claude_client.extract_insights(
-                    context_to_analyze, project, user_auth_method=user_auth_method, user_id=owner
-                )
+
+                insights = {}
+                if self.llm_service:
+                    insights = await self.llm_service.extract_insights(
+                        context_to_analyze, project, user_auth_method=user_auth_method, user_id=owner
+                    )
 
                 if insights:
                     # Apply extracted insights to project context
@@ -183,7 +249,8 @@ class ProjectManagerAgent(Agent):
                 # Non-fatal: continue with empty specs if extraction fails
                 self.log(f"Warning: Could not analyze project context: {e}", level="warning")
 
-        self.orchestrator.database.save_project(project)
+        if self.database_service:
+            await self.database_service.save_project(project)
         self.log(f"Created project '{project_name}' (type: {project_type}) with ID {project_id}")
 
         # Calculate initial maturity based on specs that were extracted from description/KB
@@ -193,14 +260,16 @@ class ProjectManagerAgent(Agent):
             try:
                 self.log(f"Calculating initial maturity for project '{project_name}'...")
                 # Use quality controller to calculate initial maturity from specs
-                maturity_result = self.orchestrator.process_request(
-                    "quality_controller",
-                    {
-                        "action": "calculate_maturity",
-                        "project": project,
-                        "current_user": owner,
-                    },
-                )
+                maturity_result = {}
+                if self.agent_bus:
+                    maturity_result = await self.agent_bus.process_request(
+                        "quality_controller",
+                        {
+                            "action": "calculate_maturity",
+                            "project": project,
+                            "current_user": owner,
+                        },
+                    )
                 if maturity_result and maturity_result.get("overall_maturity") is not None:
                     project.overall_maturity = maturity_result["overall_maturity"]
                     if maturity_result.get("phase_maturity_scores"):
@@ -213,6 +282,388 @@ class ProjectManagerAgent(Agent):
                 self.log(f"Warning: Could not calculate initial maturity: {e}", level="warning")
 
         return {"status": "success", "project": project}
+
+    def _create_from_github_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._create_from_github_async(request))
+
+    async def _create_from_github_async(self, request: Dict) -> Dict:
+        """Create a project from a GitHub repository"""
+        github_url = request.get("github_url")
+        owner = request.get("owner")
+
+        if not github_url or not owner:
+            return {"status": "error", "message": "github_url and owner are required"}
+
+        user = None
+        if self.database_service:
+            user = await self.database_service.load_user(owner)
+
+        if not user:
+            user = User(
+                username=owner,
+                email=self._generate_auto_user_email(owner),
+                passcode_hash="",
+                created_at=datetime.datetime.now(),
+                projects=[],
+                subscription_tier="pro",
+            )
+            if self.database_service:
+                await self.database_service.save_user(user)
+
+        can_create, error_msg = SubscriptionChecker.check_project_limit(user)
+        if not can_create:
+            return {"status": "error", "message": error_msg}
+
+        project = ProjectContext(
+            id=ProjectIDGenerator.generate(),
+            name=f"Project from {github_url.split('/')[-1]}",
+            owner=owner,
+            created_at=datetime.datetime.now(),
+        )
+
+        if self.database_service:
+            await self.database_service.save_project(project)
+
+        return {"status": "success", "project": project}
+
+    def _load_project_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._load_project_async(request))
+
+    async def _load_project_async(self, request: Dict) -> Dict:
+        """Load a project from database"""
+        project_id = request.get("project_id")
+
+        if not project_id:
+            return {"status": "error", "message": "project_id is required"}
+
+        if self.database_service:
+            try:
+                project = await self.database_service.load_project(project_id)
+                if project:
+                    return {"status": "success", "project": project}
+                return {"status": "error", "message": "Project not found"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _save_project_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._save_project_async(request))
+
+    async def _save_project_async(self, request: Dict) -> Dict:
+        """Save a project to database"""
+        project = request.get("project")
+
+        if not project:
+            return {"status": "error", "message": "project is required"}
+
+        if self.database_service:
+            try:
+                await self.database_service.save_project(project)
+                return {"status": "success", "message": "Project saved"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _add_collaborator_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._add_collaborator_async(request))
+
+    async def _add_collaborator_async(self, request: Dict) -> Dict:
+        """Add a collaborator to a project"""
+        project_id = request.get("project_id")
+        username = request.get("username")
+        role = request.get("role", "contributor")
+
+        if not project_id or not username:
+            return {"status": "error", "message": "project_id and username are required"}
+
+        if role not in VALID_ROLES:
+            return {"status": "error", "message": f"Invalid role: {role}"}
+
+        if self.database_service:
+            try:
+                project = await self.database_service.load_project(project_id)
+                if not project:
+                    return {"status": "error", "message": "Project not found"}
+
+                member = TeamMemberRole(username=username, role=role)
+                if project.team_members is None:
+                    project.team_members = []
+                project.team_members.append(member)
+
+                await self.database_service.save_project(project)
+                return {"status": "success", "message": f"Added {username} as {role}"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _update_member_role_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._update_member_role_async(request))
+
+    async def _update_member_role_async(self, request: Dict) -> Dict:
+        """Update a team member's role"""
+        project_id = request.get("project_id")
+        username = request.get("username")
+        new_role = request.get("new_role")
+
+        if not project_id or not username or not new_role:
+            return {"status": "error", "message": "project_id, username, and new_role are required"}
+
+        if new_role not in VALID_ROLES:
+            return {"status": "error", "message": f"Invalid role: {new_role}"}
+
+        if self.database_service:
+            try:
+                project = await self.database_service.load_project(project_id)
+                if not project:
+                    return {"status": "error", "message": "Project not found"}
+
+                for member in project.team_members or []:
+                    if member.username == username:
+                        member.role = new_role
+                        break
+                else:
+                    return {"status": "error", "message": "Team member not found"}
+
+                await self.database_service.save_project(project)
+                return {"status": "success", "message": f"Updated {username} role to {new_role}"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _list_projects_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._list_projects_async(request))
+
+    async def _list_projects_async(self, request: Dict) -> Dict:
+        """List projects for a user"""
+        owner = request.get("owner")
+
+        if not owner:
+            return {"status": "error", "message": "owner is required"}
+
+        if self.database_service:
+            try:
+                user = await self.database_service.load_user(owner)
+                if user and user.projects:
+                    return {"status": "success", "projects": user.projects}
+                return {"status": "success", "projects": []}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _list_collaborators_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._list_collaborators_async(request))
+
+    async def _list_collaborators_async(self, request: Dict) -> Dict:
+        """List collaborators on a project"""
+        project_id = request.get("project_id")
+
+        if not project_id:
+            return {"status": "error", "message": "project_id is required"}
+
+        if self.database_service:
+            try:
+                project = await self.database_service.load_project(project_id)
+                if not project:
+                    return {"status": "error", "message": "Project not found"}
+
+                collaborators = project.team_members or []
+                return {"status": "success", "collaborators": collaborators}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _remove_collaborator_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._remove_collaborator_async(request))
+
+    async def _remove_collaborator_async(self, request: Dict) -> Dict:
+        """Remove a collaborator from a project"""
+        project_id = request.get("project_id")
+        username = request.get("username")
+
+        if not project_id or not username:
+            return {"status": "error", "message": "project_id and username are required"}
+
+        if self.database_service:
+            try:
+                project = await self.database_service.load_project(project_id)
+                if not project:
+                    return {"status": "error", "message": "Project not found"}
+
+                if project.team_members:
+                    project.team_members = [m for m in project.team_members if m.username != username]
+
+                await self.database_service.save_project(project)
+                return {"status": "success", "message": f"Removed {username}"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _archive_project_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._archive_project_async(request))
+
+    async def _archive_project_async(self, request: Dict) -> Dict:
+        """Archive a project"""
+        project_id = request.get("project_id")
+
+        if not project_id:
+            return {"status": "error", "message": "project_id is required"}
+
+        if self.database_service:
+            try:
+                success = await self.database_service.archive_project(project_id)
+                if success:
+                    return {"status": "success", "message": "Project archived"}
+                return {"status": "error", "message": "Failed to archive project"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _restore_project_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._restore_project_async(request))
+
+    async def _restore_project_async(self, request: Dict) -> Dict:
+        """Restore an archived project"""
+        project_id = request.get("project_id")
+
+        if not project_id:
+            return {"status": "error", "message": "project_id is required"}
+
+        if self.database_service:
+            try:
+                success = await self.database_service.restore_project(project_id)
+                if success:
+                    return {"status": "success", "message": "Project restored"}
+                return {"status": "error", "message": "Failed to restore project"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _delete_project_permanently_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._delete_project_permanently_async(request))
+
+    async def _delete_project_permanently_async(self, request: Dict) -> Dict:
+        """Permanently delete a project"""
+        project_id = request.get("project_id")
+        confirmation = request.get("confirmation", "")
+
+        if not project_id:
+            return {"status": "error", "message": "project_id is required"}
+
+        if confirmation != "DELETE":
+            return {"status": "error", "message": 'Must type "DELETE" to confirm permanent deletion'}
+
+        if self.database_service:
+            try:
+                success = await self.database_service.permanently_delete_project(project_id)
+                if success:
+                    return {"status": "success", "message": "Project permanently deleted"}
+                return {"status": "error", "message": "Failed to delete project"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
+
+    def _get_archived_projects_sync(self, request: Dict) -> Dict:
+        """Synchronous wrapper"""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                return {"status": "error", "message": "Use process_async()"}
+        except RuntimeError:
+            pass
+        return asyncio.run(self._get_archived_projects_async(request))
+
+    async def _get_archived_projects_async(self, request: Dict) -> Dict:
+        """Get archived projects"""
+        owner = request.get("owner")
+
+        if not owner:
+            return {"status": "error", "message": "owner is required"}
+
+        if self.database_service:
+            try:
+                archived = await self.database_service.get_archived_items("projects")
+                filtered = [p for p in archived if p.get("owner") == owner]
+                return {"status": "success", "projects": filtered}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "Database service not available"}
 
     def _apply_initial_insights(self, project: "ProjectContext", insights: Dict) -> None:
         """Apply extracted insights from description/notes to project context.
