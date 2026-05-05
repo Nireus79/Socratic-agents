@@ -5,11 +5,9 @@ Provides turnkey initialization of the agent system for external projects.
 Handles agent registration, service setup, and request routing.
 """
 
-import asyncio
 import logging
 from typing import Any, Dict, Optional
 
-from socratic_agents.config import SocratesConfig
 from socratic_agents.orchestrator import AgentOrchestrator
 from socratic_agents.registry import AgentRegistry
 from socratic_agents.request_handler import RequestHandler
@@ -19,7 +17,6 @@ from socratic_agents.services import (
     EventEmitterService,
     LLMService,
     VectorDatabaseService,
-    create_service_adapters,
 )
 from socratic_agents.services.defaults import (
     DefaultConfigService,

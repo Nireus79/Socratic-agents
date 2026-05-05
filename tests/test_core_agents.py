@@ -1,6 +1,5 @@
 """Comprehensive tests for core Socratic Agents."""
 
-import pytest
 
 from socratic_agents import (
     Agent,

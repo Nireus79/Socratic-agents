@@ -12,15 +12,6 @@ All agents can be initialized with either:
 """
 
 # Abstract service interfaces
-from socratic_agents.services.base import (
-    ConfigService,
-    DatabaseService,
-    EventEmitterService,
-    LLMService,
-    ServiceRegistry,
-    VectorDatabaseService,
-)
-
 # Service adapters (wrap orchestrator for compatibility)
 from socratic_agents.services.adapters import (
     OrchestratorConfigAdapter,
@@ -30,12 +21,13 @@ from socratic_agents.services.adapters import (
     OrchestratorVectorDBAdapter,
     create_service_adapters,
 )
-
-# Specialized services
-from socratic_agents.services.document_understanding import DocumentUnderstandingService
-from socratic_agents.services.orchestrator_service import (
-    OrchestratorService,
-    get_orchestrator_service,
+from socratic_agents.services.base import (
+    ConfigService,
+    DatabaseService,
+    EventEmitterService,
+    LLMService,
+    ServiceRegistry,
+    VectorDatabaseService,
 )
 
 # Default implementations for standalone use
@@ -45,6 +37,13 @@ from socratic_agents.services.defaults import (
     DefaultEventEmitterService,
     DefaultLLMService,
     DefaultVectorDatabaseService,
+)
+
+# Specialized services
+from socratic_agents.services.document_understanding import DocumentUnderstandingService
+from socratic_agents.services.orchestrator_service import (
+    OrchestratorService,
+    get_orchestrator_service,
 )
 
 __all__ = [

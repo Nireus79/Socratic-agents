@@ -6,7 +6,7 @@ for use in external projects.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from socratic_agents.base import Agent
 
