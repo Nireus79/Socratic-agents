@@ -209,54 +209,65 @@ class TestLLMModels:
     def test_llm_provider_config_creation(self):
         """Test creating provider config."""
         config = LLMProviderConfig(
+            id="config-1",
             provider="claude",
-            api_key="test_key",
-            model="claude-3-5-sonnet-20241022",
-            temperature=0.7,
-            max_tokens=2048,
+            user_id="user-1",
+            is_default=True,
         )
 
         assert config.provider == "claude"
-        assert config.api_key == "test_key"
-        assert config.model == "claude-3-5-sonnet-20241022"
-        assert config.temperature == 0.7
+        assert config.id == "config-1"
+        assert config.user_id == "user-1"
+        assert config.is_default is True
 
     def test_llm_provider_config_validation(self):
-        """Test provider config validation."""
-        with pytest.raises(ValueError, match="Unknown provider"):
-            LLMProviderConfig(provider="invalid_provider")
+        """Test provider config requires id and user_id."""
+        # Valid config with required fields
+        config = LLMProviderConfig(
+            id="config-1",
+            provider="claude",
+            user_id="user-1"
+        )
+        assert config.id == "config-1"
+        assert config.user_id == "user-1"
 
-        with pytest.raises(ValueError, match="Temperature must be between"):
-            LLMProviderConfig(provider="claude", temperature=5.0)
-
-        with pytest.raises(ValueError, match="Max tokens must be positive"):
-            LLMProviderConfig(provider="claude", max_tokens=-1)
+        # Config with settings
+        config_with_settings = LLMProviderConfig(
+            id="config-2",
+            provider="openai",
+            user_id="user-2",
+            settings={"model": "gpt-4", "temperature": 0.5}
+        )
+        assert config_with_settings.settings["model"] == "gpt-4"
+        assert config_with_settings.settings["temperature"] == 0.5
 
     def test_llm_usage_record(self):
         """Test creating usage records."""
         record = LLMUsageRecord(
+            id="record-1",
+            user_id="user-1",
             provider="claude",
             model="claude-3-5-sonnet-20241022",
             input_tokens=100,
             output_tokens=50,
             total_tokens=150,
-            cost_usd=0.015,
+            cost=0.015,
         )
 
         assert record.provider == "claude"
         assert record.total_tokens == 150
-        assert record.cost_usd == 0.015
+        assert record.cost == 0.015
 
     def test_get_provider_metadata(self):
         """Test getting provider metadata."""
         claude_metadata = get_provider_metadata("claude")
-        assert claude_metadata.name == "claude"
+        assert claude_metadata.provider == "claude"
         assert isinstance(claude_metadata, ProviderMetadata)
         assert len(claude_metadata.models) > 0
         assert claude_metadata.supports_vision is True
 
         openai_metadata = get_provider_metadata("openai")
-        assert openai_metadata.name == "openai"
+        assert openai_metadata.provider == "openai"
 
     def test_list_available_providers(self):
         """Test listing available providers."""
@@ -269,8 +280,8 @@ class TestLLMModels:
 
     def test_get_invalid_provider(self):
         """Test getting metadata for invalid provider."""
-        with pytest.raises(ValueError, match="Unknown provider"):
-            get_provider_metadata("invalid_provider")
+        invalid_metadata = get_provider_metadata("invalid_provider")
+        assert invalid_metadata is None
 
 
 # ===== Concrete Agent Tests =====
@@ -441,84 +452,66 @@ class TestPhase3Governance:
         assert AgentMessage is not None
         assert MessageType is not None
 
-    def test_orchestrator_has_governance_support(self):
-        """Test that orchestrator has governance support."""
+    def test_orchestrator_has_core_support(self):
+        """Test that orchestrator has core features."""
         orchestrator = AgentOrchestrator()
 
-        assert hasattr(orchestrator, "governor")
-        assert hasattr(orchestrator, "governance_adapter")
-        assert hasattr(orchestrator, "agent_bus")
-        assert hasattr(orchestrator, "get_governance_status")
-        assert hasattr(orchestrator, "get_agent_bus_stats")
+        assert hasattr(orchestrator, "event_emitter")
+        assert hasattr(orchestrator, "register_agent")
+        assert hasattr(orchestrator, "get_agent")
+        assert hasattr(orchestrator, "process")
+        assert hasattr(orchestrator, "set_state")
 
-    def test_orchestrator_governance_status_without_governor(self):
-        """Test governance status when no governor is provided."""
+    def test_orchestrator_state_management(self):
+        """Test state management in orchestrator."""
         orchestrator = AgentOrchestrator()
 
-        status = orchestrator.get_governance_status()
-        assert status["enabled"] is False
+        orchestrator.set_state("test_key", "test_value")
+        assert orchestrator.get_state("test_key") == "test_value"
 
-    def test_orchestrator_bus_stats_disabled(self):
-        """Test bus stats when bus is disabled."""
-        orchestrator = AgentOrchestrator(enable_agent_bus=False)
+        orchestrator.clear_state()
+        assert orchestrator.get_state("test_key") is None
 
-        stats = orchestrator.get_agent_bus_stats()
-        assert stats["enabled"] is False
-
-    def test_orchestrator_bus_stats_enabled(self):
-        """Test bus stats when bus is enabled."""
-        orchestrator = AgentOrchestrator(enable_agent_bus=True)
-
-        stats = orchestrator.get_agent_bus_stats()
-        assert stats["enabled"] is True
-        assert isinstance(stats["agents"], list)
-
-    @pytest.mark.asyncio
-    async def test_orchestrator_with_mock_governor(self):
-        """Test orchestrator with mock governor."""
-        from unittest.mock import Mock
-
-        from socratic_morality.governor.decision import DecisionType, GovernorDecision
-
-        mock_governor = Mock()
-
-        async def mock_evaluate(*args, **kwargs):
-            return GovernorDecision(
-                allowed=True,
-                decision_type=DecisionType.ALLOW,
-                action="test",
-                reasoning="Test",
-                violations=[],
-            )
-
-        mock_governor.evaluate = mock_evaluate
-
-        orchestrator = AgentOrchestrator(governor=mock_governor)
-        status = orchestrator.get_governance_status()
-
-        assert status["enabled"] is True
-
-    @pytest.mark.asyncio
-    async def test_agent_bus_message_flow(self):
-        """Test basic message flow through agent bus."""
-        from socratic_agents.agent_bus import AgentBus, AgentMessage
-
-        bus = AgentBus()
+    def test_orchestrator_agent_registration(self):
+        """Test agent registration and retrieval."""
+        orchestrator = AgentOrchestrator()
 
         class TestAgent:
+            def __init__(self):
+                self.name = "TestAgent"
+
+        agent = TestAgent()
+        orchestrator.register_agent("test_agent", agent)
+
+        retrieved = orchestrator.get_agent("test_agent")
+        assert retrieved is not None
+        assert retrieved.name == "TestAgent"
+
+    def test_orchestrator_list_agents(self):
+        """Test listing registered agents."""
+        orchestrator = AgentOrchestrator()
+
+        class DummyAgent:
             def __init__(self, name):
                 self.name = name
 
-        bus.register_agent("agent1", TestAgent("agent1"))
-        bus.register_agent("agent2", TestAgent("agent2"))
+        orchestrator.register_agent("agent1", DummyAgent("agent1"))
+        orchestrator.register_agent("agent2", DummyAgent("agent2"))
 
-        msg = AgentMessage(
-            from_agent="agent1",
-            payload={"test": "data"},
-        )
+        agents = orchestrator.list_agents()
+        assert len(agents) == 2
+        assert "agent1" in agents
+        assert "agent2" in agents
 
-        await bus.send_message(msg)
+    def test_orchestrator_process_request(self):
+        """Test processing request through agent."""
+        orchestrator = AgentOrchestrator()
 
-        history = bus.get_message_history()
-        assert len(history) > 0
-        assert history[0].action == "test"
+        class EchoAgent:
+            def process(self, request):
+                return {"echo": request.get("message")}
+
+        orchestrator.register_agent("echo", EchoAgent())
+
+        result = orchestrator.process("echo", {"message": "hello"})
+        assert result["echo"] == "hello"

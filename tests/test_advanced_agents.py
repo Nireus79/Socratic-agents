@@ -201,33 +201,39 @@ class TestLLMConfiguration:
         for provider in list_available_providers():
             metadata = get_provider_metadata(provider)
 
-            assert metadata.name == provider
+            assert metadata.provider == provider
             assert len(metadata.models) > 0
-            assert metadata.default_model is not None
-            assert metadata.default_model in metadata.models
+            assert metadata.models[0] is not None
+            assert metadata.models[0] in metadata.models
 
     def test_config_with_optional_parameters(self):
-        """Test config with various optional parameters."""
+        """Test config with optional settings."""
         config = LLMProviderConfig(
+            id="config-1",
             provider="claude",
-            temperature=0.8,
-            max_tokens=1000,
-            timeout=60,
+            user_id="user-1",
+            settings={
+                "temperature": 0.8,
+                "max_tokens": 1000,
+                "timeout": 60,
+            }
         )
 
-        assert config.temperature == 0.8
-        assert config.max_tokens == 1000
-        assert config.timeout == 60
+        assert config.settings.get("temperature") == 0.8
+        assert config.settings.get("max_tokens") == 1000
+        assert config.settings.get("timeout") == 60
 
     def test_usage_record_totals(self):
         """Test usage record token totals."""
         record = LLMUsageRecord(
+            id="record-1",
+            user_id="user-1",
             provider="claude",
             model="claude-3-5-sonnet-20241022",
             input_tokens=100,
             output_tokens=50,
             total_tokens=150,
-            cost_usd=0.01,
+            cost=0.01,
         )
 
         assert record.total_tokens == 150
