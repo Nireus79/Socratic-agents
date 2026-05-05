@@ -77,10 +77,14 @@ class Agent(ABC):
             self.orchestrator = orchestrator
             self.database = orchestrator.database if hasattr(orchestrator, "database") else database
             self.llm = orchestrator.claude_client if hasattr(orchestrator, "claude_client") else llm
-            self.vector_db = orchestrator.vector_db if hasattr(orchestrator, "vector_db") else vector_db
+            self.vector_db = (
+                orchestrator.vector_db if hasattr(orchestrator, "vector_db") else vector_db
+            )
             self.config = orchestrator.config if hasattr(orchestrator, "config") else config
             self.event_emitter = (
-                orchestrator.event_emitter if hasattr(orchestrator, "event_emitter") else event_emitter
+                orchestrator.event_emitter
+                if hasattr(orchestrator, "event_emitter")
+                else event_emitter
             )
         else:
             # New: Direct service injection

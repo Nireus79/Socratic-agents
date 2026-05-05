@@ -72,9 +72,7 @@ class LLMService(ABC):
     """Abstract service for LLM operations."""
 
     @abstractmethod
-    def generate_response(
-        self, prompt: str, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_response(self, prompt: str, context: Optional[str] = None, **kwargs) -> str:
         """Generate a response from the LLM."""
         pass
 
@@ -93,9 +91,7 @@ class LLMService(ABC):
         pass
 
     @abstractmethod
-    def generate_question(
-        self, project: Any, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_question(self, project: Any, context: Optional[str] = None, **kwargs) -> str:
         """Generate a question."""
         pass
 

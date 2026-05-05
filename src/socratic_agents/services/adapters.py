@@ -86,9 +86,7 @@ class OrchestratorLLMAdapter(LLMService):
         self.orchestrator = orchestrator
         self._llm = orchestrator.claude_client if hasattr(orchestrator, "claude_client") else None
 
-    def generate_response(
-        self, prompt: str, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_response(self, prompt: str, context: Optional[str] = None, **kwargs) -> str:
         if self._llm and hasattr(self._llm, "generate_response"):
             return self._llm.generate_response(prompt, context=context, **kwargs)
         return ""
@@ -107,9 +105,7 @@ class OrchestratorLLMAdapter(LLMService):
             return self._llm.generate_documentation(project, artifact, artifact_type, **kwargs)
         return ""
 
-    def generate_question(
-        self, project: Any, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_question(self, project: Any, context: Optional[str] = None, **kwargs) -> str:
         if self._llm and hasattr(self._llm, "generate_question"):
             return self._llm.generate_question(project, context=context, **kwargs)
         return ""

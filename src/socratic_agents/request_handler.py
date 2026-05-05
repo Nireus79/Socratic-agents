@@ -52,7 +52,9 @@ class AgentResponse:
         return AgentResponse(status="success", data=data, message=message)
 
     @staticmethod
-    def error(message: str, error_code: str = "AGENT_ERROR", data: Dict[str, Any] = None) -> "AgentResponse":
+    def error(
+        message: str, error_code: str = "AGENT_ERROR", data: Dict[str, Any] = None
+    ) -> "AgentResponse":
         """Create an error response."""
         return AgentResponse(status="error", data=data, message=message, error_code=error_code)
 

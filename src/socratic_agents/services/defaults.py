@@ -54,7 +54,12 @@ class DefaultEventEmitterService(EventEmitterService):
 class DefaultConfigService(ConfigService):
     """Basic configuration service."""
 
-    def __init__(self, data_dir: str = ".", api_key: Optional[str] = None, claude_model: str = "claude-haiku-4-5-20251001"):
+    def __init__(
+        self,
+        data_dir: str = ".",
+        api_key: Optional[str] = None,
+        claude_model: str = "claude-haiku-4-5-20251001",
+    ):
         """
         Initialize config service.
 
@@ -156,9 +161,7 @@ class DefaultLLMService(LLMService):
         self.api_key = api_key
         self.logger = logging.getLogger("socratic_agents.llm")
 
-    def generate_response(
-        self, prompt: str, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_response(self, prompt: str, context: Optional[str] = None, **kwargs) -> str:
         """Generate response - requires implementation."""
         if not self.api_key:
             self.logger.error("LLM service not configured (no API key)")
@@ -186,9 +189,7 @@ class DefaultLLMService(LLMService):
         self.logger.warning("DefaultLLMService.generate_documentation() not fully implemented")
         return ""
 
-    def generate_question(
-        self, project: Any, context: Optional[str] = None, **kwargs
-    ) -> str:
+    def generate_question(self, project: Any, context: Optional[str] = None, **kwargs) -> str:
         """Generate question - requires implementation."""
         if not self.api_key:
             self.logger.error("LLM service not configured (no API key)")

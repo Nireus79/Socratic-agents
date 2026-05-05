@@ -120,7 +120,9 @@ class AgentRegistry:
                     self.logger.error(f"Failed to create agent {name} with orchestrator: {e}")
                     return None
             else:
-                self.logger.error(f"Failed to create agent {name}: missing orchestrator or services")
+                self.logger.error(
+                    f"Failed to create agent {name}: missing orchestrator or services"
+                )
                 return None
 
     def auto_register_agents(self) -> None:
