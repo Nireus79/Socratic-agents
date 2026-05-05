@@ -43,6 +43,7 @@ from .learning_agent import UserLearningAgent
 from .models import (
     LLMProviderConfig,
     LLMUsageRecord,
+    ProjectContext,
     ProviderMetadata,
     get_provider_metadata,
     list_available_providers,
@@ -64,11 +65,10 @@ __all__ = [
     "AgentOrchestrator",
     "EventEmitter",
     # Models
-    "LLMProviderConfig",
-    "LLMUsageRecord",
-    "ProviderMetadata",
-    "get_provider_metadata",
-    "list_available_providers",
+    "ProjectContext",
+    "ProjectNote",
+    "User",
+    "TeamMemberRole",
     # Agent implementations
     "ProjectManagerAgent",
     "UserManagerAgent",

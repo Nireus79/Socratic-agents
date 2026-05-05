@@ -5,6 +5,13 @@ Extracted from socratic_system to make agents fully independent.
 
 from .knowledge import KnowledgeEntry
 from .learning import KnowledgeBaseDocument, QuestionEffectiveness, UserBehaviorPattern
+from .llm_provider import (
+    LLMProviderConfig,
+    LLMUsageRecord,
+    ProviderMetadata,
+    get_provider_metadata,
+    list_available_providers,
+)
 from .monitoring import TokenUsage
 from .note import ProjectNote
 from .project import ProjectContext
@@ -22,13 +29,20 @@ from .workflow import (
 )
 
 __all__ = [
-    # Models
+    # LLM Provider models
+    "LLMProviderConfig",
+    "LLMUsageRecord",
+    "ProviderMetadata",
+    "get_provider_metadata",
+    "list_available_providers",
+    # Project models
     "ProjectContext",
     "ProjectNote",
     "KnowledgeEntry",
     "TeamMemberRole",
     "User",
     "TokenUsage",
+    # Workflow models
     "WorkflowApprovalRequest",
     "WorkflowDefinition",
     "WorkflowNode",
@@ -37,6 +51,7 @@ __all__ = [
     "WorkflowPath",
     "WorkflowExecutionState",
     "PathDecisionStrategy",
+    # Learning models
     "QuestionEffectiveness",
     "UserBehaviorPattern",
     "KnowledgeBaseDocument",
