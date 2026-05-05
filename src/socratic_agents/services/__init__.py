@@ -38,6 +38,15 @@ from socratic_agents.services.orchestrator_service import (
     get_orchestrator_service,
 )
 
+# Default implementations for standalone use
+from socratic_agents.services.defaults import (
+    DefaultConfigService,
+    DefaultDatabaseService,
+    DefaultEventEmitterService,
+    DefaultLLMService,
+    DefaultVectorDatabaseService,
+)
+
 __all__ = [
     # Abstract service interfaces
     "EventEmitterService",
@@ -57,4 +66,10 @@ __all__ = [
     "DocumentUnderstandingService",
     "OrchestratorService",
     "get_orchestrator_service",
+    # Default implementations
+    "DefaultEventEmitterService",
+    "DefaultConfigService",
+    "DefaultDatabaseService",
+    "DefaultLLMService",
+    "DefaultVectorDatabaseService",
 ]

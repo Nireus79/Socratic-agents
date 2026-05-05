@@ -183,3 +183,16 @@ __all__ += [
     # Configuration
     "SocratesConfig",
 ]
+
+# System for external projects - Turnkey initialization
+from .registry import AgentRegistry
+from .request_handler import AgentResponse, RequestHandler
+from .system import SocraticAgentsSystem
+
+__all__ += [
+    # System orchestration
+    "AgentRegistry",
+    "RequestHandler",
+    "AgentResponse",
+    "SocraticAgentsSystem",
+]
