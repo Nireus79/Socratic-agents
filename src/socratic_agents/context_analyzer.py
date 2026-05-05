@@ -1,16 +1,13 @@
-from __future__ import annotations
-
 """
 Context analysis agent for Socrates AI
 """
 
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import Any, Dict, List
+
+from socratic_agents.models import ProjectContext
 
 from .base import Agent
-
-if TYPE_CHECKING:
-    from socratic_agents.models import ProjectContext
 
 
 class ContextAnalyzerAgent(Agent):
@@ -62,7 +59,7 @@ class ContextAnalyzerAgent(Agent):
 
         return {"status": "success", "analysis": analysis, "relevant_knowledge": relevant_knowledge}
 
-    def get_context_summary(self, project: "ProjectContext") -> str:
+    def get_context_summary(self, project: ProjectContext) -> str:
         """Generate comprehensive project summary"""
         summary_parts = []
 

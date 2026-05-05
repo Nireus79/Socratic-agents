@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Knowledge Manager Agent for automatic knowledge enrichment
 
@@ -14,13 +12,12 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from socratic_agents.models import KnowledgeEntry
-
-from .base import Agent
-from .events import EventType
+from socratic_agents.base import Agent
+from socratic_agents.events import EventType
+from socratic_agents.models.knowledge import KnowledgeEntry
 
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from socratic_agents.orchestration.orchestrator import AgentOrchestrator
 
 
 class KnowledgeManagerAgent(Agent):

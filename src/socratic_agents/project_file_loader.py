@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Project File Loader - Auto-loads project files into vector DB for chat sessions
 
@@ -13,15 +11,13 @@ Handles:
 import logging
 import random
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
-
-# ProjectFileManager is injected
-from socratic_agents.models import ProjectContext
-
-logger = logging.getLogger("socrates.agents.project_file_loader")
+from typing import TYPE_CHECKING, Any, Dict, List
 
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from socratic_agents.models import ProjectContext
+    from socratic_agents.orchestration import AgentOrchestrator
+
+logger = logging.getLogger("socrates.agents.project_file_loader")
 
 
 class ProjectFileLoader:
@@ -48,6 +44,7 @@ class ProjectFileLoader:
             True if project has files to load, False otherwise
         """
         try:
+            from socratic_agents.database.project_file_manager import ProjectFileManager
 
             file_manager = ProjectFileManager(self.orchestrator.database.db_path)
             file_count = file_manager.get_file_count(project.project_id)
@@ -65,6 +62,7 @@ class ProjectFileLoader:
     ) -> Dict[str, Any]:
         """Load project files into vector DB based on strategy"""
         try:
+            from socratic_agents.database.project_file_manager import ProjectFileManager
 
             file_manager = ProjectFileManager(self.orchestrator.database.db_path)
 
@@ -151,7 +149,7 @@ class ProjectFileLoader:
         files: List[Dict],
         project_id: str,
         show_progress: bool,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         """Process files through DocumentProcessor and return counts"""
         loaded_count = 0
         total_chunks = 0

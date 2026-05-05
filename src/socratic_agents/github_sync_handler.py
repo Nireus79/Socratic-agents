@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 GitHub Sync Edge Case Handler
 
@@ -543,35 +541,25 @@ class GitHubSyncHandler:
                     logger.error(f"Sync failed after {max_retries} attempts: {e}")
                     raise NetworkSyncFailedError(f"Sync failed after {max_retries} attempts: {e}")
 
-        # Fallback if no retries were attempted
-        raise NetworkSyncFailedError(
-            f"Sync failed: no retries attempted (max_retries={max_retries})"
-        )
-
     def _call_with_timeout(self, func: Any, args: tuple = (), timeout_seconds: int = 30) -> Any:
         """Call function with timeout"""
         import signal
-        import sys
 
-        # On Windows, signal.SIGALRM is not available, so just run without timeout
-        if sys.platform == "win32":
-            return func(*args)
-
-        def timeout_handler(signum: int, frame: Any) -> None:  # type: ignore[name-defined]
+        def timeout_handler(signum, frame):
             raise TimeoutError(f"Operation timed out after {timeout_seconds} seconds")
 
-        # Set timeout alarm (Unix-like systems only)
-        signal.signal(signal.SIGALRM, timeout_handler)  # type: ignore[attr-defined]
-        signal.alarm(timeout_seconds)  # type: ignore[attr-defined]
+        # Set timeout alarm
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(timeout_seconds)
 
         try:
             result = func(*args)
-            signal.alarm(0)  # type: ignore[attr-defined]
+            signal.alarm(0)  # Disable alarm
             return result
         except TimeoutError:
             raise
         finally:
-            signal.alarm(0)  # type: ignore[attr-defined]
+            signal.alarm(0)  # Disable alarm
 
     # ========================================================================
     # Edge Case 5: Permission Errors and Access Revocation

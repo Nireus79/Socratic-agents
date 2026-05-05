@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 """
-Base Agent class for Socratic Agents
+Base Agent class for Socrates AI
 """
 
 import asyncio
@@ -10,10 +8,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from .events import EventType
+from socratic_agents.events import EventType
 
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from socratic_agents.orchestration.orchestrator import AgentOrchestrator
 
 
 class Agent(ABC):

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Conflict detection and resolution agent for Socrates AI
 """
@@ -7,17 +5,12 @@ Conflict detection and resolution agent for Socrates AI
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict
 
-try:
-    from socratic_conflict import (
-        ConstraintsConflictChecker,
-        GoalsConflictChecker,
-        RequirementsConflictChecker,
-        TechStackConflictChecker,
-    )
-
-    CONFLICT_CHECKERS_AVAILABLE = True
-except ImportError:
-    CONFLICT_CHECKERS_AVAILABLE = False
+from socratic_agents.conflict_resolution import (
+    ConstraintsConflictChecker,
+    GoalsConflictChecker,
+    RequirementsConflictChecker,
+    TechStackConflictChecker,
+)
 
 from .base import Agent
 
@@ -28,19 +21,13 @@ class ConflictDetectorAgent(Agent):
     def __init__(self, orchestrator):
         super().__init__("ConflictDetector", orchestrator)
 
-        # Initialize pluggable conflict checkers if socratic-conflict is available
-        if CONFLICT_CHECKERS_AVAILABLE:
-            self.checkers = [
-                TechStackConflictChecker(orchestrator),
-                RequirementsConflictChecker(orchestrator),
-                GoalsConflictChecker(orchestrator),
-                ConstraintsConflictChecker(orchestrator),
-            ]
-        else:
-            self.checkers = []
-            self.log(
-                "Warning: socratic-conflict not installed. Conflict detection disabled.", "WARNING"
-            )
+        # Initialize pluggable conflict checkers
+        self.checkers = [
+            TechStackConflictChecker(orchestrator),
+            RequirementsConflictChecker(orchestrator),
+            GoalsConflictChecker(orchestrator),
+            ConstraintsConflictChecker(orchestrator),
+        ]
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process conflict detection requests"""

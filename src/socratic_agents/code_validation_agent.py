@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Code Validation Agent for Socrates AI
 
@@ -13,36 +11,13 @@ Orchestrates comprehensive code validation pipeline:
 import logging
 from typing import Any, Dict, List
 
-from .base import Agent
-from .events import EventType
-
-#     DependencyValidator,
-#     SyntaxValidator,
-#     TestExecutor,
-# )
-
-
-# Stub implementations for validators (will be replaced by actual implementations)
-class SyntaxValidator:
-    """Stub for syntax validation"""
-
-    def validate(self, code):
-        return {"valid": True, "errors": []}
-
-
-class DependencyValidator:
-    """Stub for dependency validation"""
-
-    def validate(self, dependencies):
-        return {"valid": True, "issues": []}
-
-
-class TestExecutor:
-    """Stub for test execution"""
-
-    def execute(self, test_dir):
-        return {"passed": 0, "failed": 0, "skipped": 0}
-
+from socratic_agents.base import Agent
+from socratic_agents.events import EventType
+from socratic_agents.utils.validators import (
+    DependencyValidator,
+    SyntaxValidator,
+    TestExecutor,
+)
 
 logger = logging.getLogger("socrates.agents.code_validation_agent")
 

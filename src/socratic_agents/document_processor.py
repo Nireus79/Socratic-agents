@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Document processing for importing files into projects
 Extracts content from PDFs, text files, code files, pasted text, and web pages
@@ -11,7 +9,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
-# CodeParser is injected
+from socratic_agents.parsers import CodeParser
 from socratic_agents.utils.logger import get_logger
 
 from .base import Agent

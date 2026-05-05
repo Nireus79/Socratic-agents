@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Question Queue Agent - Manages question assignment and tracking for team projects.
 
@@ -11,52 +9,30 @@ Capabilities:
 - get_queue_status: Get overall queue status
 """
 
-import asyncio
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from .base import Agent
-
-if TYPE_CHECKING:
-    from .agent_bus import AgentBus
+from socratic_agents.base import Agent
 
 
 class QuestionQueueAgent(Agent):
     """Manages question queue for team projects with role-based assignment."""
 
-    def __init__(
-        self,
-        database_service: Optional[Any] = None,
-        llm_service: Optional[Any] = None,
-        vector_db_service: Optional[Any] = None,
-        file_service: Optional[Any] = None,
-        auth_service: Optional[Any] = None,
-        event_emitter_service: Optional[Any] = None,
-        agent_bus: Optional["AgentBus"] = None,
-    ):
+    def __init__(self, orchestrator):
         """Initialize question queue agent."""
-        super().__init__(
-            "QuestionQueue",
-            database_service=database_service,
-            llm_service=llm_service,
-            vector_db_service=vector_db_service,
-            file_service=file_service,
-            auth_service=auth_service,
-            event_emitter_service=event_emitter_service,
-            agent_bus=agent_bus,
-        )
+        super().__init__("QuestionQueue", orchestrator)
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process question queue requests (synchronous wrapper)."""
+        """Process question queue requests."""
         action = request.get("action")
 
         handlers = {
-            "add_question": self._add_question_sync,
-            "get_user_questions": self._get_user_questions_sync,
-            "answer_question": self._answer_question_sync,
-            "skip_question": self._skip_question_sync,
-            "get_queue_status": self._get_queue_status_sync,
+            "add_question": self._add_question,
+            "get_user_questions": self._get_user_questions,
+            "answer_question": self._answer_question,
+            "skip_question": self._skip_question,
+            "get_queue_status": self._get_queue_status,
         }
 
         handler = handlers.get(action)
@@ -69,39 +45,7 @@ class QuestionQueueAgent(Agent):
 
         return {"status": "error", "message": f"Unknown action: {action}"}
 
-    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process question queue requests asynchronously."""
-        action = request.get("action")
-
-        handlers = {
-            "add_question": self._add_question_async,
-            "get_user_questions": self._get_user_questions_async,
-            "answer_question": self._answer_question_async,
-            "skip_question": self._skip_question_async,
-            "get_queue_status": self._get_queue_status_async,
-        }
-
-        handler = handlers.get(action)
-        if handler:
-            try:
-                return await handler(request)
-            except Exception as e:
-                self.logger.error(f"Error in {action}: {str(e)}", exc_info=True)
-                return {"status": "error", "message": f"Failed to {action}: {str(e)}"}
-
-        return {"status": "error", "message": f"Unknown action: {action}"}
-
-    def _add_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Synchronous wrapper"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {"status": "error", "message": "Use process_async()"}
-        except RuntimeError:
-            pass
-        return asyncio.run(self._add_question_async(request))
-
-    async def _add_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _add_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Add question to queue with role-based assignment."""
         project_id = request.get("project_id")
         question = request.get("question")
@@ -109,8 +53,7 @@ class QuestionQueueAgent(Agent):
         project = request.get("project")
 
         if not project:
-            if self.database_service:
-                project = await self.database_service.load_project(project_id)
+            project = self.orchestrator.database.load_project(project_id)
 
         if not project:
             return {"status": "error", "message": "Project not found"}
@@ -187,25 +130,14 @@ class QuestionQueueAgent(Agent):
 
         return suggested_roles
 
-    def _get_user_questions_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Synchronous wrapper"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {"status": "error", "message": "Use process_async()"}
-        except RuntimeError:
-            pass
-        return asyncio.run(self._get_user_questions_async(request))
-
-    async def _get_user_questions_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_user_questions(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Get pending questions for a specific user."""
         project_id = request.get("project_id")
         username = request.get("username")
         project = request.get("project")
 
         if not project:
-            if self.database_service:
-                project = await self.database_service.load_project(project_id)
+            project = self.orchestrator.database.load_project(project_id)
 
         if not project:
             return {"status": "error", "message": "Project not found"}
@@ -219,17 +151,7 @@ class QuestionQueueAgent(Agent):
 
         return {"status": "success", "questions": user_questions, "total": len(user_questions)}
 
-    def _answer_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Synchronous wrapper"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {"status": "error", "message": "Use process_async()"}
-        except RuntimeError:
-            pass
-        return asyncio.run(self._answer_question_async(request))
-
-    async def _answer_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _answer_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Mark question as answered."""
         project_id = request.get("project_id")
         question_id = request.get("question_id")
@@ -238,8 +160,7 @@ class QuestionQueueAgent(Agent):
         project = request.get("project")
 
         if not project:
-            if self.database_service:
-                project = await self.database_service.load_project(project_id)
+            project = self.orchestrator.database.load_project(project_id)
 
         if not project:
             return {"status": "error", "message": "Project not found"}
@@ -265,25 +186,14 @@ class QuestionQueueAgent(Agent):
 
         return {"status": "success", "message": "Question marked as answered"}
 
-    def _skip_question_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Synchronous wrapper"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {"status": "error", "message": "Use process_async()"}
-        except RuntimeError:
-            pass
-        return asyncio.run(self._skip_question_async(request))
-
-    async def _skip_question_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _skip_question(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Skip a question."""
         project_id = request.get("project_id")
         question_id = request.get("question_id")
         project = request.get("project")
 
         if not project:
-            if self.database_service:
-                project = await self.database_service.load_project(project_id)
+            project = self.orchestrator.database.load_project(project_id)
 
         if not project:
             return {"status": "error", "message": "Project not found"}
@@ -307,24 +217,13 @@ class QuestionQueueAgent(Agent):
 
         return {"status": "success", "message": "Question skipped"}
 
-    def _get_queue_status_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Synchronous wrapper"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {"status": "error", "message": "Use process_async()"}
-        except RuntimeError:
-            pass
-        return asyncio.run(self._get_queue_status_async(request))
-
-    async def _get_queue_status_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_queue_status(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Get overall queue status."""
         project_id = request.get("project_id")
         project = request.get("project")
 
         if not project:
-            if self.database_service:
-                project = await self.database_service.load_project(project_id)
+            project = self.orchestrator.database.load_project(project_id)
 
         if not project:
             return {"status": "error", "message": "Project not found"}

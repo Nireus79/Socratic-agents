@@ -1,4 +1,9 @@
-"""Workflow optimization models"""
+"""
+Workflow optimization models for Quality Controller
+
+Provides data structures for workflow definition, path enumeration,
+cost/risk calculation, and approval workflow management.
+"""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -54,8 +59,8 @@ class WorkflowPath:
     """Complete path through workflow with calculated metrics"""
 
     path_id: str
-    nodes: List[str]
-    edges: List[str]
+    nodes: List[str]  # Ordered list of node IDs in this path
+    edges: List[str]  # Ordered list of edge IDs in this path
     total_cost_tokens: int = 0
     total_cost_usd: float = 0.0
     risk_score: float = 0.0
@@ -71,15 +76,15 @@ class WorkflowPath:
 
 @dataclass
 class WorkflowDefinition:
-    """Complete workflow graph definition"""
+    """Complete workflow graph definition with nodes, edges, and metadata"""
 
     workflow_id: str
     name: str
-    phase: str
-    nodes: Dict[str, WorkflowNode]
+    phase: str  # "discovery", "analysis", "design", "implementation"
+    nodes: Dict[str, WorkflowNode]  # node_id -> WorkflowNode
     edges: List[WorkflowEdge]
-    start_node: str
-    end_nodes: List[str]
+    start_node: str  # ID of start node
+    end_nodes: List[str]  # IDs of possible end nodes
     strategy: str = "balanced"
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -97,7 +102,7 @@ class WorkflowApprovalRequest:
     strategy: PathDecisionStrategy
     created_at: str
     requested_by: str
-    status: str = "pending"
+    status: str = "pending"  # "pending", "approved", "rejected"
     approved_path_id: Optional[str] = None
     approval_timestamp: Optional[str] = None
 
@@ -115,4 +120,4 @@ class WorkflowExecutionState:
     actual_tokens_used: int = 0
     estimated_tokens_remaining: int = 0
     started_at: str = ""
-    status: str = "active"
+    status: str = "active"  # "active", "completed", "paused"

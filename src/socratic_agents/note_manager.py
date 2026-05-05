@@ -1,16 +1,12 @@
-from __future__ import annotations
-
 """Note manager agent for handling project notes"""
 
 from typing import TYPE_CHECKING, Any, Dict
 
+from socratic_agents.base import Agent
 from socratic_agents.models import ProjectNote
 
-from .base import Agent
-from .events import EventType
-
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from socratic_agents.orchestration.orchestrator import AgentOrchestrator
 
 
 class NoteManagerAgent(Agent):
@@ -129,6 +125,7 @@ class NoteManagerAgent(Agent):
 
                         # Emit DOCUMENT_IMPORTED event for knowledge base
                         try:
+                            from socratic_agents.events import EventType
 
                             if self.orchestrator.event_emitter:
                                 self.orchestrator.event_emitter.emit(

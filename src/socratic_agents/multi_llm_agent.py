@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Multi-LLM Provider Agent - Unified LLM management and routing.
 
@@ -16,8 +14,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from .base import Agent
-from .models import (
+from socratic_agents.base import Agent
+from socratic_agents.models import (
     LLMProviderConfig,
     LLMUsageRecord,
     get_provider_metadata,

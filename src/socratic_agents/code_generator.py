@@ -1,36 +1,30 @@
-from __future__ import annotations
-
 """
 Code generation agent for Socrates AI
 """
 
-import asyncio
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from pathlib import Path
+from typing import Any, Dict
+
+from socratic_agents.models import ProjectContext
+from socratic_agents.utils.artifact_saver import ArtifactSaver
+from socratic_agents.utils.code_structure_analyzer import CodeStructureAnalyzer
+from socratic_agents.utils.multi_file_splitter import (
+    MultiFileCodeSplitter,
+    ProjectStructureGenerator,
+)
 
 from .base import Agent
-from .interfaces import DatabaseService, LLMService
-
-if TYPE_CHECKING:
-    from .agent_bus import AgentBus
 
 
 class CodeGeneratorAgent(Agent):
     """Generates code and documentation based on project context"""
 
-    def __init__(
-        self,
-        name: str = "CodeGenerator",
-        llm_service: Optional[LLMService] = None,
-        database_service: Optional[DatabaseService] = None,
-        agent_bus: Optional["AgentBus"] = None,
-    ):
-        """Initialize CodeGeneratorAgent with injected dependencies."""
-        super().__init__(name, agent_bus)
-        self.llm_service = llm_service
-        self.database_service = database_service
+    def __init__(self, orchestrator):
+        super().__init__("CodeGenerator", orchestrator)
+        self.current_user = None
 
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process code generation requests (synchronous wrapper)"""
+        """Process artifact generation requests"""
         action = request.get("action")
 
         if action == "generate_artifact":
@@ -43,55 +37,26 @@ class CodeGeneratorAgent(Agent):
 
         return {"status": "error", "message": "Unknown action"}
 
-    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process code generation requests asynchronously"""
-        action = request.get("action")
-
-        if action == "generate_artifact":
-            return await self._generate_artifact_async(request)
-        elif action == "generate_documentation":
-            return await self._generate_documentation_async(request)
-        # Legacy support
-        elif action == "generate_script":
-            return await self._generate_artifact_async(request)
-
-        return {"status": "error", "message": "Unknown action"}
-
     def _generate_artifact(self, request: Dict) -> Dict:
-        """Generate project-type-appropriate artifact (sync wrapper)"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {
-                    "status": "error",
-                    "message": "Use process_async() instead of process() in async context",
-                }
-        except RuntimeError:
-            pass
-
-        return asyncio.run(self._generate_artifact_async(request))
-
-    async def _generate_artifact_async(self, request: Dict) -> Dict:
         """Generate project-type-appropriate artifact"""
-        if not self.llm_service:
-            return {"status": "error", "message": "LLM service not configured"}
-
         project = request.get("project")
-
-        if not project:
-            return {"status": "error", "message": "Project is required"}
+        current_user = request.get("current_user")  # Extract current_user from request
 
         # Build comprehensive context
         context = self._build_generation_context(project)
 
         # Generate artifact based on project type
-        try:
-            artifact = await self.llm_service.generate_artifact(context, project.project_type)
-        except Exception as e:
-            self.log(f"ERROR: Failed to generate artifact: {str(e)}")
-            return {"status": "error", "message": f"Generation failed: {str(e)}"}
+        # Get user's auth method
+        user_auth_method = "api_key"
+        if current_user:
+            user_obj = self.orchestrator.database.load_user(current_user)
+            if user_obj and hasattr(user_obj, "claude_auth_method"):
+                user_auth_method = user_obj.claude_auth_method or "api_key"
+        artifact = self.orchestrator.claude_client.generate_artifact(
+            context, project.project_type, user_auth_method, user_id=current_user
+        )
 
-        # Determine artifact type
+        # Determine artifact type for documentation
         artifact_type_map = {
             "software": "code",
             "business": "business_plan",
@@ -104,35 +69,120 @@ class CodeGeneratorAgent(Agent):
 
         self.log(f"Generated {artifact_type} for {project.project_type} project '{project.name}'")
 
+        # Auto-save artifact to disk with multi-file organization
+        save_path = None
+        project_root = None
+        try:
+            data_dir = Path(self.orchestrator.config.data_dir)
+
+            # For code artifacts, split into multiple files
+            if artifact_type == "code" and project.project_type == "software":
+                self.log("Organizing code into multi-file structure...")
+
+                # Analyze code structure
+                analyzer = CodeStructureAnalyzer(artifact, language="python")
+                analysis = analyzer.analyze()
+                self.log(
+                    f"Analyzed code: {analysis['class_count']} classes, "
+                    f"{analysis['function_count']} functions"
+                )
+
+                # Split code into organized files
+                splitter = MultiFileCodeSplitter(
+                    artifact, language="python", project_type=project.project_type
+                )
+                file_structure = splitter.split()
+
+                # Create complete project structure
+                complete_structure = ProjectStructureGenerator.create_structure(
+                    project.name, file_structure, project.project_type
+                )
+
+                # Save multi-file project
+                success, project_root = ArtifactSaver.save_multi_file_project(
+                    file_structure=complete_structure,
+                    project_id=project.project_id,
+                    project_name=project.name,
+                    data_dir=data_dir,
+                )
+
+                if success:
+                    save_path = project_root
+                    file_count = len(complete_structure)
+                    self.log(
+                        f"Auto-saved {artifact_type} as multi-file project "
+                        f"({file_count} files) to {save_path}"
+                    )
+
+                    # NEW: Also save files to database for knowledge base integration
+                    self.log("Saving generated files to database...")
+                    try:
+                        from socratic_agents.database.project_file_manager import ProjectFileManager
+
+                        file_manager = ProjectFileManager(self.orchestrator.database.db_path)
+
+                        # Prepare files for batch insert
+                        files_to_save = []
+                        for file_path, content in complete_structure.items():
+                            language = self._detect_language(file_path)
+                            files_to_save.append(
+                                {
+                                    "path": file_path,
+                                    "content": content,
+                                    "language": language,
+                                    "size": len(content.encode("utf-8")),
+                                }
+                            )
+
+                        # Save all files to database
+                        if files_to_save:
+                            files_saved, save_msg = file_manager.save_files_batch(
+                                project.project_id, files_to_save
+                            )
+                            self.log(save_msg)
+                        else:
+                            self.log("No files to save to database")
+
+                    except Exception as e:
+                        self.log(f"WARNING: Failed to save generated files to database: {str(e)}")
+                        # Don't fail artifact generation if database save fails
+
+                else:
+                    self.log(f"WARNING: Failed to auto-save {artifact_type}")
+
+            else:
+                # For non-code artifacts, save as single file
+                success, save_path = ArtifactSaver.save_artifact(
+                    artifact=artifact,
+                    artifact_type=artifact_type,
+                    project_id=project.project_id,
+                    project_name=project.name,
+                    data_dir=data_dir,
+                    timestamp=True,
+                )
+                if success:
+                    self.log(f"Auto-saved {artifact_type} to {save_path}")
+                else:
+                    self.log(f"WARNING: Failed to auto-save {artifact_type}")
+
+        except Exception as e:
+            self.log(f"WARNING: Error auto-saving artifact: {e}")
+
         return {
             "status": "success",
             "artifact": artifact,
             "artifact_type": artifact_type,
             "script": artifact,  # Legacy compatibility
             "context_used": context,
+            "save_path": save_path,  # Include save path in response
+            "is_multi_file": project_root is not None,  # Indicate if multi-file project
         }
 
     def _generate_documentation(self, request: Dict) -> Dict:
-        """Generate documentation for artifact (sync wrapper)"""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                return {
-                    "status": "error",
-                    "message": "Use process_async() instead of process() in async context",
-                }
-        except RuntimeError:
-            pass
-
-        return asyncio.run(self._generate_documentation_async(request))
-
-    async def _generate_documentation_async(self, request: Dict) -> Dict:
         """Generate documentation for project artifact"""
-        if not self.llm_service:
-            return {"status": "error", "message": "LLM service not configured"}
-
         project = request.get("project")
-        artifact = request.get("artifact") or request.get("script")
+        artifact = request.get("artifact") or request.get("script")  # Support both
+        current_user = request.get("current_user")  # Extract current_user from request
 
         if not project:
             return {"status": "error", "message": "Project is required"}
@@ -148,19 +198,47 @@ class CodeGeneratorAgent(Agent):
         }
         artifact_type = artifact_type_map.get(project.project_type, "code")
 
+        # Log when artifact is missing (but still try to generate)
         if not artifact:
             self.log(f"WARNING: Generating {artifact_type} documentation without artifact")
 
+        # Get user's auth method
+        user_auth_method = "api_key"
+        if current_user:
+            user_obj = self.orchestrator.database.load_user(current_user)
+            if user_obj and hasattr(user_obj, "claude_auth_method"):
+                user_auth_method = user_obj.claude_auth_method or "api_key"
+
         try:
-            documentation = await self.llm_service.generate_documentation(
-                project, artifact, artifact_type
+            documentation = self.orchestrator.claude_client.generate_documentation(
+                project, artifact, artifact_type, user_auth_method=user_auth_method, user_id=current_user
             )
 
             self.log(f"Generated documentation for {artifact_type}")
 
+            # Auto-save documentation to disk
+            save_path = None
+            try:
+                data_dir = Path(self.orchestrator.config.data_dir)
+                success, save_path = ArtifactSaver.save_artifact(
+                    artifact=documentation,
+                    artifact_type="documentation",
+                    project_id=project.project_id,
+                    project_name=project.name,
+                    data_dir=data_dir,
+                    timestamp=True,
+                )
+                if success:
+                    self.log(f"Auto-saved documentation to {save_path}")
+                else:
+                    self.log("WARNING: Failed to auto-save documentation")
+            except Exception as save_err:
+                self.log(f"WARNING: Error auto-saving documentation: {save_err}")
+
             return {
                 "status": "success",
                 "documentation": documentation,
+                "save_path": save_path,  # Include save path in response
             }
         except Exception as e:
             self.log(f"ERROR: Failed to generate documentation: {e}")
@@ -169,7 +247,7 @@ class CodeGeneratorAgent(Agent):
                 "message": f"Documentation generation failed: {str(e)}",
             }
 
-    def _build_generation_context(self, project: Any) -> str:
+    def _build_generation_context(self, project: ProjectContext) -> str:
         """Build comprehensive context for code generation"""
         context_parts = [
             f"Project: {project.name}",
@@ -177,22 +255,79 @@ class CodeGeneratorAgent(Agent):
         ]
 
         # Add optional fields with safe defaults
-        if hasattr(project, "goals") and project.goals:
+        if project.goals:
             context_parts.append(f"Goals: {project.goals}")
 
-        if hasattr(project, "tech_stack") and project.tech_stack:
+        if project.tech_stack:
             context_parts.append(f"Tech Stack: {', '.join(project.tech_stack)}")
 
-        if hasattr(project, "requirements") and project.requirements:
+        if project.requirements:
             context_parts.append(f"Requirements: {', '.join(project.requirements)}")
 
-        if hasattr(project, "constraints") and project.constraints:
+        if project.constraints:
             context_parts.append(f"Constraints: {', '.join(project.constraints)}")
 
-        if hasattr(project, "deployment_target") and project.deployment_target:
+        if project.deployment_target:
             context_parts.append(f"Target: {project.deployment_target}")
 
-        if hasattr(project, "code_style") and project.code_style:
+        if project.code_style:
             context_parts.append(f"Style: {project.code_style}")
 
+        # Add conversation insights
+        if project.conversation_history:
+            recent_responses = project.conversation_history[-5:]
+            context_parts.append("Recent Discussion:")
+            for msg in recent_responses:
+                if msg.get("type") == "user":
+                    context_parts.append(f"- {msg['content']}")
+
         return "\n".join(context_parts)
+
+    def _detect_language(self, file_path: str) -> str:
+        """
+        Detect programming language from file extension.
+
+        Args:
+            file_path: Path to the file as string
+
+        Returns:
+            Language name or 'Unknown' if not recognized
+        """
+        ext_to_lang = {
+            ".py": "Python",
+            ".js": "JavaScript",
+            ".ts": "TypeScript",
+            ".jsx": "JSX",
+            ".tsx": "TSX",
+            ".java": "Java",
+            ".cpp": "C++",
+            ".c": "C",
+            ".cs": "C#",
+            ".rb": "Ruby",
+            ".go": "Go",
+            ".rs": "Rust",
+            ".php": "PHP",
+            ".swift": "Swift",
+            ".kt": "Kotlin",
+            ".scala": "Scala",
+            ".sh": "Shell",
+            ".bash": "Bash",
+            ".sql": "SQL",
+            ".html": "HTML",
+            ".css": "CSS",
+            ".scss": "SCSS",
+            ".less": "Less",
+            ".json": "JSON",
+            ".yaml": "YAML",
+            ".yml": "YAML",
+            ".xml": "XML",
+            ".md": "Markdown",
+            ".rst": "ReStructuredText",
+            ".txt": "Text",
+            ".toml": "TOML",
+            ".ini": "INI",
+            ".cfg": "Config",
+        }
+
+        file_ext = Path(file_path).suffix.lower()
+        return ext_to_lang.get(file_ext, "Unknown")

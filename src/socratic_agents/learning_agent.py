@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 User Learning Agent - Background learning and personalization.
 
@@ -21,28 +19,9 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict
 
-from socratic_agents.models import (
-    KnowledgeBaseDocument,
-    QuestionEffectiveness,
-    UserBehaviorPattern,
-)
-
-from .base import Agent
-
-# Optional: Try to import LearningEngine from socratic-learning package
-try:
-    from socratic_learning import LearningEngine
-except ImportError:
-    # If not available, provide a stub for testing
-    class LearningEngine:  # type: ignore
-        """Stub LearningEngine when socratic-learning not installed."""
-
-        def __init__(self, logger):
-            """Initialize stub learning engine."""
-            self.logger = logger
-            self.logger.warning(
-                "LearningEngine stub: Install socratic-learning for full functionality"
-            )
+from socratic_agents.base import Agent
+from socratic_agents.core.learning_engine import LearningEngine
+from socratic_agents.models import KnowledgeBaseDocument, QuestionEffectiveness, UserBehaviorPattern
 
 
 class UserLearningAgent(Agent):

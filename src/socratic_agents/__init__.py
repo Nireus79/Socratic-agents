@@ -158,7 +158,7 @@ except ImportError:
 
 # GitHub sync utilities
 # Phase 3 - Configuration
-from .config import AgentConfig, GovernanceConfig, OrchestratorConfig
+from .config import SocratesConfig
 from .github_sync_handler import (
     ConflictResolutionError,
     FileSizeExceededError,
@@ -181,7 +181,5 @@ __all__ += [
     "NetworkSyncFailedError",
     "FileSizeExceededError",
     # Configuration
-    "GovernanceConfig",
-    "AgentConfig",
-    "OrchestratorConfig",
+    "SocratesConfig",
 ]

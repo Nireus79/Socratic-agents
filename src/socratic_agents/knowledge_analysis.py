@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """
 Knowledge Analysis Agent for dynamic knowledge-based question regeneration
 
@@ -14,11 +12,11 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict
 
-from .base import Agent
-from .events import EventType
+from socratic_agents.base import Agent
+from socratic_agents.events import EventType
 
 if TYPE_CHECKING:
-    from .orchestrator import AgentOrchestrator
+    from socratic_agents.orchestration.orchestrator import AgentOrchestrator
 
 
 class KnowledgeAnalysisAgent(Agent):

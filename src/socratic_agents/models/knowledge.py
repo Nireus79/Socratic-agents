@@ -1,4 +1,6 @@
-"""Knowledge entry model for Socratic Agents"""
+"""
+Knowledge entry model for Socrates AI
+"""
 
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
