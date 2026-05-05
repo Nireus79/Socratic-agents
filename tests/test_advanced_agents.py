@@ -216,7 +216,7 @@ class TestLLMConfiguration:
                 "temperature": 0.8,
                 "max_tokens": 1000,
                 "timeout": 60,
-            }
+            },
         )
 
         assert config.settings.get("temperature") == 0.8

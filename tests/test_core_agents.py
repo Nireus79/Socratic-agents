@@ -223,11 +223,7 @@ class TestLLMModels:
     def test_llm_provider_config_validation(self):
         """Test provider config requires id and user_id."""
         # Valid config with required fields
-        config = LLMProviderConfig(
-            id="config-1",
-            provider="claude",
-            user_id="user-1"
-        )
+        config = LLMProviderConfig(id="config-1", provider="claude", user_id="user-1")
         assert config.id == "config-1"
         assert config.user_id == "user-1"
 
@@ -236,7 +232,7 @@ class TestLLMModels:
             id="config-2",
             provider="openai",
             user_id="user-2",
-            settings={"model": "gpt-4", "temperature": 0.5}
+            settings={"model": "gpt-4", "temperature": 0.5},
         )
         assert config_with_settings.settings["model"] == "gpt-4"
         assert config_with_settings.settings["temperature"] == 0.5
