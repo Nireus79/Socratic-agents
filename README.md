@@ -8,7 +8,7 @@
 
 **Socratic Agents** is a collection of 19+ specialized agents that handle complex tasks like Socratic questioning, code generation, project management, quality control, learning, and conflict resolution.
 
-The library is being **refactored for complete independence** - agents use dependency injection instead of tight coupling to a monolith, enabling use in diverse deployment scenarios.
+The library uses **service-based architecture with dependency injection** - agents are decoupled from any monolithic system, enabling flexible use in diverse deployment scenarios.
 
 **Key Features**:
 - Service-based architecture with dependency injection
