@@ -1,5 +1,9 @@
 """
-Base Agent class for Socrates AI
+Base Agent class for Socrates AI with service injection support.
+
+Agents can be initialized in two ways:
+1. Service Injection (Recommended): Pass individual services for loose coupling
+2. Orchestrator (Legacy): Pass orchestrator for backward compatibility
 """
 
 import asyncio
@@ -12,33 +16,80 @@ from socratic_agents.events import EventType
 
 if TYPE_CHECKING:
     from socratic_agents.orchestration.orchestrator import AgentOrchestrator
+    from socratic_agents.services.base import (
+        ConfigService,
+        DatabaseService,
+        EventEmitterService,
+        LLMService,
+        VectorDatabaseService,
+    )
 
 
 class Agent(ABC):
     """
     Abstract base class for all agents in the Socrates AI.
 
-    Agents are specialized components that handle different aspects of
-    the system (project management, questioning, code generation, etc.).
+    Supports both service injection (recommended) and orchestrator-based initialization
+    for backward compatibility.
 
-    All agents are capable of:
-    - Synchronous request processing
-    - Asynchronous request processing (default wraps sync)
-    - Event-based logging (replaces print statements)
-    - Structured error handling
+    Service-Injected Initialization:
+        agent = MyAgent(
+            name="MyAgent",
+            database=db_service,
+            llm=llm_service,
+            vector_db=vector_service,
+            config=config_service,
+            event_emitter=event_service
+        )
+
+    Legacy Orchestrator Initialization (backward compatible):
+        agent = MyAgent(name="MyAgent", orchestrator=orchestrator)
     """
 
-    def __init__(self, name: str, orchestrator: "AgentOrchestrator"):
+    def __init__(
+        self,
+        name: str,
+        orchestrator: Optional["AgentOrchestrator"] = None,
+        database: Optional["DatabaseService"] = None,
+        llm: Optional["LLMService"] = None,
+        vector_db: Optional["VectorDatabaseService"] = None,
+        config: Optional["ConfigService"] = None,
+        event_emitter: Optional["EventEmitterService"] = None,
+    ):
         """
-        Initialize an agent.
+        Initialize an agent with either services or orchestrator.
 
         Args:
             name: Display name for the agent
-            orchestrator: Reference to the AgentOrchestrator for accessing other agents/services
+            orchestrator: (Legacy) AgentOrchestrator for backward compatibility
+            database: DatabaseService for database operations
+            llm: LLMService for LLM operations
+            vector_db: VectorDatabaseService for vector operations
+            config: ConfigService for configuration
+            event_emitter: EventEmitterService for event handling
         """
         self.name = name
-        self.orchestrator = orchestrator
         self.logger = logging.getLogger(f"socrates.agents.{name}")
+
+        # Support both service injection and orchestrator patterns
+        if orchestrator is not None:
+            # Legacy: Extract services from orchestrator
+            self.orchestrator = orchestrator
+            self.database = orchestrator.database if hasattr(orchestrator, "database") else database
+            self.llm = orchestrator.claude_client if hasattr(orchestrator, "claude_client") else llm
+            self.vector_db = orchestrator.vector_db if hasattr(orchestrator, "vector_db") else vector_db
+            self.config = orchestrator.config if hasattr(orchestrator, "config") else config
+            self.event_emitter = (
+                orchestrator.event_emitter if hasattr(orchestrator, "event_emitter") else event_emitter
+            )
+        else:
+            # New: Direct service injection
+            self.orchestrator = None
+            self.database = database
+            self.llm = llm
+            self.vector_db = vector_db
+            self.config = config
+            self.event_emitter = event_emitter
 
     @abstractmethod
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
@@ -81,7 +132,7 @@ class Agent(ABC):
         Emit a structured log event and write to logger.
 
         Replaces direct print statements with event emission for better integration
-        with plugins and UI systems.
+        with plugins and UI systems. Works with both service injection and orchestrator patterns.
 
         Args:
             message: The message to log
@@ -111,17 +162,23 @@ class Agent(ABC):
         # Log to Python logger
         logger_method(f"{self.name}: {message}")
 
-        # Emit structured event
-        self.orchestrator.event_emitter.emit(
-            event_type,
-            {"agent": self.name, "message": message, "timestamp": datetime.now().isoformat()},
-        )
+        # Emit structured event (if event_emitter is available)
+        event_emitter = self.event_emitter
+        if event_emitter is None and self.orchestrator is not None:
+            event_emitter = self.orchestrator.event_emitter
+
+        if event_emitter is not None:
+            event_emitter.emit(
+                event_type,
+                {"agent": self.name, "message": message, "timestamp": datetime.now().isoformat()},
+            )
 
     def emit_event(self, event_type: EventType, data: Optional[Dict[str, Any]] = None) -> None:
         """
-        Emit a structured event through the orchestrator's event emitter.
+        Emit a structured event through the event emitter.
 
         Allows agents to emit domain-specific events (e.g., CODE_GENERATED, CONFLICT_DETECTED).
+        Works with both service injection and orchestrator patterns.
 
         Args:
             event_type: The type of event to emit
@@ -137,7 +194,13 @@ class Agent(ABC):
         if "agent" not in data:
             data["agent"] = self.name
 
-        self.orchestrator.event_emitter.emit(event_type, data)
+        # Emit through available event emitter
+        event_emitter = self.event_emitter
+        if event_emitter is None and self.orchestrator is not None:
+            event_emitter = self.orchestrator.event_emitter
+
+        if event_emitter is not None:
+            event_emitter.emit(event_type, data)
 
     def suggest_knowledge_addition(
         self,
