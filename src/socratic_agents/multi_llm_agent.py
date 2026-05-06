@@ -110,27 +110,27 @@ class MultiLLMAgent(Agent):
             for provider in providers:
                 # Transform backend provider metadata to frontend format
                 provider_dict = {
-                    "name": provider.name,
+                    "name": provider.provider,
                     "label": provider.display_name,
                     "models": provider.models,
                     "requires_api_key": provider.requires_api_key,
-                    "description": getattr(provider, "description", ""),
+                    "description": provider.description,
                     "cost_per_1k_input_tokens": provider.cost_per_1k_input_tokens,
                     "cost_per_1k_output_tokens": provider.cost_per_1k_output_tokens,
-                    "context_window": provider.max_context_tokens,
+                    "context_window": provider.context_window,
                     "supports_streaming": provider.supports_streaming,
                     "supports_vision": provider.supports_vision,
-                    "available": True,
-                    "auth_methods": getattr(provider, "auth_methods", ["api_key"]),
+                    "available": provider.available,
+                    "auth_methods": provider.auth_methods,
                 }
 
                 # Check if user has configured this provider (has API key)
                 if user_id:
                     try:
-                        api_key = self.orchestrator.database.get_api_key(user_id, provider.name)
+                        api_key = self.orchestrator.database.get_api_key(user_id, provider.provider)
                         provider_dict["is_configured"] = api_key is not None
                     except Exception as e:
-                        self.logger.debug(f"Error checking API key for {provider.name}: {e}")
+                        self.logger.debug(f"Error checking API key for {provider.provider}: {e}")
                         provider_dict["is_configured"] = False
                 else:
                     # If no user_id provided, assume not configured
