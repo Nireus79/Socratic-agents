@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
@@ -40,7 +40,7 @@ class LLMUsageRecord:
     output_tokens: int
     total_tokens: int
     cost_usd: float
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     request_id: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -128,14 +128,15 @@ def get_provider_metadata(provider: str) -> ProviderMetadata:
     return metadata_map[provider]
 
 
-def list_available_providers() -> List[str]:
+def list_available_providers() -> List[ProviderMetadata]:
     """
     List all available LLM providers.
 
     Returns:
-        List of provider names
+        List of ProviderMetadata objects for all available providers
     """
-    return ["claude", "openai", "gemini", "ollama"]
+    provider_names = ["claude", "openai", "gemini", "ollama"]
+    return [get_provider_metadata(name) for name in provider_names]
 
 
 __all__ = [
