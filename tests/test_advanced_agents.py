@@ -199,7 +199,9 @@ class TestLLMConfiguration:
     def test_provider_metadata_consistency(self):
         """Test that provider metadata is consistent."""
         for provider in list_available_providers():
-            metadata = provider  # provider is already ProviderMetadata from list_available_providers()
+            metadata = (
+                provider  # provider is already ProviderMetadata from list_available_providers()
+            )
 
             # metadata.provider is a string, provider is ProviderMetadata
             assert isinstance(metadata.provider, str)
