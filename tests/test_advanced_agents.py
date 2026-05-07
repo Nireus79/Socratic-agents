@@ -7,7 +7,6 @@ from socratic_agents import (
     EventType,
     LLMProviderConfig,
     LLMUsageRecord,
-    get_provider_metadata,
     list_available_providers,
 )
 from socratic_agents.knowledge_manager import KnowledgeManagerAgent
