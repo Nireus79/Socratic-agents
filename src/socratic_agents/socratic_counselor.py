@@ -112,9 +112,10 @@ class SocraticCounselorAgent(Agent):
 
         import datetime
 
-        # Check if workflow optimization is enabled for this project
-        if self._should_use_workflow_optimization(project):
-            return self._generate_question_with_workflow(project, current_user)
+        # DISABLED: Workflow optimization disabled to ensure single question per generation
+        # Reason: Bulk question generation breaks the single-question-per-generation workflow
+        # if self._should_use_workflow_optimization(project):
+        #     return self._generate_question_with_workflow(project, current_user)
 
         # HYBRID APPROACH: Check for existing unanswered question before generating new one
         # This prevents double question generation (unless force_refresh is set)
@@ -2048,7 +2049,7 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
 
             # Save and re-generate question from new node
             self.database.save_project(project)
-            return self._generate_question_with_workflow(project, "system")
+            # DISABLED: return self._generate_question_with_workflow(project, "system")
 
         except Exception as e:
             logging.error(f"Unexpected error advancing workflow node: {type(e).__name__}: {e}")

@@ -267,10 +267,11 @@ class TestLLMModels:
         """Test listing available providers."""
         providers = list_available_providers()
         assert isinstance(providers, list)
-        assert "claude" in providers
-        assert "openai" in providers
-        assert "gemini" in providers
-        assert "ollama" in providers
+        provider_names = [p.provider for p in providers]
+        assert "claude" in provider_names
+        assert "openai" in provider_names
+        assert "gemini" in provider_names
+        assert "ollama" in provider_names
 
     def test_get_invalid_provider(self):
         """Test getting metadata for invalid provider."""

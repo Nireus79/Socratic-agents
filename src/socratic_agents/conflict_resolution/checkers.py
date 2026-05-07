@@ -98,6 +98,12 @@ class RequirementsConflictChecker(ConflictChecker):
         if not self.orchestrator:
             return []
 
+        # Safety check: ensure claude_client and client are properly initialized
+        if not self.orchestrator.claude_client:
+            return []
+        if not self.orchestrator.claude_client.client:
+            return []
+
         try:
             prompt = f"""Analyze if this new {field_type} item conflicts with existing {field_type}.
 
@@ -186,6 +192,12 @@ class GoalsConflictChecker(ConflictChecker):
         if not self.orchestrator:
             return []
 
+        # Safety check: ensure claude_client and client are properly initialized
+        if not self.orchestrator.claude_client:
+            return []
+        if not self.orchestrator.claude_client.client:
+            return []
+
         try:
             prompt = f"""Analyze if these goals conflict or contradict each other.
 
@@ -256,6 +268,12 @@ class ConstraintsConflictChecker(ConflictChecker):
     ) -> List[Dict]:
         """Use Claude to detect semantic conflicts in constraints"""
         if not self.orchestrator:
+            return []
+
+        # Safety check: ensure claude_client and client are properly initialized
+        if not self.orchestrator.claude_client:
+            return []
+        if not self.orchestrator.claude_client.client:
             return []
 
         try:
