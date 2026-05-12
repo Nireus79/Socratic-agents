@@ -9,8 +9,6 @@
 
 Socratic Agents is a collection of 19+ specialized agents designed to operate within the Socrates monolith. The agents work together through a centralized orchestrator to handle complex AI workflows.
 
-⚠️ **Important**: This library is tightly coupled to Socrates internals. It is NOT designed for standalone use.
-
 ---
 
 ## Design Principles
