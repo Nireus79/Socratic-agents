@@ -1,5 +1,11 @@
 # Socratic Agents
 
+[![PyPI](https://img.shields.io/pypi/v/socratic-agents.svg)](https://pypi.org/project/socratic-agents/)
+[![Downloads](https://img.shields.io/pypi/dm/socratic-agents.svg)](https://pypi.org/project/socratic-agents/)
+[![GitHub](https://img.shields.io/github/stars/Nireus79/Socratic-agents.svg?style=social)](https://github.com/Nireus79/Socratic-agents)
+[![License](https://img.shields.io/github/license/Nireus79/Socratic-agents.svg)](LICENSE)
+
+
 **Socratic Agents** - Independent multi-agent framework designed for standalone use with optional Constitutional AI governance integration.
 
 ---
@@ -238,3 +244,34 @@ MIT License - See [LICENSE](LICENSE) for details.
 **This library is part of the Socrates AI platform**
 
 Made by [@Nireus79](https://github.com/Nireus79)
+
+
+---
+
+## Part of Socrates AI Ecosystem
+
+This package is a component of [**Socrates AI**](https://github.com/Nireus79/Socrates), a production-ready platform for building intelligent multi-agent systems with constitutional governance.
+
+### Use This Package Standalone:
+```bash
+pip install socratic-agents
+```
+
+### Or As Part of Socrates Platform:
+```bash
+pip install socrates-ai  # Includes 37+ modules + all 11 packages
+```
+
+### Integration Example:
+
+See the [**Socrates ECOSYSTEM.md**](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md#layer-2-specialized-libraries) for detailed integration examples showing how to use socratic-agents with other Socratic packages.
+
+**Related packages you might use together:**
+- See [Complete Package Map](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
+
+### More Information:
+- 📖 [Full Socrates Documentation](https://github.com/Nireus79/Socrates/tree/main/docs)
+- 🏗️ [Complete Architecture Guide](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
+- 💬 [Socrates Discussions](https://github.com/Nireus79/Socrates/discussions)
+
+---
