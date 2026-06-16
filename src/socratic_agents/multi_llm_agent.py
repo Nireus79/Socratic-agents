@@ -333,7 +333,7 @@ class MultiLLMAgent(Agent):
                     "enabled": config.enabled,
                     "settings": config.settings,
                     "updated_at": config.updated_at.isoformat() if config.updated_at else None,
-                }
+                },
             )
 
             self.logger.info(f"Set default provider to {provider} for user {user_id}")
@@ -421,7 +421,7 @@ class MultiLLMAgent(Agent):
                     "enabled": config.enabled,
                     "settings": config.settings,
                     "updated_at": config.updated_at.isoformat() if config.updated_at else None,
-                }
+                },
             )
 
             self.logger.info(f"Set model {model} for provider {provider} for user {user_id}")
