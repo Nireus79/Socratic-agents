@@ -58,7 +58,7 @@ class ProjectManagerAgent(Agent):
         return {"status": "error", "message": "Unknown action"}
 
     def _create_project(self, request: Dict) -> Dict:
-        """Create a new project with quota checking"""
+        """Create a new project"""
         project_name = request.get("project_name")
         owner = request.get("owner")
         project_type = request.get("project_type", "software")  # Default to software
@@ -76,12 +76,9 @@ class ProjectManagerAgent(Agent):
                 "message": "owner is required to create a project",
             }
 
-        # NEW: Check project limit
-        from socratic_agents.subscription.checker import SubscriptionChecker
-
+        # Ensure user exists (for automation/testing)
         user = self.orchestrator.database.load_user(owner)
 
-        # Create user if they don't exist (for automation/testing)
         if user is None:
             from socratic_agents.models.user import User
 
@@ -90,25 +87,13 @@ class ProjectManagerAgent(Agent):
 
             user = User(
                 username=owner,
-                email=unique_email,  # UUID-based email for system-created users
-                passcode_hash="",  # Empty hash - will need password reset to use UI
+                email=unique_email,
+                passcode_hash="",
                 created_at=datetime.datetime.now(),
                 projects=[],
-                subscription_tier="free",  # Default to free tier for auto-created users (enforces project limits)
+                subscription_tier="free",
             )
             self.orchestrator.database.save_user(user)
-
-        # Count only OWNED projects for tier limit, not collaborated projects
-        all_projects = self.orchestrator.database.get_user_projects(owner)
-        owned_projects = [p for p in all_projects if p.owner == owner and not p.is_archived]
-        active_count = len(owned_projects)
-
-        can_create, error_message = SubscriptionChecker.check_project_limit(user, active_count)
-        if not can_create:
-            return {
-                "status": "error",
-                "message": error_message,
-            }
 
         # Use unified ProjectIDGenerator for consistent IDs across CLI and API
         project_id = ProjectIDGenerator.generate(owner)
@@ -299,11 +284,8 @@ class ProjectManagerAgent(Agent):
                 repo_owner, repo_name = self._parse_repo_info(github_url)
                 final_project_name = project_name or repo_name
 
-                # Validate user and subscription
-                user = self._get_or_create_user(owner)
-                subscription_error = self._validate_subscription(user, owner)
-                if subscription_error:
-                    return subscription_error
+                # Ensure user exists
+                self._get_or_create_user(owner)
 
                 # Run code validation
                 validation_result = self._run_code_validation(temp_path)
@@ -386,19 +368,6 @@ class ProjectManagerAgent(Agent):
             )
             self.orchestrator.database.save_user(user)
         return user
-
-    def _validate_subscription(self, user, owner: str) -> Dict:
-        """Validate user subscription allows project creation"""
-        from socratic_agents.subscription.checker import SubscriptionChecker
-
-        # Count only OWNED projects for tier limit, not collaborated projects
-        all_projects = self.orchestrator.database.get_user_projects(owner)
-        owned_projects = [p for p in all_projects if p.owner == owner and not p.is_archived]
-        active_count = len(owned_projects)
-        can_create, error_message = SubscriptionChecker.check_project_limit(user, active_count)
-        if not can_create:
-            return {"status": "error", "message": error_message}
-        return None
 
     def _run_code_validation(self, temp_path: str) -> Dict:
         """Run code validation on project"""
@@ -518,7 +487,7 @@ class ProjectManagerAgent(Agent):
         return {"status": "success"}
 
     def _add_collaborator(self, request: Dict) -> Dict:
-        """Add a collaborator to a project with team size checking"""
+        """Add a collaborator to a project"""
         project = request.get("project")
         username = request.get("username")
         role = request.get("role", "creator")  # Default to creator role
@@ -528,21 +497,6 @@ class ProjectManagerAgent(Agent):
             return {
                 "status": "error",
                 "message": f"Invalid role: {role}. Valid roles: {', '.join(VALID_ROLES)}",
-            }
-
-        # NEW: Check team member limit
-        from socratic_agents.subscription.checker import SubscriptionChecker
-
-        user = self.orchestrator.database.load_user(project.owner)
-        current_team_size = len(project.team_members or [])
-
-        can_add, error_message = SubscriptionChecker.check_team_member_limit(
-            user, current_team_size
-        )
-        if not can_add:
-            return {
-                "status": "error",
-                "message": error_message,
             }
 
         # Check if user already in team_members
