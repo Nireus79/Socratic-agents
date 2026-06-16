@@ -324,7 +324,17 @@ class MultiLLMAgent(Agent):
             self.orchestrator.database.unset_other_default_providers(user_id, provider)
 
             # Save config
-            self.orchestrator.database.save_llm_config(config)
+            self.orchestrator.database.save_llm_config(
+                user_id=user_id,
+                provider=provider,
+                config_data={
+                    "id": config.id,
+                    "is_default": config.is_default,
+                    "enabled": config.enabled,
+                    "settings": config.settings,
+                    "updated_at": config.updated_at.isoformat() if config.updated_at else None,
+                }
+            )
 
             self.logger.info(f"Set default provider to {provider} for user {user_id}")
 
@@ -402,7 +412,17 @@ class MultiLLMAgent(Agent):
                 self.logger.debug(f"Created new config for {provider}")
 
             # Save config
-            self.orchestrator.database.save_llm_config(config)
+            self.orchestrator.database.save_llm_config(
+                user_id=user_id,
+                provider=provider,
+                config_data={
+                    "id": config.id,
+                    "is_default": config.is_default,
+                    "enabled": config.enabled,
+                    "settings": config.settings,
+                    "updated_at": config.updated_at.isoformat() if config.updated_at else None,
+                }
+            )
 
             self.logger.info(f"Set model {model} for provider {provider} for user {user_id}")
 
