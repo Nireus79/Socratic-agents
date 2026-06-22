@@ -255,19 +255,19 @@ class TestLLMModels:
     def test_get_provider_metadata(self):
         """Test getting provider metadata."""
         claude_metadata = get_provider_metadata("claude")
-        assert claude_metadata.provider == "claude"
+        assert claude_metadata.name == "claude"
         assert isinstance(claude_metadata, ProviderMetadata)
         assert len(claude_metadata.models) > 0
         assert claude_metadata.supports_vision is True
 
         openai_metadata = get_provider_metadata("openai")
-        assert openai_metadata.provider == "openai"
+        assert openai_metadata.name == "openai"
 
     def test_list_available_providers(self):
         """Test listing available providers."""
         providers = list_available_providers()
         assert isinstance(providers, list)
-        provider_names = [p.provider for p in providers]
+        provider_names = [p.name for p in providers]
         assert "claude" in provider_names
         assert "openai" in provider_names
         assert "gemini" in provider_names

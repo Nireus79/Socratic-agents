@@ -193,7 +193,7 @@ class TestLLMConfiguration:
 
         expected = ["claude", "openai", "gemini", "ollama"]
         for provider in expected:
-            assert provider in [p.provider for p in providers]
+            assert provider in [p.name for p in providers]
 
     def test_provider_metadata_consistency(self):
         """Test that provider metadata is consistent."""
@@ -202,8 +202,8 @@ class TestLLMConfiguration:
                 provider  # provider is already ProviderMetadata from list_available_providers()
             )
 
-            # metadata.provider is a string, provider is ProviderMetadata
-            assert isinstance(metadata.provider, str)
+            # metadata.name is a string, metadata is ProviderMetadata
+            assert isinstance(metadata.name, str)
             assert len(metadata.models) > 0
             assert metadata.models[0] is not None
             assert metadata.models[0] in metadata.models
