@@ -128,13 +128,13 @@ class LLMUsageRecord:
 class ProviderMetadata:
     """Metadata about available LLM providers."""
 
-    provider: str
+    name: str
     display_name: str
     models: List[str]
     requires_api_key: bool
     cost_per_1k_input_tokens: float
     cost_per_1k_output_tokens: float
-    context_window: int
+    max_context_tokens: int
     supports_streaming: bool = True
     supports_vision: bool = False
     available: bool = True
@@ -155,7 +155,7 @@ class ProviderMetadata:
 # Predefined provider metadata
 PROVIDER_METADATA = {
     "claude": ProviderMetadata(
-        provider="claude",
+        name="claude",
         display_name="Anthropic Claude",
         models=[
             "claude-haiku-4-5-20251001",
@@ -168,7 +168,7 @@ PROVIDER_METADATA = {
         requires_api_key=False,  # Uses environment variable
         cost_per_1k_input_tokens=0.000800,  # Haiku: $0.80 per 1M input
         cost_per_1k_output_tokens=0.004000,  # Haiku: $4.00 per 1M output
-        context_window=200000,
+        max_context_tokens=200000,
         supports_streaming=True,
         supports_vision=True,
         available=True,
@@ -176,39 +176,39 @@ PROVIDER_METADATA = {
         auth_methods=["subscription", "api_key"],  # Support both subscription and API key
     ),
     "openai": ProviderMetadata(
-        provider="openai",
+        name="openai",
         display_name="OpenAI",
         models=["gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
         requires_api_key=True,
         cost_per_1k_input_tokens=0.01,
         cost_per_1k_output_tokens=0.03,
-        context_window=128000,
+        max_context_tokens=128000,
         supports_streaming=True,
         supports_vision=True,
         available=True,
         description="Advanced OpenAI GPT models",
     ),
     "gemini": ProviderMetadata(
-        provider="gemini",
+        name="gemini",
         display_name="Google Gemini",
         models=["gemini-pro", "gemini-pro-vision"],
         requires_api_key=True,
         cost_per_1k_input_tokens=0.0005,
         cost_per_1k_output_tokens=0.0015,
-        context_window=32000,
+        max_context_tokens=32000,
         supports_streaming=True,
         supports_vision=True,
         available=True,
         description="Google's Gemini models",
     ),
     "ollama": ProviderMetadata(
-        provider="ollama",
+        name="ollama",
         display_name="Ollama (Local)",
         models=["llama2", "mistral", "neural-chat", "orca-mini"],
         requires_api_key=False,
         cost_per_1k_input_tokens=0.0,
         cost_per_1k_output_tokens=0.0,
-        context_window=8000,
+        max_context_tokens=8000,
         supports_streaming=True,
         supports_vision=False,
         available=True,
