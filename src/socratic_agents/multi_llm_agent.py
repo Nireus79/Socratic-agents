@@ -71,6 +71,25 @@ class MultiLLMAgent(Agent):
 
         return {"status": "error", "message": f"Unknown action: {action}"}
 
+    def _ensure_config_object(self, config):
+        """
+        Convert dict to LLMProviderConfig object if needed.
+
+        Database returns provider configs as flattened dicts, but MultiLLMAgent
+        methods expect LLMProviderConfig objects with methods like to_dict().
+
+        Args:
+            config: dict or LLMProviderConfig object
+
+        Returns:
+            LLMProviderConfig object or None
+        """
+        if not config:
+            return None
+        if isinstance(config, dict):
+            return LLMProviderConfig.from_dict(config)
+        return config
+
     # ============================================================================
     # Provider Information
     # ============================================================================
@@ -242,24 +261,14 @@ class MultiLLMAgent(Agent):
                     "note": "Using default Claude configuration",
                 }
 
-            # Handle both dict and object configs
-            provider_dicts = []
-            for c in configs:
-                if isinstance(c, dict):
-                    provider_dicts.append(c)
-                else:
-                    provider_dicts.append(c.to_dict())
-            # Get default provider (handle both dict and object configs)
-            default_provider = "claude"
-            for c in configs:
-                is_default = c.get("is_default") if isinstance(c, dict) else getattr(c, "is_default", False)
-                if is_default:
-                    default_provider = c.get("provider") if isinstance(c, dict) else c.provider
-                    break
+            # Convert all configs to objects, then to dicts
+            config_objects = [self._ensure_config_object(c) for c in configs]
+            provider_dicts = [c.to_dict() for c in config_objects if c]
 
-            if default_provider == "claude" and configs:
-                first_config = configs[0]
-                default_provider = first_config.get("provider") if isinstance(first_config, dict) else first_config.provider
+            default_provider = next(
+                (c.provider for c in config_objects if c and c.is_default),
+                config_objects[0].provider if config_objects and config_objects[0] else "claude",
+            )
 
             return {
                 "status": "success",
