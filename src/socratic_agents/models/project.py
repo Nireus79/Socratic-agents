@@ -275,15 +275,21 @@ class ProjectContext:
         """Deserialize ProjectContext from dictionary."""
         data = dict(data)
         # Convert ISO strings to datetime objects
-        datetime_fields = ['created_at', 'updated_at', 'archived_at', 'repository_imported_at', 'last_export_time']
+        datetime_fields = [
+            "created_at",
+            "updated_at",
+            "archived_at",
+            "repository_imported_at",
+            "last_export_time",
+        ]
         for field in datetime_fields:
             if field in data and isinstance(data[field], str):
                 data[field] = datetime.datetime.fromisoformat(data[field])
         # Handle team_members which are TeamMemberRole objects
-        if 'team_members' in data and data['team_members']:
-            data['team_members'] = [
+        if "team_members" in data and data["team_members"]:
+            data["team_members"] = [
                 TeamMemberRole.from_dict(m) if isinstance(m, dict) else m
-                for m in data['team_members']
+                for m in data["team_members"]
             ]
         return ProjectContext(**data)
 
@@ -305,9 +311,8 @@ class ProjectContext:
         data = convert_datetimes(data)
 
         # Handle team_members serialization
-        if 'team_members' in data and data['team_members']:
-            data['team_members'] = [
-                m.to_dict() if hasattr(m, 'to_dict') else m
-                for m in data['team_members']
+        if "team_members" in data and data["team_members"]:
+            data["team_members"] = [
+                m.to_dict() if hasattr(m, "to_dict") else m for m in data["team_members"]
             ]
         return data

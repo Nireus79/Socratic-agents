@@ -58,10 +58,10 @@ class PhaseMaturity:
         """Deserialize from dictionary."""
         data = dict(data)
         # Convert category_scores dict to CategoryScore objects if needed
-        if 'category_scores' in data and data['category_scores']:
-            data['category_scores'] = {
+        if "category_scores" in data and data["category_scores"]:
+            data["category_scores"] = {
                 k: CategoryScore.from_dict(v) if isinstance(v, dict) else v
-                for k, v in data['category_scores'].items()
+                for k, v in data["category_scores"].items()
             }
         return PhaseMaturity(**data)
 
@@ -69,10 +69,10 @@ class PhaseMaturity:
         """Serialize to dictionary."""
         data = asdict(self)
         # Convert CategoryScore objects to dicts
-        if 'category_scores' in data and data['category_scores']:
-            data['category_scores'] = {
-                k: v.to_dict() if hasattr(v, 'to_dict') else v
-                for k, v in data['category_scores'].items()
+        if "category_scores" in data and data["category_scores"]:
+            data["category_scores"] = {
+                k: v.to_dict() if hasattr(v, "to_dict") else v
+                for k, v in data["category_scores"].items()
             }
         return data
 
@@ -93,13 +93,13 @@ class MaturityEvent:
     def from_dict(data: dict) -> "MaturityEvent":
         """Deserialize from dictionary."""
         data = dict(data)
-        if 'timestamp' in data and isinstance(data['timestamp'], str):
-            data['timestamp'] = datetime.fromisoformat(data['timestamp'])
+        if "timestamp" in data and isinstance(data["timestamp"], str):
+            data["timestamp"] = datetime.fromisoformat(data["timestamp"])
         return MaturityEvent(**data)
 
     def to_dict(self) -> dict:
         """Serialize to dictionary."""
         data = asdict(self)
-        if 'timestamp' in data and isinstance(data['timestamp'], datetime):
-            data['timestamp'] = data['timestamp'].isoformat()
+        if "timestamp" in data and isinstance(data["timestamp"], datetime):
+            data["timestamp"] = data["timestamp"].isoformat()
         return data

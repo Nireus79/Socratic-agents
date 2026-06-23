@@ -60,15 +60,15 @@ class WorkflowNode:
     def from_dict(data: dict) -> "WorkflowNode":
         """Deserialize from dictionary."""
         data = dict(data)
-        if 'node_type' in data:
-            data['node_type'] = WorkflowNodeType.from_value(data['node_type'])
+        if "node_type" in data:
+            data["node_type"] = WorkflowNodeType.from_value(data["node_type"])
         return WorkflowNode(**data)
 
     def to_dict(self) -> dict:
         """Serialize to dictionary."""
         data = asdict(self)
-        if 'node_type' in data and isinstance(data['node_type'], WorkflowNodeType):
-            data['node_type'] = data['node_type'].value
+        if "node_type" in data and isinstance(data["node_type"], WorkflowNodeType):
+            data["node_type"] = data["node_type"].value
         return data
 
 
@@ -140,16 +140,15 @@ class WorkflowDefinition:
         """Deserialize from dictionary."""
         data = dict(data)
         # Convert nodes dict values to WorkflowNode objects if needed
-        if 'nodes' in data and data['nodes']:
-            data['nodes'] = {
+        if "nodes" in data and data["nodes"]:
+            data["nodes"] = {
                 k: WorkflowNode.from_dict(v) if isinstance(v, dict) else v
-                for k, v in data['nodes'].items()
+                for k, v in data["nodes"].items()
             }
         # Convert edges list to WorkflowEdge objects if needed
-        if 'edges' in data and data['edges']:
-            data['edges'] = [
-                WorkflowEdge.from_dict(e) if isinstance(e, dict) else e
-                for e in data['edges']
+        if "edges" in data and data["edges"]:
+            data["edges"] = [
+                WorkflowEdge.from_dict(e) if isinstance(e, dict) else e for e in data["edges"]
             ]
         return WorkflowDefinition(**data)
 
@@ -157,16 +156,12 @@ class WorkflowDefinition:
         """Serialize to dictionary."""
         data = asdict(self)
         # Convert nested objects back to dicts
-        if 'nodes' in data and data['nodes']:
-            data['nodes'] = {
-                k: v.to_dict() if hasattr(v, 'to_dict') else v
-                for k, v in data['nodes'].items()
+        if "nodes" in data and data["nodes"]:
+            data["nodes"] = {
+                k: v.to_dict() if hasattr(v, "to_dict") else v for k, v in data["nodes"].items()
             }
-        if 'edges' in data and data['edges']:
-            data['edges'] = [
-                e.to_dict() if hasattr(e, 'to_dict') else e
-                for e in data['edges']
-            ]
+        if "edges" in data and data["edges"]:
+            data["edges"] = [e.to_dict() if hasattr(e, "to_dict") else e for e in data["edges"]]
         return data
 
 
@@ -192,34 +187,32 @@ class WorkflowApprovalRequest:
         """Deserialize from dictionary."""
         data = dict(data)
         # Convert nested objects
-        if 'workflow' in data and isinstance(data['workflow'], dict):
-            data['workflow'] = WorkflowDefinition.from_dict(data['workflow'])
-        if 'all_paths' in data and data['all_paths']:
-            data['all_paths'] = [
-                WorkflowPath.from_dict(p) if isinstance(p, dict) else p
-                for p in data['all_paths']
+        if "workflow" in data and isinstance(data["workflow"], dict):
+            data["workflow"] = WorkflowDefinition.from_dict(data["workflow"])
+        if "all_paths" in data and data["all_paths"]:
+            data["all_paths"] = [
+                WorkflowPath.from_dict(p) if isinstance(p, dict) else p for p in data["all_paths"]
             ]
-        if 'recommended_path' in data and isinstance(data['recommended_path'], dict):
-            data['recommended_path'] = WorkflowPath.from_dict(data['recommended_path'])
-        if 'strategy' in data:
-            data['strategy'] = PathDecisionStrategy.from_value(data['strategy'])
+        if "recommended_path" in data and isinstance(data["recommended_path"], dict):
+            data["recommended_path"] = WorkflowPath.from_dict(data["recommended_path"])
+        if "strategy" in data:
+            data["strategy"] = PathDecisionStrategy.from_value(data["strategy"])
         return WorkflowApprovalRequest(**data)
 
     def to_dict(self) -> dict:
         """Serialize to dictionary."""
         data = asdict(self)
         # Convert nested objects
-        if 'workflow' in data and hasattr(data['workflow'], 'to_dict'):
-            data['workflow'] = data['workflow'].to_dict()
-        if 'all_paths' in data and data['all_paths']:
-            data['all_paths'] = [
-                p.to_dict() if hasattr(p, 'to_dict') else p
-                for p in data['all_paths']
+        if "workflow" in data and hasattr(data["workflow"], "to_dict"):
+            data["workflow"] = data["workflow"].to_dict()
+        if "all_paths" in data and data["all_paths"]:
+            data["all_paths"] = [
+                p.to_dict() if hasattr(p, "to_dict") else p for p in data["all_paths"]
             ]
-        if 'recommended_path' in data and hasattr(data['recommended_path'], 'to_dict'):
-            data['recommended_path'] = data['recommended_path'].to_dict()
-        if 'strategy' in data and isinstance(data['strategy'], PathDecisionStrategy):
-            data['strategy'] = data['strategy'].value
+        if "recommended_path" in data and hasattr(data["recommended_path"], "to_dict"):
+            data["recommended_path"] = data["recommended_path"].to_dict()
+        if "strategy" in data and isinstance(data["strategy"], PathDecisionStrategy):
+            data["strategy"] = data["strategy"].value
         return data
 
 

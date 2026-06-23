@@ -106,7 +106,14 @@ class User:
         """Deserialize User from dictionary."""
         data = dict(data)  # Make a copy to avoid modifying original
         # Convert ISO strings back to datetime objects
-        for field in ["created_at", "archived_at", "subscription_start", "subscription_end", "usage_reset_date", "github_token_expires"]:
+        for field in [
+            "created_at",
+            "archived_at",
+            "subscription_start",
+            "subscription_end",
+            "usage_reset_date",
+            "github_token_expires",
+        ]:
             if field in data and isinstance(data[field], str):
                 data[field] = datetime.datetime.fromisoformat(data[field])
         return User(**data)
@@ -117,7 +124,14 @@ class User:
 
         data = asdict(self)
         # Convert datetime objects to ISO strings
-        for field in ["created_at", "archived_at", "subscription_start", "subscription_end", "usage_reset_date", "github_token_expires"]:
+        for field in [
+            "created_at",
+            "archived_at",
+            "subscription_start",
+            "subscription_end",
+            "usage_reset_date",
+            "github_token_expires",
+        ]:
             if field in data and isinstance(data[field], datetime.datetime):
                 data[field] = data[field].isoformat()
         return data
