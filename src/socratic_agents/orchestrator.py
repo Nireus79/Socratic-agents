@@ -120,18 +120,14 @@ class AgentOrchestrator:
         """
         Get the appropriate LLM client based on provider configuration.
 
-        This method implements provider-aware client selection. When Socrates passes
-        a provider_config with provider name and credentials, this method instantiates
-        the correct client (Claude, OpenAI, Ollama, Gemini, etc.).
+        NOTE: This is a hook method for frameworks/applications to override.
+        The socratic-agents library does not instantiate clients itself to remain
+        provider-agnostic and lightweight.
 
-        Supported providers:
-        - claude: Anthropic Claude API (via socratic-nexus ClaudeClient)
-        - openai: OpenAI GPT models (via socratic-nexus OpenAIClient)
-        - ollama: Local Ollama models (via socratic-nexus OllamaClient)
-        - gemini: Google Gemini API (via socratic-nexus GoogleClient)
+        Applications (like Socrates) should override this method to instantiate
+        the correct client from their LLM provider library (socratic-nexus, etc.)
 
-        For backward compatibility, if no provider_config is provided, defaults to
-        the existing claude_client.
+        Default behavior: returns self.claude_client
 
         Args:
             provider_config: Dict with 'provider', 'api_key', and 'settings'.
@@ -139,66 +135,14 @@ class AgentOrchestrator:
 
         Returns:
             An LLM client instance appropriate for the provider
-
-        Raises:
-            ValueError: If provider is unknown or client instantiation fails
         """
-        # Default to Claude client if no provider config
-        if not provider_config or not provider_config.get("provider"):
-            return self.claude_client
-
-        provider = provider_config.get("provider", "").lower()
-        api_key = provider_config.get("api_key")
-
-        try:
-            if provider == "claude":
-                from socratic_nexus.clients import ClaudeClient
-                subscription_token = provider_config.get("subscription_token")
-                client = ClaudeClient(
-                    api_key=api_key,
-                    orchestrator=self,
-                    subscription_token=subscription_token,
-                )
-                self.logger.debug(f"Created ClaudeClient for provider: {provider}")
-                return client
-
-            elif provider == "ollama":
-                from socratic_nexus.clients import OllamaClient
-                # Ollama doesn't require API key, but accepts it for compatibility
-                client = OllamaClient(api_key=api_key, orchestrator=self)
-                settings = provider_config.get("settings", {})
-                base_url = settings.get("base_url", "http://localhost:11434")
-                if hasattr(client, "base_url"):
-                    client.base_url = base_url
-                self.logger.debug(f"Created OllamaClient for provider: {provider} (base_url: {base_url})")
-                return client
-
-            elif provider == "openai":
-                from socratic_nexus.clients import OpenAIClient
-                if not api_key:
-                    raise ValueError("OpenAI provider requires an API key")
-                client = OpenAIClient(api_key=api_key, orchestrator=self)
-                self.logger.debug(f"Created OpenAIClient for provider: {provider}")
-                return client
-
-            elif provider == "gemini":
-                from socratic_nexus.clients import GoogleClient
-                if not api_key:
-                    raise ValueError("Gemini provider requires an API key")
-                client = GoogleClient(api_key=api_key, orchestrator=self)
-                self.logger.debug(f"Created GoogleClient for provider: {provider}")
-                return client
-
-            else:
-                self.logger.warning(f"Unknown provider: {provider}, falling back to claude_client")
-                return self.claude_client
-
-        except ImportError as e:
-            self.logger.error(f"Client library not available for {provider}: {e}")
-            return self.claude_client  # Fallback to claude
-        except Exception as e:
-            self.logger.error(f"Failed to create LLM client for {provider}: {e}")
-            return self.claude_client  # Fallback to claude
+        # Default: applications should override this method
+        # socratic-agents remains provider-agnostic
+        self.logger.debug(
+            "get_llm_client_for_provider called but not implemented in this orchestrator. "
+            "Applications should override this method to instantiate provider-specific clients."
+        )
+        return self.claude_client
 
     def register_agent(self, name: str, agent: Any) -> None:
         """
