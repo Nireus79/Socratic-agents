@@ -123,7 +123,11 @@ class Agent(ABC):
             return self.llm
 
         provider_config = request.get("provider_config")
-        if provider_config and self.orchestrator and hasattr(self.orchestrator, "get_llm_client_for_provider"):
+        if (
+            provider_config
+            and self.orchestrator
+            and hasattr(self.orchestrator, "get_llm_client_for_provider")
+        ):
             return self.orchestrator.get_llm_client_for_provider(provider_config)
 
         return self.llm
