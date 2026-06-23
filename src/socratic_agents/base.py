@@ -99,24 +99,31 @@ class Agent(ABC):
         """
         Get the LLM client, respecting provider_config if available.
 
-        If the request contains a provider_config dict, this method uses the
-        orchestrator's provider-aware client selection to get the correct client
-        (Claude, Ollama, Google, etc.). Otherwise falls back to the default LLM.
+        This method supports two patterns:
 
-        This allows agents to support multiple LLM providers without needing
-        provider-specific logic.
+        1. Service Injection (Recommended):
+           - LLM client is injected at initialization (self.llm)
+           - Always uses that client
+
+        2. Orchestrator Pattern:
+           - If request has provider_config, calls orchestrator.get_llm_client_for_provider()
+           - Applications can override that method to select provider-specific clients
+           - Fallback to default orchestrator.claude_client
+
+        This allows applications to support multiple LLM providers at the framework
+        level, while agents remain provider-agnostic.
 
         Args:
             request: Request dict that may contain 'provider_config'
 
         Returns:
-            An LLM client instance appropriate for the provider
+            An LLM client instance (provider selected by orchestrator if provider_config present)
         """
         if not request:
             return self.llm
 
         provider_config = request.get("provider_config")
-        if provider_config and self.orchestrator:
+        if provider_config and self.orchestrator and hasattr(self.orchestrator, "get_llm_client_for_provider"):
             return self.orchestrator.get_llm_client_for_provider(provider_config)
 
         return self.llm
