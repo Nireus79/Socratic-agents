@@ -95,6 +95,32 @@ class Agent(ABC):
             self.config = config
             self.event_emitter = event_emitter
 
+    def get_llm_client(self, request: Dict[str, Any] | None = None) -> Any:
+        """
+        Get the LLM client, respecting provider_config if available.
+
+        If the request contains a provider_config dict, this method uses the
+        orchestrator's provider-aware client selection to get the correct client
+        (Claude, Ollama, Google, etc.). Otherwise falls back to the default LLM.
+
+        This allows agents to support multiple LLM providers without needing
+        provider-specific logic.
+
+        Args:
+            request: Request dict that may contain 'provider_config'
+
+        Returns:
+            An LLM client instance appropriate for the provider
+        """
+        if not request:
+            return self.llm
+
+        provider_config = request.get("provider_config")
+        if provider_config and self.orchestrator:
+            return self.orchestrator.get_llm_client_for_provider(provider_config)
+
+        return self.llm
+
     @abstractmethod
     def process(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """
