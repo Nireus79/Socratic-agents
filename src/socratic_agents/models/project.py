@@ -4,7 +4,7 @@ Project context model for Socrates AI
 
 import datetime
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from socratic_agents.models.role import TeamMemberRole
 
@@ -61,27 +61,27 @@ class ProjectContext:
     phase_maturity_scores: Dict[str, float] = None  # Per-phase maturity (0-100)
     overall_maturity: float = 0.0  # Overall project maturity (0-100)
     category_scores: Dict[str, Dict[str, float]] = None  # Category scores by phase
-    categorized_specs: Dict[str, List[Dict[str, any]]] = (
+    categorized_specs: Dict[str, List[Dict[str, Any]]] = (
         None  # Specs organized by phase and category
     )
-    maturity_history: List[Dict[str, any]] = None  # Historical maturity events
+    maturity_history: List[Dict[str, Any]] = None  # Historical maturity events
 
     # Analytics tracking fields (real-time metrics updated after each Q&A)
-    analytics_metrics: Dict[str, any] = None  # Real-time analytics metrics
+    analytics_metrics: Dict[str, Any] = None  # Real-time analytics metrics
 
     # Workflow optimization fields (NEW)
-    workflow_definitions: Dict[str, any] = None  # Workflow definitions by phase
-    workflow_approval_requests: Optional[List[Dict[str, any]]] = (
+    workflow_definitions: Dict[str, Any] = None  # Workflow definitions by phase
+    workflow_approval_requests: Optional[List[Dict[str, Any]]] = (
         None  # History of approval requests
     )
-    active_workflow_execution: Optional[Dict[str, any]] = None  # Current workflow execution state
-    workflow_history: Optional[List[Dict[str, any]]] = None  # Completed workflows with metrics
-    metadata: Optional[Dict[str, any]] = (
+    active_workflow_execution: Optional[Dict[str, Any]] = None  # Current workflow execution state
+    workflow_history: Optional[List[Dict[str, Any]]] = None  # Completed workflows with metrics
+    metadata: Optional[Dict[str, Any]] = (
         None  # Project metadata (use_workflow_optimization flag, etc.)
     )
 
     # LLM Provider configuration
-    llm_configuration: Optional[Dict[str, any]] = (
+    llm_configuration: Optional[Dict[str, Any]] = (
         None  # LLM provider config (provider, model, temperature, etc.)
     )
 
