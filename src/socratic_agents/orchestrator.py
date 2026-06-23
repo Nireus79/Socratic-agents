@@ -122,7 +122,13 @@ class AgentOrchestrator:
 
         This method implements provider-aware client selection. When Socrates passes
         a provider_config with provider name and credentials, this method instantiates
-        the correct client (Claude, Ollama, Google, etc.).
+        the correct client (Claude, OpenAI, Ollama, Gemini, etc.).
+
+        Supported providers:
+        - claude: Anthropic Claude API (via socratic-nexus ClaudeClient)
+        - openai: OpenAI GPT models (via socratic-nexus OpenAIClient)
+        - ollama: Local Ollama models (via socratic-nexus OllamaClient)
+        - gemini: Google Gemini API (via socratic-nexus GoogleClient)
 
         For backward compatibility, if no provider_config is provided, defaults to
         the existing claude_client.
@@ -165,6 +171,14 @@ class AgentOrchestrator:
                 if hasattr(client, "base_url"):
                     client.base_url = base_url
                 self.logger.debug(f"Created OllamaClient for provider: {provider} (base_url: {base_url})")
+                return client
+
+            elif provider == "openai":
+                from socratic_nexus.clients import OpenAIClient
+                if not api_key:
+                    raise ValueError("OpenAI provider requires an API key")
+                client = OpenAIClient(api_key=api_key, orchestrator=self)
+                self.logger.debug(f"Created OpenAIClient for provider: {provider}")
                 return client
 
             elif provider == "gemini":
