@@ -40,11 +40,14 @@ class TeamMemberRole:
     @staticmethod
     def from_dict(data):
         """Create from dictionary."""
+        joined_at = data["joined_at"]
+        if isinstance(joined_at, str):
+            joined_at = datetime.fromisoformat(joined_at)
         return TeamMemberRole(
             username=data["username"],
             role=data["role"],
             skills=data.get("skills", []),
-            joined_at=datetime.fromisoformat(data["joined_at"]),
+            joined_at=joined_at,
         )
 
 

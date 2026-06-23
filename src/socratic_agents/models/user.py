@@ -100,3 +100,24 @@ class User:
         if self.projects is None:
             return 0
         return len([p for p in self.projects if p])
+
+    @staticmethod
+    def from_dict(data: dict) -> "User":
+        """Deserialize User from dictionary."""
+        data = dict(data)  # Make a copy to avoid modifying original
+        # Convert ISO strings back to datetime objects
+        for field in ["created_at", "archived_at", "subscription_start", "subscription_end", "usage_reset_date", "github_token_expires"]:
+            if field in data and isinstance(data[field], str):
+                data[field] = datetime.datetime.fromisoformat(data[field])
+        return User(**data)
+
+    def to_dict(self) -> dict:
+        """Serialize User to dictionary."""
+        from dataclasses import asdict
+
+        data = asdict(self)
+        # Convert datetime objects to ISO strings
+        for field in ["created_at", "archived_at", "subscription_start", "subscription_end", "usage_reset_date", "github_token_expires"]:
+            if field in data and isinstance(data[field], datetime.datetime):
+                data[field] = data[field].isoformat()
+        return data

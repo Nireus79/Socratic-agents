@@ -269,3 +269,45 @@ class ProjectContext:
     def is_solo_project(self) -> bool:
         """Check if this is a solo project (only owner, no other team members)."""
         return len(self.team_members or []) <= 1
+
+    @staticmethod
+    def from_dict(data: dict) -> "ProjectContext":
+        """Deserialize ProjectContext from dictionary."""
+        data = dict(data)
+        # Convert ISO strings to datetime objects
+        datetime_fields = ['created_at', 'updated_at', 'archived_at', 'repository_imported_at', 'last_export_time']
+        for field in datetime_fields:
+            if field in data and isinstance(data[field], str):
+                data[field] = datetime.datetime.fromisoformat(data[field])
+        # Handle team_members which are TeamMemberRole objects
+        if 'team_members' in data and data['team_members']:
+            data['team_members'] = [
+                TeamMemberRole.from_dict(m) if isinstance(m, dict) else m
+                for m in data['team_members']
+            ]
+        return ProjectContext(**data)
+
+    def to_dict(self) -> dict:
+        """Serialize ProjectContext to dictionary."""
+        from dataclasses import asdict
+
+        def convert_datetimes(obj):
+            """Recursively convert datetime objects to ISO strings."""
+            if isinstance(obj, datetime.datetime):
+                return obj.isoformat()
+            elif isinstance(obj, dict):
+                return {k: convert_datetimes(v) for k, v in obj.items()}
+            elif isinstance(obj, (list, tuple)):
+                return [convert_datetimes(item) for item in obj]
+            return obj
+
+        data = asdict(self)
+        data = convert_datetimes(data)
+
+        # Handle team_members serialization
+        if 'team_members' in data and data['team_members']:
+            data['team_members'] = [
+                m.to_dict() if hasattr(m, 'to_dict') else m
+                for m in data['team_members']
+            ]
+        return data

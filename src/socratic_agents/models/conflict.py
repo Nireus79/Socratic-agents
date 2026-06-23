@@ -2,7 +2,7 @@
 Conflict detection models for Socrates AI
 """
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import List
 
 
@@ -20,3 +20,12 @@ class ConflictInfo:
     new_timestamp: str
     severity: str  # 'low', 'medium', 'high'
     suggestions: List[str]
+
+    @staticmethod
+    def from_dict(data: dict) -> "ConflictInfo":
+        """Deserialize from dictionary."""
+        return ConflictInfo(**data)
+
+    def to_dict(self) -> dict:
+        """Serialize to dictionary."""
+        return asdict(self)
