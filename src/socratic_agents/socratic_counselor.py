@@ -131,9 +131,6 @@ class SocraticCounselorAgent(Agent):
 
         context = self.orchestrator.context_analyzer.get_context_summary(project)
 
-        # NEW: Check question limit
-        from socratic_agents.subscription.checker import SubscriptionChecker
-
         # Get or create user (auto-create for CLI/local users)
         user = self.orchestrator.database.load_user(current_user)
         if user is None:
@@ -151,12 +148,8 @@ class SocraticCounselorAgent(Agent):
             self.orchestrator.database.save_user(user)
             logging.debug(f"Auto-created user: {current_user}")
 
-        can_ask, error_message = SubscriptionChecker.check_question_limit(user)
-        if not can_ask:
-            return {
-                "status": "error",
-                "message": error_message,
-            }
+        # Note: Subscription/rate limiting checks should be implemented by the consuming project
+        # (e.g., in Socrates), not by the agent framework itself. Agents remain independent.
 
         # Count questions already asked in this phase
         phase_questions = [
