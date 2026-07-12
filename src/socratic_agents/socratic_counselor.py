@@ -160,7 +160,7 @@ class SocraticCounselorAgent(Agent):
 
         if self.use_dynamic_questions:
             question = self._generate_dynamic_question(
-                project, context, len(phase_questions), current_user
+                project, context, len(phase_questions), current_user, request
             )
         else:
             question = self._generate_static_question(project, len(phase_questions))
@@ -202,7 +202,7 @@ class SocraticCounselorAgent(Agent):
         return {"status": "success", "question": question}
 
     def _generate_dynamic_question(
-        self, project: ProjectContext, context: str, question_count: int, current_user: str = None
+        self, project: ProjectContext, context: str, question_count: int, current_user: str = None, request: Dict = None
     ) -> str:
         """Generate contextual questions using Claude with role-aware context"""
         from socratic_agents.utils.logger import get_logger
@@ -822,7 +822,7 @@ What would be most helpful for you?"""
         # REAL-TIME CONFLICT DETECTION
         if insights:
             conflict_result = self._handle_conflict_detection(
-                insights, project, current_user, logger, is_api_mode
+                insights, project, current_user, logger, is_api_mode, request
             )
             if conflict_result.get("has_conflicts"):
                 # Save project even when conflicts detected (question is already marked answered above)
@@ -853,12 +853,13 @@ What would be most helpful for you?"""
         return result
 
     def _handle_conflict_detection(
-        self, insights, project, current_user, logger, is_api_mode=False
+        self, insights, project, current_user, logger, is_api_mode=False, request: Dict = None
     ) -> dict:
         """Handle conflict detection and return result dict with conflict status
 
         Args:
             is_api_mode: If True, returns conflicts for frontend handling. If False, handles interactively.
+            request: Request dict for provider_config
 
         Returns:
             Dict with 'has_conflicts' bool and 'conflicts' list if in API mode
