@@ -202,7 +202,12 @@ class SocraticCounselorAgent(Agent):
         return {"status": "success", "question": question}
 
     def _generate_dynamic_question(
-        self, project: ProjectContext, context: str, question_count: int, current_user: str = None, request: Dict = None
+        self,
+        project: ProjectContext,
+        context: str,
+        question_count: int,
+        current_user: str = None,
+        request: Dict = None,
     ) -> str:
         """Generate contextual questions using Claude with role-aware context"""
         from socratic_agents.utils.logger import get_logger
