@@ -172,7 +172,8 @@ Provide a concise, focused summary."""
                 user_obj = self.orchestrator.database.load_user(user_id)
                 if user_obj and hasattr(user_obj, "claude_auth_method"):
                     user_auth_method = user_obj.claude_auth_method or "api_key"
-            summary = self.orchestrator.claude_client.generate_response(
+            llm_client = self.get_llm_client(request)
+            summary = llm_client.generate_response(
                 prompt, user_auth_method=user_auth_method, user_id=user_id
             )
 

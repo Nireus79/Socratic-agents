@@ -52,7 +52,8 @@ class CodeGeneratorAgent(Agent):
             user_obj = self.orchestrator.database.load_user(current_user)
             if user_obj and hasattr(user_obj, "claude_auth_method"):
                 user_auth_method = user_obj.claude_auth_method or "api_key"
-        artifact = self.orchestrator.claude_client.generate_artifact(
+        llm_client = self.get_llm_client(request)
+        artifact = llm_client.generate_artifact(
             context, project.project_type, user_auth_method, user_id=current_user
         )
 
@@ -210,7 +211,8 @@ class CodeGeneratorAgent(Agent):
                 user_auth_method = user_obj.claude_auth_method or "api_key"
 
         try:
-            documentation = self.orchestrator.claude_client.generate_documentation(
+            llm_client = self.get_llm_client(request)
+            documentation = llm_client.generate_documentation(
                 project,
                 artifact,
                 artifact_type,

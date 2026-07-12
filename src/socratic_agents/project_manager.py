@@ -148,7 +148,8 @@ class ProjectManagerAgent(Agent):
                     user_obj = self.orchestrator.database.load_user(owner)
                     if user_obj and hasattr(user_obj, "claude_auth_method"):
                         user_auth_method = user_obj.claude_auth_method or "api_key"
-                insights = self.orchestrator.claude_client.extract_insights(
+                llm_client = self.get_llm_client(request)
+                insights = llm_client.extract_insights(
                     context_to_analyze, project, user_auth_method=user_auth_method, user_id=owner
                 )
 

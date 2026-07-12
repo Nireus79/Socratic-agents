@@ -345,7 +345,8 @@ class SocraticCounselorAgent(Agent):
             # Cache key includes project ID, phase, and question number to ensure variety
             cache_key = f"{project.project_id}:{project.phase}:{question_count}"
 
-            question = self.orchestrator.claude_client.generate_socratic_question(
+            llm_client = self.get_llm_client(request)
+            question = llm_client.generate_socratic_question(
                 prompt, cache_key=cache_key, user_auth_method=user_auth_method, user_id=current_user
             )
             logger.debug(f"Question generated successfully: {question[:100]}...")
@@ -751,7 +752,8 @@ What would be most helpful for you?"""
 
         # Extract insights using Claude
         logger.info("Extracting insights from user response (confirmation mode)...")
-        insights = self.orchestrator.claude_client.extract_insights(
+        llm_client = self.get_llm_client(request)
+        insights = llm_client.extract_insights(
             user_response, project, user_auth_method=user_auth_method, user_id=current_user
         )
         self._log_extracted_insights(logger, insights)
@@ -800,7 +802,8 @@ What would be most helpful for you?"""
             insights = pre_extracted_insights
         else:
             logger.info("Extracting insights from user response...")
-            insights = self.orchestrator.claude_client.extract_insights(
+            llm_client = self.get_llm_client(request)
+            insights = llm_client.extract_insights(
                 user_response, project, user_auth_method=user_auth_method, user_id=current_user
             )
             self._log_extracted_insights(logger, insights)
@@ -894,7 +897,7 @@ What would be most helpful for you?"""
             if user_obj and hasattr(user_obj, "claude_auth_method"):
                 user_auth_method = user_obj.claude_auth_method or "api_key"
         conflicts_resolved = self._handle_conflicts_realtime(
-            conflict_result["conflicts"], project, insights, user_auth_method, current_user
+            conflict_result["conflicts"], project, insights, user_auth_method, current_user, request
         )
         if not conflicts_resolved:
             logger.info("User chose not to resolve conflicts")
@@ -1064,6 +1067,7 @@ What would be most helpful for you?"""
         insights: Dict = None,
         user_auth_method: str = "api_key",
         current_user: str = None,
+        request: Dict = None,
     ) -> bool:
         """Handle conflicts in real-time during conversation
 
@@ -1073,6 +1077,7 @@ What would be most helpful for you?"""
             insights: Mutable insights dict that will be modified based on resolution
             user_auth_method: User's preferred auth method for API calls
             current_user: Current user ID for fetching user-specific API keys
+            request: Request dict for provider_config
         """
         for conflict in conflicts:
             print(f"\n{Fore.RED}[WARNING]  CONFLICT DETECTED!")
@@ -1082,7 +1087,8 @@ What would be most helpful for you?"""
             print(f"{Fore.RED}Severity: {conflict.severity}")
 
             # Get AI-generated suggestions
-            suggestions = self.orchestrator.claude_client.generate_conflict_resolution_suggestions(
+            llm_client = self.get_llm_client(request)
+            suggestions = llm_client.generate_conflict_resolution_suggestions(
                 conflict, project, user_auth_method, user_id=current_user
             )
             print(f"\n{Fore.MAGENTA}{suggestions}")
@@ -1538,7 +1544,8 @@ Provide ONE concise, actionable hint that helps the user move forward in the {pr
                     logger.debug(f"Using auth method '{user_auth_method}' for user {current_user}")
 
             # Generate hint using Claude
-            hint = self.orchestrator.claude_client.generate_response(
+            llm_client = self.get_llm_client(request)
+            hint = llm_client.generate_response(
                 prompt=hint_prompt,
                 max_tokens=500,  # Hints should be concise (1-2 sentences)
                 temperature=0.7,  # Balanced creativity
@@ -1732,7 +1739,8 @@ Format as a numbered list (1. 2. 3. etc). Return only the numbered list, no addi
             logger.debug(
                 f"Calling Claude API with auth_method={user_auth_method}, user_id={current_user}"
             )
-            response = self.orchestrator.claude_client.generate_response(
+            llm_client = self.get_llm_client(request)
+            response = llm_client.generate_response(
                 prompt=suggestions_prompt,
                 max_tokens=800,
                 temperature=1.0,

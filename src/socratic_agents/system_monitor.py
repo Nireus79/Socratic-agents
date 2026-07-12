@@ -59,9 +59,10 @@ class SystemMonitorAgent(Agent):
 
     def _check_health(self, request: Dict) -> Dict:
         """Check system health and API connection"""
-        # Test Claude API connection
+        # Test LLM API connection using provider from request
         try:
-            self.orchestrator.claude_client.test_connection()
+            llm_client = self.get_llm_client(request)
+            llm_client.test_connection()
             self.connection_status = True
             self.last_health_check = datetime.datetime.now()
 
