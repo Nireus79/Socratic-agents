@@ -166,8 +166,14 @@ class MultiLLMAgent(Agent):
         """
         Get available models for a specific provider.
 
+        Supports dynamic model discovery from caller for providers like Ollama.
+
         Args:
-            data: {'provider': str}
+            data: {
+                'provider': str,
+                'available_models': list[str] (optional) - Discovered models from caller.
+                                   If provided, returns these instead of hardcoded list.
+            }
 
         Returns:
             {
@@ -178,6 +184,7 @@ class MultiLLMAgent(Agent):
             }
         """
         provider = data.get("provider", "").lower()
+        available_models = data.get("available_models")  # May be None for static providers
 
         if not provider:
             return {"status": "error", "message": "Provider name required"}
@@ -190,11 +197,14 @@ class MultiLLMAgent(Agent):
             if not metadata:
                 return {"status": "error", "message": f"Unknown provider: {provider}"}
 
+            # Use provided models (dynamic discovery) or fall back to metadata (hardcoded)
+            models_to_return = available_models if available_models is not None else metadata.models
+
             return {
                 "status": "success",
                 "provider": provider,
-                "models": metadata.models,
-                "default_model": metadata.models[0] if metadata.models else None,
+                "models": models_to_return,
+                "default_model": models_to_return[0] if models_to_return else None,
                 "context_window": metadata.max_context_tokens,
                 "supports_streaming": metadata.supports_streaming,
                 "supports_vision": metadata.supports_vision,
@@ -285,11 +295,14 @@ class MultiLLMAgent(Agent):
         """
         Set default provider for a user.
 
+        Supports dynamic model discovery from caller for providers like Ollama.
+
         Args:
             data: {
                 'user_id': str,
                 'provider': str,
-                'settings': dict (optional)
+                'settings': dict (optional),
+                'available_models': list[str] (optional) - Discovered models from caller
             }
 
         Returns:
@@ -298,6 +311,7 @@ class MultiLLMAgent(Agent):
         user_id = data.get("user_id")
         provider = data.get("provider", "").lower()
         settings = data.get("settings", {})
+        available_models = data.get("available_models")  # May be None for static providers
 
         if not user_id or not provider:
             return {"status": "error", "message": "user_id and provider required"}
@@ -312,7 +326,9 @@ class MultiLLMAgent(Agent):
                 self.logger.warning(f"Unknown provider requested: {provider}")
                 return {"status": "error", "message": f"Unknown provider: {provider}"}
 
-            self.logger.debug(f"Provider {provider} verified, models: {metadata.models}")
+            # Use provided models (dynamic discovery) or fall back to metadata (hardcoded)
+            models_to_use = available_models if available_models is not None else metadata.models
+            self.logger.debug(f"Provider {provider} verified, models: {models_to_use}")
 
             # Get or create config
             self.logger.debug(f"Checking for existing config: user={user_id}, provider={provider}")
@@ -333,7 +349,7 @@ class MultiLLMAgent(Agent):
                     enabled=True,
                     settings=settings
                     or {
-                        "model": metadata.models[0] if metadata.models else provider,
+                        "model": models_to_use[0] if models_to_use else provider,
                         "max_tokens": 4096,
                         "temperature": 0.7,
                     },
@@ -367,11 +383,15 @@ class MultiLLMAgent(Agent):
         """
         Set the model for a specific provider.
 
+        Supports dynamic model discovery from caller for providers like Ollama.
+
         Args:
             data: {
                 'user_id': str,
                 'provider': str,
-                'model': str
+                'model': str,
+                'available_models': list[str] (optional) - Discovered models from caller.
+                                    If provided, validates against these instead of hardcoded list.
             }
 
         Returns:
@@ -380,6 +400,7 @@ class MultiLLMAgent(Agent):
         user_id = data.get("user_id")
         provider = data.get("provider", "").lower()
         model = data.get("model", "").strip()
+        available_models = data.get("available_models")  # May be None for static providers
 
         if not user_id or not provider or not model:
             return {"status": "error", "message": "user_id, provider, and model required"}
@@ -394,10 +415,15 @@ class MultiLLMAgent(Agent):
                 self.logger.warning(f"Unknown provider requested: {provider}")
                 return {"status": "error", "message": f"Unknown provider: {provider}"}
 
+            # Use provided models (dynamic discovery) or fall back to metadata (hardcoded)
+            models_to_check = available_models if available_models is not None else metadata.models
+
             # Verify model is available for this provider
             self.logger.debug(f"Verifying model {model} is available for {provider}")
-            if model not in metadata.models:
-                available = ", ".join(metadata.models)
+            self.logger.debug(f"Models available: {models_to_check}")
+
+            if model not in models_to_check:
+                available = ", ".join(models_to_check)
                 self.logger.warning(
                     f"Model {model} not available for {provider}. Available: {available}"
                 )
