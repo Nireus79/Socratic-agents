@@ -199,10 +199,6 @@ pytest -m unit
 pytest -m integration
 ```
 
-### Test Coverage
-
-Current test coverage: 81%+ across all agent implementations.
-
 ---
 
 ## Future: Post-Architecture Redesign
