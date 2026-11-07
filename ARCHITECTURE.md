@@ -345,7 +345,6 @@ Some agents will become modular packages:
 ## See Also
 
 - [README.md](README.md) - Library overview and installation
-- [Socratic Ecosystem](https://github.com/Nireus79/Socrates-nexus/blob/main/ECOSYSTEM.md)
 - [Socrates Monolith Docs](../Socrates/docs/)
 
 ---

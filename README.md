@@ -257,19 +257,14 @@ pip install socratic-agents
 
 ### Or As Part of Socrates Platform:
 ```bash
-pip install socrates-ai  # Includes 37+ modules + all 11 packages
+pip install socrates-ai  # the earlier research prototype that uses this package
 ```
 
 ### Integration Example:
 
-See the [**Socrates ECOSYSTEM.md**](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md#layer-2-specialized-libraries) for detailed integration examples showing how to use socratic-agents with other Socratic packages.
-
-**Related packages you might use together:**
-- See [Complete Package Map](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
 
 ### More Information:
 - 📖 [Full Socrates Documentation](https://github.com/Nireus79/Socrates/tree/main/docs)
-- 🏗️ [Complete Architecture Guide](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
 - 💬 [Socrates Discussions](https://github.com/Nireus79/Socrates/discussions)
 
 ---
